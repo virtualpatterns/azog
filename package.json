@@ -1,0 +1,42 @@
+{
+  "author": "virtualpatterns.com <code@virtualpatterns.com> (http://www.virtualpatterns.com)",
+  "bin": {
+    "on-completed": "./distributables/cli/bin/on-completed.sh"
+  },
+  "description": "TBD",
+  "files": [
+    "distributables/cli",
+    "distributables/configuration.js",
+    "distributables/configuration.js.map"
+  ],
+  "license": "GPL-3.0+",
+  "name": "@virtualpatterns/azog",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/virtualpatterns/azog"
+  },
+  "scripts": {
+    "refresh": "rm -Rf node_modules distributables/* && npm install",
+    "clean": "rm -Rf distributables/configuration.js distributables/configuration.js.map distributables/tasks",
+    "lint": "npm run clean && eslint --ignore-path .gitignore source/tasks",
+    "build": "npm run lint && babel source/configuration.js --out-file distributables/configuration.js --quiet --source-maps && babel source/tasks --copy-files --out-dir distributables/tasks --quiet --source-maps",
+    "tasks": "npm run build && jake --jakefile distributables/tasks/index.js --tasks",
+    "jake": "npm run build && jake --jakefile distributables/tasks/index.js",
+    "upgrade": "npm-check-updates --upgrade"
+  },
+  "version": "0.0.1",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "csv-write-stream": "^2.0.0",
+    "eslint": "^5.6.1",
+    "jake": "^8.0.15",
+    "npm-check-updates": "^2.14.1"
+  },
+  "dependencies": {
+    "@pwn/is": "^1.0.2",
+    "@virtualpatterns/mablung": "0.0.17",
+    "commander": "^2.19.0",
+    "source-map-support": "^0.5.9"
+  }
+}
