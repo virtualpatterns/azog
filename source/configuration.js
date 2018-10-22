@@ -4,7 +4,9 @@ export default {
 
   'cli': {
     'logLevel': 'trace',
-    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog.log`
+    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog.log`,
+    'downloadedPath': `${Process.env.HOME}/Deluge/Downloaded`,
+    'processingPath': `${Process.env.HOME}/Deluge/Processing`
   },
 
   'tasks': {

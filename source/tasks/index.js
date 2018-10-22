@@ -44,7 +44,7 @@ task('process', [ 'build' ], { 'async': true }, () => {
   Jake.rmRf(Configuration.cli.logPath, { 'silent': true })
 
   Jake.exec([
-    './distributables/cli/bin/on-completed.sh 0 "www.torrenting.com - Joanna.Lumleys.Silk.Road.Adventure.S01E02.720p.HEVC.x265-MeGusta" "./process/downloaded"'
+    './distributables/cli/bin/on-completed.sh 0 "www.torrenting.com - Joanna.Lumleys.Silk.Road.Adventure.S01E02.720p.HEVC.x265-MeGusta"'
   ], { 'printStderr': true, 'printStdout': false }, () => complete())
 
 })

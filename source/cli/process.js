@@ -1,17 +1,18 @@
 import { FileSystem, Log, Path, Process as _Process } from '@virtualpatterns/mablung'
 
+import Configuration from '../configuration'
+
 const BOOK_EXTENSIONS = [ '.epub', '.mobi', '.pdf' ]
 const MUSIC_EXTENSIONS = [ '.flac', '.mp3' ]
 const VIDEO_EXTENSIONS = [ '.avi', '.mkv', '.mp4' ]
 
 const Process = Object.create(_Process)
 
-Process.onTorrent = async function (torrentId, torrentName, torrentPath) {
-  Log.debug(`Process.onTorrent('${torrentId}', '${torrentName}', '${torrentPath}') { ... }`)
-  await Process.onPath(Path.join(torrentPath, torrentName), {
+Process.onTorrent = async function (torrentId, torrentName) {
+  Log.debug(`Process.onTorrent('${torrentId}', '${torrentName}') { ... }`)
+  await Process.onPath(Path.join(Configuration.cli.downloadedPath, torrentName), {
     'torrentId': torrentId,
-    'torrentName': torrentName,
-    'torrentPath': torrentPath
+    'torrentName': torrentName
   })
 }
 
@@ -73,14 +74,17 @@ Process.onFile = async function (path, context) {
 
 Process.onBook = async function (path, context) {
   Log.debug(context, `Process.onBook('${path}', context) { ... }`)
+  await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 }
 
 Process.onMusic = async function (path, context) {
   Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
+  await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 }
 
 Process.onVideo = async function (path, context) {
   Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
+  await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 }
 
 Process.onOther = async function (path, context) {

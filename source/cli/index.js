@@ -13,14 +13,9 @@ Command
   .version(Package.version)
 
 Command
-  .command('completed <torrentId> <torrentName> <torrentPath>')
+  .command('completed <torrentId> <torrentName> [torrentPath]')
   .description('Process the indicated torrent')
-  .option('--logLevel <level>', 'Log level, one of trace, debug, info, warn, error, fatal, or silent, defaults to info')
-  .option('--logPath <path>', 'Log file path, defaults to console')
-  .action(async (torrentId, torrentName, torrentPath, options) => {
-
-    Configuration.cli.logLevel = options.logLevel || Configuration.cli.logLevel
-    Configuration.cli.logPath = options.logPath || Configuration.cli.logPath
+  .action(async (torrentId, torrentName) => {
 
     try {
 
@@ -55,7 +50,9 @@ Command
           Log.error(error)
         })
 
-        await Process.onTorrent(torrentId, torrentName, torrentPath)
+        Log.debug(Configuration)
+
+        await Process.onTorrent(torrentId, torrentName)
 
       } catch (error) {
 
