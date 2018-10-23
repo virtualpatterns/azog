@@ -5,9 +5,15 @@ import { Log } from '@virtualpatterns/mablung'
 import Configuration from '../configuration'
 
 Jake.addListener('start', () => {
+
+  Jake.rmRf(Configuration.cli.logPath, { 'silent': true })
   Jake.rmRf(Configuration.tasks.logPath, { 'silent': true })
+  Jake.rmRf(Configuration.tasks.errorPath, { 'silent': true })
+  Jake.rmRf(Configuration.tasks.outputPath, { 'silent': true })
+
   Log.createFormattedLog(Configuration.tasks.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
+  
 })
 
 task('clear', [], { 'async': true }, () => {
@@ -36,17 +42,6 @@ task('build', [ 'clean', 'count', 'lint' ], { 'async': true }, () => {
     ...[ 'sandbox', 'cli' ].map((folderName) => `babel source/${folderName} --copy-files --out-dir distributables/${folderName} --source-maps`),
     'npm --no-git-tag-version version prerelease'
   ], { 'printStderr': true, 'printStdout': false }, () => complete())
-})
-
-desc('Process a downloaded torrent')
-task('process', [ 'build' ], { 'async': true }, () => {
-
-  Jake.rmRf(Configuration.cli.logPath, { 'silent': true })
-
-  Jake.exec([
-    './distributables/cli/bin/on-completed.sh 0 "www.torrenting.com - Joanna.Lumleys.Silk.Road.Adventure.S01E02.720p.HEVC.x265-MeGusta"'
-  ], { 'printStderr': true, 'printStdout': false }, () => complete())
-
 })
 
 Jake.addListener('complete', () => {

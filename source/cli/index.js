@@ -5,7 +5,7 @@ import Source from 'source-map-support'
 
 import Configuration from '../configuration'
 import Package from '../../package.json'
-import Process from './process'
+import Process from './library/process'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
@@ -49,8 +49,6 @@ Command
           Log.error('Process.on(\'warning\', (error) => { ... })')
           Log.error(error)
         })
-
-        Log.debug(Configuration)
 
         await Process.onTorrent(torrentId, torrentName)
 
