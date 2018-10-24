@@ -94,13 +94,14 @@ Process.onMusic = async function (path, context) {
 
   let tags = await ID3.parseFile(path)
 
+  Log.debug(`tags.common.artist='${tags.common.artist}'`)
   Log.debug(`tags.common.albumartist='${tags.common.albumartist}'`)
   Log.debug(`tags.common.album='${tags.common.album}'`)
   Log.debug(`tags.common.track.no=${tags.common.track.no}`)
   Log.debug(`tags.common.title='${tags.common.title}'`)
 
-  let targetPath = Path.join(Configuration.cli.processingPath, 'Music', tags.common.albumartist, tags.common.album)
-  let name = `${tags.common.title}${Path.extname(path)}`
+  let targetPath = Path.join(Configuration.cli.processingPath, 'Music', tags.common.albumartist || tags.common.artist, tags.common.album)
+  let name = `${tags.common.track.no.toString().padStart(2, '0')} ${tags.common.title}${Path.extname(path)}`
 
   Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
