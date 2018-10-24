@@ -1,3 +1,4 @@
+import Convert from 'handbrake-js'
 import { FileSystem, Log, Path, Process as _Process } from '@virtualpatterns/mablung'
 import * as ID3 from 'music-metadata'
 
@@ -92,6 +93,7 @@ Process.onBook = async function (path, context) {
 Process.onMusic = async function (path, context) {
   Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
 
+
   let tags = await ID3.parseFile(path)
 
   Log.debug(`tags.common.albumartist='${tags.common.albumartist}'`)
@@ -115,11 +117,63 @@ Process.onMusic = async function (path, context) {
 Process.onVideo = async function (path, context) {
   Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
   await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
+
+  /*
+    1. Ignore everything after SxEy
+    2. Ignore everything after NNNN (where NNNN is between 1900 and current year)
+    3. Change . to space
+  */
+
 }
 
 Process.onOther = async function (path, context) {
   Log.debug(context, `Process.onOther('${path}', context) { ... }`)
   await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
+}
+
+Process.convert = function (path, options = {}) {
+  Log.debug(options, `Process.convert('${path}', context) { ... }`)
+
+  return new Promise((resolve, reject) => {
+
+    let inputPath = path
+    let inputExtension = Path.extname(inputPath).toLowerCase()
+    
+
+    let ouputPath = null
+
+    if (MUSIC_EXTENSIONS.includes(inputExtension)) {
+      ouputPath = Path.join(Configuration.cli.processingPath, 
+    }
+    else if (VIDEO_EXTENSIONS.includes(inputExtension)) {
+    }
+      
+    let _options = {
+      'input': inputPath,
+      'output': Path.join(Configuration.cli.processingPath, 'Ch4.Great.Canal.Journeys.Series.8.Part.4.Brecon.720p.HDTV.x264.AAC.mkv[eztv].mp4')
+    }
+
+    Convert
+      .spawn({ 
+        'input': path,
+        'output': Path.join(Configuration.cli.processingPath, 'Ch4.Great.Canal.Journeys.Series.8.Part.4.Brecon.720p.HDTV.x264.AAC.mkv[eztv].mp4')
+      })
+      .on('error', (error) => {
+        console.log(error)
+      })
+      .on('progress', (progress) => {
+        console.log(
+          'Percent complete: %s, ETA: %s',
+          progress.percentComplete,
+          progress.eta
+        )
+      })
+  
+    reject(new ProcessError('The duration was exceeded.'))
+    resolve()
+
+  })
+
 }
 
 export default Process
