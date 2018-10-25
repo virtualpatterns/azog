@@ -8,6 +8,7 @@ export default {
     'errorPath': `${Process.env.HOME}/Library/Logs/azog/azog.err`,
     'outputPath': `${Process.env.HOME}/Library/Logs/azog/azog.out`,
     'downloadedPath': `${Process.env.HOME}/Deluge/Downloaded`,
+    'processedPath': `${Process.env.HOME}/Deluge/Processed`,
     'processingPath': `${Process.env.HOME}/Deluge/Processing`
   },
 

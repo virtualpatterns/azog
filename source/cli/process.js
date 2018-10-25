@@ -1,18 +1,18 @@
-import Convert from 'handbrake-js'
+import Convert from 'fluent-ffmpeg'
 import { FileSystem, Log, Path, Process as _Process } from '@virtualpatterns/mablung'
 import * as ID3 from 'music-metadata'
 
-import Configuration from '../../configuration'
+import Configuration from '../configuration'
 
 const BOOK_EXTENSIONS = [ '.epub', '.mobi', '.pdf' ]
 const MUSIC_EXTENSIONS = [ '.flac', '.m4a', '.mp3' ]
-const OTHER_EXTENSIONS = [ '.zip' ]
+const OTHER_EXTENSIONS = [ '.rar', '.zip' ]
 const VIDEO_EXTENSIONS = [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ]
 
 const Process = Object.create(_Process)
 
 Process.onTorrent = async function (torrentId, torrentName) {
-  Log.debug(`COMPLETED ${torrentId} ${torrentName}`)
+  Log.debug(`Process.onTorrent('${torrentId}', '${torrentName}')`)
   await Process.onPath(Path.join(Configuration.cli.downloadedPath, torrentName), {
     'torrentId': torrentId,
     'torrentName': torrentName
@@ -75,24 +75,27 @@ Process.onFile = async function (path, context) {
 
 }
 
-Process.onBook = async function (path, context) {
-  Log.debug(context, `Process.onBook('${path}', context) { ... }`)
+Process.onBook = async function (path) { // , context) {
+  // Log.debug(context, `Process.onBook('${path}', context) { ... }`)
+  Log.debug(`Process.onBook('${path}') { ... }`)
 
-  let targetPath = Path.join(Configuration.cli.processingPath, 'Books')
+  let targetPath = Path.join(Configuration.cli.processedPath, 'Books')
 
-  Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
+  // Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
 
   targetPath = Path.join(targetPath, Path.basename(path))
 
-  Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr': true })`)
+  // Log.debug(`FileSystem.promisedCopy)`)
   await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
 
-Process.onMusic = async function (path, context) {
-  Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
+Process.onMusic = async function (path) { // , context) {
+  // Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
+  Log.debug(`Process.onMusic('${path}') { ... }`)
 
+  path = await Process.convert(path)
 
   let tags = await ID3.parseFile(path)
 
@@ -101,76 +104,92 @@ Process.onMusic = async function (path, context) {
   Log.debug(`tags.common.track.no=${tags.common.track.no}`)
   Log.debug(`tags.common.title='${tags.common.title}'`)
 
-  let targetPath = Path.join(Configuration.cli.processingPath, 'Music', tags.common.albumartist, tags.common.album)
+  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist, tags.common.album)
   let name = `${tags.common.title}${Path.extname(path)}`
 
-  Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
+  // Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
 
   targetPath = Path.join(targetPath, name)
 
-  Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr': true })`)
-  await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
+  // Log.debug(`FileSystem.promisedRename('${path}', '${targetPath}')`)
+  await FileSystem.promisedRename(path, targetPath)
 
 }
 
-Process.onVideo = async function (path, context) {
-  Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
+Process.onVideo = async function (path) { // , context) {
+  // Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
+  Log.debug(`Process.onVideo('${path}') { ... }`)
+
+  await Process.convert(path)
+
+  // await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
+
+}
+
+Process.onOther = async function (path) { // , context) {
+  // Log.debug(context, `Process.onOther('${path}', context) { ... }`)
+  Log.debug(`Process.onOther('${path}') { ... }`)
   await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
-
-  /*
-    1. Ignore everything after SxEy
-    2. Ignore everything after NNNN (where NNNN is between 1900 and current year)
-    3. Change . to space
-  */
-
 }
 
-Process.onOther = async function (path, context) {
-  Log.debug(context, `Process.onOther('${path}', context) { ... }`)
-  await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
-}
-
-Process.convert = function (path, options = {}) {
-  Log.debug(options, `Process.convert('${path}', context) { ... }`)
+Process.convert = function (path) {
+  // Log.debug(`Process.convert('${path}') { ... }`)
 
   return new Promise((resolve, reject) => {
 
     let inputPath = path
     let inputExtension = Path.extname(inputPath).toLowerCase()
-    
 
-    let ouputPath = null
+    let outputPath = Path.join(Configuration.cli.processingPath, Path.basename(inputPath, inputExtension))
+    let outputExtension = null
 
     if (MUSIC_EXTENSIONS.includes(inputExtension)) {
-      ouputPath = Path.join(Configuration.cli.processingPath, 
+      outputExtension = '.mp3'
     }
     else if (VIDEO_EXTENSIONS.includes(inputExtension)) {
-    }
-      
-    let _options = {
-      'input': inputPath,
-      'output': Path.join(Configuration.cli.processingPath, 'Ch4.Great.Canal.Journeys.Series.8.Part.4.Brecon.720p.HDTV.x264.AAC.mkv[eztv].mp4')
+      outputExtension = '.mp4'
     }
 
-    Convert
-      .spawn({ 
-        'input': path,
-        'output': Path.join(Configuration.cli.processingPath, 'Ch4.Great.Canal.Journeys.Series.8.Part.4.Brecon.720p.HDTV.x264.AAC.mkv[eztv].mp4')
+    outputPath = `${outputPath}${outputExtension}`
+
+    let percent = 0
+
+    Convert()
+      .input(inputPath)
+      .output(outputPath)
+      .on('start', (command) => {
+        Log.debug('Convert.on(\'start\', (data) => { ... })')
+        Log.debug(command)
       })
-      .on('error', (error) => {
-        console.log(error)
-      })
+      .on('codecData', (data) => Log.debug({ 'data': data }, 'Convert.on(\'codecData\', (data) => { ... })'))
       .on('progress', (progress) => {
-        console.log(
-          'Percent complete: %s, ETA: %s',
-          progress.percentComplete,
-          progress.eta
-        )
+
+        if (progress.percent - percent >= 5 || percent == 0) {
+          Log.debug(`Convert.on('progress', (progress) => { ... }) approx. ${progress.percent.toFixed(2)}%`)
+          percent = progress.percent
+        }
+
       })
-  
-    reject(new ProcessError('The duration was exceeded.'))
-    resolve()
+      // .on('stderr', (data) => Log.debug({ 'error': data }, 'Convert.on(\'stderr\', (data) => { ... })'))
+      .on('error', (error) => {
+
+        delete error.name
+
+        Log.error('Convert.on(\'error\', (error) => { ... })')
+        Log.error(error)
+
+        reject(error)
+
+      })
+      .on('end', () => {
+
+        Log.debug('Convert.on(\'end\', () => { ... })')
+
+        resolve(outputPath)
+
+      })
+      .run()
 
   })
 
