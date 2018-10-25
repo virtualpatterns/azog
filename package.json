@@ -22,7 +22,7 @@
     "process": "npm run jake build && ./distributables/cli/bin/on-completed.sh 0",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.2-53",
+  "version": "0.0.2-103",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
@@ -33,9 +33,11 @@
   },
   "dependencies": {
     "@pwn/is": "^1.0.2",
-    "@virtualpatterns/mablung": "0.0.18",
+    "@virtualpatterns/mablung": "0.0.20",
     "commander": "^2.19.0",
+    "fluent-ffmpeg": "^2.1.2",
     "music-metadata": "^3.1.4",
+    "node-tvdb": "^4.1.0",
     "source-map-support": "^0.5.9"
   }
 }

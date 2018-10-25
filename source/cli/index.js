@@ -5,7 +5,7 @@ import Source from 'source-map-support'
 
 import Configuration from '../configuration'
 import Package from '../../package.json'
-import Process from './library/process'
+import Process from './process'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
