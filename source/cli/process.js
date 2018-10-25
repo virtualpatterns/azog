@@ -103,7 +103,7 @@ Process.onBook = async function (path) { // , context) {
 
   targetPath = Path.join(targetPath, Path.basename(path))
 
-  // Log.debug(`FileSystem.promisedCopy)`)
+  Log.debug(`FileSystem.promisedCopy(path, ${targetPath}, { 'stopOnErr' : true })`)
   await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
@@ -112,7 +112,7 @@ Process.onMusic = async function (path) { // , context) {
   // Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
   Log.debug(`Process.onMusic('${path}') { ... }`)
 
-  path = await Process.convert(path)
+  // path = await Process.convert(path)
 
   let tags = await ID3.parseFile(path)
 
@@ -124,8 +124,8 @@ Process.onMusic = async function (path) { // , context) {
   // Log.debug(`tags.common.track.no=${tags.common.track.no}`)
   // Log.debug(`tags.common.title='${tags.common.title}'`)
 
-  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist || tags.common.artist, tags.common.album)
-  let name = `${tags.common.title}${Path.extname(path)}`
+  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist || tags.common.artist || 'Unknown Artist', tags.common.album || 'Unknown Album')
+  let name = `${tags.common.track.no && tags.common.track.no.toString().padStart(2, '0') || '00'} ${tags.common.title || 'Unknown Title'}${Path.extname(path)}`
 
   // Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
@@ -133,7 +133,10 @@ Process.onMusic = async function (path) { // , context) {
   targetPath = Path.join(targetPath, name)
 
   // Log.debug(`FileSystem.promisedRename('${path}', '${targetPath}')`)
-  await FileSystem.promisedRename(path, targetPath)
+  // await FileSystem.promisedRename(path, targetPath)
+
+  Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
+  await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
 
@@ -141,16 +144,20 @@ Process.onVideo = async function (path) { // , context) {
   // Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
   Log.debug(`Process.onVideo('${path}') { ... }`)
 
-  await Process.convert(path)
+  // await Process.convert(path)
 
-  // await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
+  Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
+  await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 
 }
 
 Process.onOther = async function (path) { // , context) {
   // Log.debug(context, `Process.onOther('${path}', context) { ... }`)
   Log.debug(`Process.onOther('${path}') { ... }`)
+
+  Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
   await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
+
 }
 
 Process.convert = function (path) {

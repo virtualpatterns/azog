@@ -6,10 +6,11 @@ import Configuration from '../configuration'
 
 Jake.addListener('start', () => {
 
-  Jake.rmRf(Configuration.cli.logPath, { 'silent': true })
   Jake.rmRf(Configuration.tasks.logPath, { 'silent': true })
-  Jake.rmRf(Configuration.tasks.errorPath, { 'silent': true })
-  Jake.rmRf(Configuration.tasks.outputPath, { 'silent': true })
+
+  Jake.rmRf(Configuration.cli.logPath, { 'silent': true })
+  Jake.rmRf(Configuration.cli.errorPath, { 'silent': true })
+  Jake.rmRf(Configuration.cli.outputPath, { 'silent': true })
 
   Log.createFormattedLog(Configuration.tasks.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
