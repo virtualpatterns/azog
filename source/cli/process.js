@@ -4,6 +4,8 @@ import * as ID3 from 'music-metadata'
 
 import Configuration from '../configuration'
 
+const NANOSECONDS_PER_SECOND = 1e9
+
 const BOOK_EXTENSIONS = [ '.epub', '.mobi', '.pdf' ]
 const MUSIC_EXTENSIONS = [ '.flac', '.m4a', '.mp3' ]
 const OTHER_EXTENSIONS = [ '.rar', '.zip' ]
@@ -12,11 +14,26 @@ const VIDEO_EXTENSIONS = [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ]
 const Process = Object.create(_Process)
 
 Process.onTorrent = async function (torrentId, torrentName) {
-  Log.debug(`Process.onTorrent('${torrentId}', '${torrentName}')`)
-  await Process.onPath(Path.join(Configuration.cli.downloadedPath, torrentName), {
-    'torrentId': torrentId,
-    'torrentName': torrentName
-  })
+  Log.debug(`START Process.onTorrent(torrentId, '${torrentName}')`)
+
+  let start = Process.hrtime()
+
+  try {
+
+    await Process.onPath(Path.join(Configuration.cli.downloadedPath, torrentName), {
+      'torrentId': torrentId,
+      'torrentName': torrentName
+    })
+
+  }
+  finally {
+
+    let duration = Process.hrtime(start)
+
+    Log.debug(`FINISH Process.onTorrent(torrentId, '${torrentName}') in ${((duration[0] * NANOSECONDS_PER_SECOND + duration[1])/NANOSECONDS_PER_SECOND).toFixed(2)}s`)
+
+  }
+
 }
 
 Process.onPath = async function (path, context) {
@@ -99,12 +116,15 @@ Process.onMusic = async function (path) { // , context) {
 
   let tags = await ID3.parseFile(path)
 
-  Log.debug(`tags.common.albumartist='${tags.common.albumartist}'`)
-  Log.debug(`tags.common.album='${tags.common.album}'`)
-  Log.debug(`tags.common.track.no=${tags.common.track.no}`)
-  Log.debug(`tags.common.title='${tags.common.title}'`)
+  Log.debug(tags, 'ID3.parseFile(path)')
 
-  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist, tags.common.album)
+  // Log.debug(`tags.common.album='${tags.common.album}'`)
+  // Log.debug(`tags.common.albumartist='${tags.common.albumartist}'`)
+  // Log.debug(`tags.common.artist='${tags.common.artist}'`)
+  // Log.debug(`tags.common.track.no=${tags.common.track.no}`)
+  // Log.debug(`tags.common.title='${tags.common.title}'`)
+
+  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist || tags.common.artist, tags.common.album)
   let name = `${tags.common.title}${Path.extname(path)}`
 
   // Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
