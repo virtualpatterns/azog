@@ -1,4 +1,4 @@
-import Convert from 'fluent-ffmpeg'
+import Conversion from 'fluent-ffmpeg'
 import { FileSystem, Log, Path, Process as _Process } from '@virtualpatterns/mablung'
 import * as ID3 from 'music-metadata'
 
@@ -112,7 +112,7 @@ Process.onMusic = async function (path) { // , context) {
   // Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
   Log.debug(`Process.onMusic('${path}') { ... }`)
 
-  // path = await Process.convert(path)
+  path = await Process.convert(path)
 
   let tags = await ID3.parseFile(path)
 
@@ -132,11 +132,11 @@ Process.onMusic = async function (path) { // , context) {
 
   targetPath = Path.join(targetPath, name)
 
-  // Log.debug(`FileSystem.promisedRename('${path}', '${targetPath}')`)
-  // await FileSystem.promisedRename(path, targetPath)
+  Log.debug(`FileSystem.promisedRename('${path}', '${targetPath}')`)
+  await FileSystem.promisedRename(path, targetPath)
 
-  Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
-  await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
+  // Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
+  // await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
 
@@ -144,10 +144,10 @@ Process.onVideo = async function (path) { // , context) {
   // Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
   Log.debug(`Process.onVideo('${path}') { ... }`)
 
-  // await Process.convert(path)
+  await Process.convert(path)
 
-  Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
-  await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
+  // Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
+  // await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 
 }
 
@@ -170,30 +170,43 @@ Process.convert = function (path) {
 
     let outputPath = Path.join(Configuration.cli.processingPath, Path.basename(inputPath, inputExtension))
     let outputExtension = null
+    let outputOptions = null
 
     if (MUSIC_EXTENSIONS.includes(inputExtension)) {
       outputExtension = '.mp3'
     }
     else if (VIDEO_EXTENSIONS.includes(inputExtension)) {
+
       outputExtension = '.mp4'
+      outputOptions = '-codec copy'
+
     }
 
     outputPath = `${outputPath}${outputExtension}`
 
+    let convert = new Conversion()
     let percent = 0
 
-    Convert()
+    convert
       .input(inputPath)
       .output(outputPath)
+
+    if (outputOptions) {
+      convert.outputOptions(outputOptions)
+    }
+
+    convert
       .on('start', (command) => {
         Log.debug('Convert.on(\'start\', (data) => { ... })')
         Log.debug(command)
       })
-      .on('codecData', (data) => Log.debug({ 'data': data }, 'Convert.on(\'codecData\', (data) => { ... })'))
+      .on('codecData', (data) => {
+        Log.debug({ 'data': data }, 'Convert.on(\'codecData\', (data) => { ... })')
+      })
       .on('progress', (progress) => {
 
         if (progress.percent - percent >= 5 || percent == 0) {
-          Log.debug(`Convert.on('progress', (progress) => { ... }) approx. ${progress.percent.toFixed(2)}%`)
+          Log.debug(`Convert.on('progress', (progress) => { ... }) ${progress.percent.toFixed(2)}%`)
           percent = progress.percent
         }
 
@@ -203,8 +216,8 @@ Process.convert = function (path) {
 
         delete error.name
 
-        Log.error('Convert.on(\'error\', (error) => { ... })')
-        Log.error(error)
+        // Log.error('Convert.on(\'error\', (error) => { ... })')
+        // Log.error(error)
 
         reject(error)
 
