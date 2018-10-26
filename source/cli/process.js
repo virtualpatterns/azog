@@ -70,24 +70,36 @@ Process.onDirectory = async function (path, context) {
 }
 
 Process.onFile = async function (path, context) {
-  // Log.debug('Process.onFile(path, context) { ... }')
+  // Log.debug(`Process.onFile('${path}', context) { ... }`)
 
-  // let fileInformation = await FileSystem.promisedStat(path, { 'bigint': true })
+  try {
 
-  let extension = Path.extname(path).toLowerCase()
-  // let size = fileInformation.size
+    let extension = Path.extname(path).toLowerCase()
 
-  if (BOOK_EXTENSIONS.includes(extension)) {
-    await Process.onBook(path, context)
+    if (BOOK_EXTENSIONS.includes(extension)) {
+      await Process.onBook(path, context)
+    }
+    else if (MUSIC_EXTENSIONS.includes(extension)) {
+      await Process.onMusic(path, context)
+    }
+    else if (VIDEO_EXTENSIONS.includes(extension)) {
+      await Process.onVideo(path, context)
+    }
+    else if (OTHER_EXTENSIONS.includes(extension)) {
+      await Process.onOther(path, context)
+    }
+
   }
-  else if (MUSIC_EXTENSIONS.includes(extension)) {
-    await Process.onMusic(path, context)
-  }
-  else if (VIDEO_EXTENSIONS.includes(extension)) {
-    await Process.onVideo(path, context)
-  }
-  else if (OTHER_EXTENSIONS.includes(extension)) {
-    await Process.onOther(path, context)
+  catch (error) {
+
+    Log.error(`Process.onFile('${path}', context) { ... }`)
+    Log.error(error)
+
+    let targetPath = Path.join(Configuration.cli.failedPath, Path.basename(path))
+  
+    Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
+    await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
+    
   }
 
 }
@@ -117,12 +129,6 @@ Process.onMusic = async function (path) { // , context) {
   let tags = await ID3.parseFile(path)
 
   Log.debug(tags, 'ID3.parseFile(path)')
-
-  // Log.debug(`tags.common.album='${tags.common.album}'`)
-  // Log.debug(`tags.common.albumartist='${tags.common.albumartist}'`)
-  // Log.debug(`tags.common.artist='${tags.common.artist}'`)
-  // Log.debug(`tags.common.track.no=${tags.common.track.no}`)
-  // Log.debug(`tags.common.title='${tags.common.title}'`)
 
   let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist || tags.common.artist || 'Unknown Artist', tags.common.album || 'Unknown Album')
   let name = `${tags.common.track.no && tags.common.track.no.toString().padStart(2, '0') || '00'} ${tags.common.title || 'Unknown Title'}${Path.extname(path)}`
@@ -170,64 +176,63 @@ Process.convert = function (path) {
 
     let outputPath = Path.join(Configuration.cli.processingPath, Path.basename(inputPath, inputExtension))
     let outputExtension = null
-    let outputOptions = null
 
     if (MUSIC_EXTENSIONS.includes(inputExtension)) {
       outputExtension = '.mp3'
     }
     else if (VIDEO_EXTENSIONS.includes(inputExtension)) {
-
       outputExtension = '.mp4'
-      outputOptions = '-codec copy'
-
     }
 
     outputPath = `${outputPath}${outputExtension}`
 
-    let convert = new Conversion()
-    let percent = 0
+    let convert = new Conversion({ 'stdoutLines': 0 })
+    let percent = 0.00
 
     convert
       .input(inputPath)
       .output(outputPath)
 
-    if (outputOptions) {
-      convert.outputOptions(outputOptions)
+    if (VIDEO_EXTENSIONS.includes(outputExtension)) {
+      convert.outputOptions('-codec copy')
     }
 
     convert
       .on('start', (command) => {
-        Log.debug('Convert.on(\'start\', (data) => { ... })')
+        Log.debug('Conversion.on(\'start\', (data) => { ... })')
         Log.debug(command)
       })
       .on('codecData', (data) => {
-        Log.debug({ 'data': data }, 'Convert.on(\'codecData\', (data) => { ... })')
+        Log.debug({ 'data': data }, 'Conversion.on(\'codecData\', (data) => { ... })')
       })
       .on('progress', (progress) => {
 
-        if (progress.percent - percent >= 5 || percent == 0) {
-          Log.debug(`Convert.on('progress', (progress) => { ... }) ${progress.percent.toFixed(2)}%`)
+        if (percent == 0.00 || progress.percent - percent >= 5.00) {
+          Log.debug(`Conversion.on('progress', (progress) => { ... }) ${progress.percent.toFixed(2)}%`)
           percent = progress.percent
         }
 
       })
-      // .on('stderr', (data) => Log.debug({ 'error': data }, 'Convert.on(\'stderr\', (data) => { ... })'))
-      .on('error', (error) => {
+      .on('error', (error, stdout, stderr) => {
+
+        Log.error('Conversion.on(\'error\', (error) => { ... })')
+        Log.error(`\n\n${stderr}`)
+        
+        try {
+          FileSystem.unlinkSync(outputPath)
+        }
+        catch (error) {
+          Log.error(`FileSystem.unlinkSync('${outputPath}')`)
+          Log.error(error)
+        }
 
         delete error.name
-
-        // Log.error('Convert.on(\'error\', (error) => { ... })')
-        // Log.error(error)
 
         reject(error)
 
       })
       .on('end', () => {
-
-        Log.debug('Convert.on(\'end\', () => { ... })')
-
         resolve(outputPath)
-
       })
       .run()
 

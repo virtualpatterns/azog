@@ -9,7 +9,8 @@ export default {
     'outputPath': `${Process.env.HOME}/Library/Logs/azog/azog.out`,
     'downloadedPath': `${Process.env.HOME}/Deluge/Downloaded`,
     'processedPath': `${Process.env.HOME}/Deluge/Processed`,
-    'processingPath': `${Process.env.HOME}/Deluge/Processing`
+    'processingPath': `${Process.env.HOME}/Deluge/Processing`,
+    'failedPath': `${Process.env.HOME}/Deluge/Failed`
   },
 
   'tasks': {

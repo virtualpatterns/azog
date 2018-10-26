@@ -1,4 +1,5 @@
 .DS_Store
+.gitbackup
 *.bts
 /distributables
 /node_modules
