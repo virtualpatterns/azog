@@ -4,12 +4,14 @@ import * as ID3 from 'music-metadata'
 
 import Configuration from '../configuration'
 
+import ConversionError from './errors/conversion-error'
+
 const NANOSECONDS_PER_SECOND = 1e9
 
 const BOOK_EXTENSIONS = [ '.epub', '.mobi', '.pdf' ]
 const MUSIC_EXTENSIONS = [ '.flac', '.m4a', '.mp3' ]
-const OTHER_EXTENSIONS = [ '.rar', '.zip' ]
 const VIDEO_EXTENSIONS = [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ]
+const OTHER_EXTENSIONS = [ '.rar', '.zip' ]
 
 const Process = Object.create(_Process)
 
@@ -70,7 +72,7 @@ Process.onDirectory = async function (path, context) {
 }
 
 Process.onFile = async function (path, context) {
-  // Log.debug(`Process.onFile('${path}', context) { ... }`)
+  // Log.debug(`Process.onFile('${Path.trim(path)}', context) { ... }`)
 
   try {
 
@@ -92,12 +94,12 @@ Process.onFile = async function (path, context) {
   }
   catch (error) {
 
-    Log.error(`Process.onFile('${path}', context) { ... }`)
+    Log.error(`Process.onFile('${Path.trim(path)}', context) { ... }`)
     Log.error(error)
 
     let targetPath = Path.join(Configuration.cli.failedPath, Path.basename(path))
   
-    Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
+    // Log.debug(`FileSystem.promisedCopy(path, '${Path.trim(targetPath)}', { 'stopOnErr' : true })`)
     await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
     
   }
@@ -105,24 +107,24 @@ Process.onFile = async function (path, context) {
 }
 
 Process.onBook = async function (path) { // , context) {
-  // Log.debug(context, `Process.onBook('${path}', context) { ... }`)
-  Log.debug(`Process.onBook('${path}') { ... }`)
+  // Log.debug(context, `Process.onBook('${Path.trim(path)}', context) { ... }`)
+  Log.debug(`Process.onBook('${Path.trim(path)}') { ... }`)
 
   let targetPath = Path.join(Configuration.cli.processedPath, 'Books')
 
-  // Log.debug(`FileSystem.promisedMakeDir('${targetPath}', { 'recursive': true })`)
+  // Log.debug(`FileSystem.promisedMakeDir('${Path.trim(targetPath)}', { 'recursive': true })`)
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
 
   targetPath = Path.join(targetPath, Path.basename(path))
 
-  Log.debug(`FileSystem.promisedCopy(path, ${targetPath}, { 'stopOnErr' : true })`)
+  // Log.debug(`FileSystem.promisedCopy(path, ${Path.trim(targetPath)}, { 'stopOnErr' : true })`)
   await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
 
 Process.onMusic = async function (path) { // , context) {
-  // Log.debug(context, `Process.onMusic('${path}', context) { ... }`)
-  Log.debug(`Process.onMusic('${path}') { ... }`)
+  // Log.debug(context, `Process.onMusic('${Path.trim(path)}', context) { ... }`)
+  Log.debug(`Process.onMusic('${Path.trim(path)}') { ... }`)
 
   path = await Process.convert(path)
 
@@ -138,36 +140,40 @@ Process.onMusic = async function (path) { // , context) {
 
   targetPath = Path.join(targetPath, name)
 
-  Log.debug(`FileSystem.promisedRename('${path}', '${targetPath}')`)
+  // Log.debug(`FileSystem.promisedRename('${Path.trim(path)}', '${targetPath}')`)
   await FileSystem.promisedRename(path, targetPath)
 
-  // Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
+  // Log.debug(`FileSystem.promisedCopy(path, '${Path.trim(targetPath)}', { 'stopOnErr' : true })`)
   // await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
 
 Process.onVideo = async function (path) { // , context) {
-  // Log.debug(context, `Process.onVideo('${path}', context) { ... }`)
-  Log.debug(`Process.onVideo('${path}') { ... }`)
+  // Log.debug(context, `Process.onVideo('${Path.trim(path)}', context) { ... }`)
+  Log.debug(`Process.onVideo('${Path.trim(path)}') { ... }`)
 
-  await Process.convert(path)
+  path = await Process.convert(path)
 
-  // Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
+  let tags = await ID3.parseFile(path)
+
+  Log.debug(tags, 'ID3.parseFile(path)')
+
+  // Log.debug(`FileSystem.promisedCopy(path, '${Path.trim(Path.join(Configuration.cli.processingPath, Path.basename(path)))}', { 'stopOnErr' : true })`)
   // await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 
 }
 
 Process.onOther = async function (path) { // , context) {
-  // Log.debug(context, `Process.onOther('${path}', context) { ... }`)
-  Log.debug(`Process.onOther('${path}') { ... }`)
+  // Log.debug(context, `Process.onOther('${Path.trim(path)}', context) { ... }`)
+  Log.debug(`Process.onOther('${Path.trim(path)}') { ... }`)
 
-  Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
+  // Log.debug(`FileSystem.promisedCopy(path, '${Path.trim(Path.join(Configuration.cli.processingPath, Path.basename(path)))}', { 'stopOnErr' : true })`)
   await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 
 }
 
 Process.convert = function (path) {
-  // Log.debug(`Process.convert('${path}') { ... }`)
+  // Log.debug(`Process.convert('${Path.trim(path)}') { ... }`)
 
   return new Promise((resolve, reject) => {
 
@@ -204,9 +210,9 @@ Process.convert = function (path) {
         Log.debug('Conversion.on(\'start\', (data) => { ... })')
         Log.debug(command)
       })
-      .on('codecData', (data) => {
-        Log.debug({ 'data': data }, 'Conversion.on(\'codecData\', (data) => { ... })')
-      })
+      // .on('codecData', (data) => {
+      //   Log.debug({ 'data': data }, 'Conversion.on(\'codecData\', (data) => { ... })')
+      // })
       .on('progress', (progress) => {
 
         if (percent == 0.00 || progress.percent - percent >= 5.00) {
@@ -228,9 +234,11 @@ Process.convert = function (path) {
           // Log.error(error)
         }
 
-        delete error.name
+        // delete error.name
 
-        reject(error)
+        // reject(error)
+
+        reject(new ConversionError(`The path '${Path.trim(inputPath)}' failed to convert.`))
 
       })
       .on('end', () => {
