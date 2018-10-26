@@ -4,7 +4,7 @@ export default {
 
   'cli': {
 
-    'logLevel': 'trace',
+    'logLevel': 'debug',
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog.log`,
     'errorPath': `${Process.env.HOME}/Library/Logs/azog/azog.err`,
     'outputPath': `${Process.env.HOME}/Library/Logs/azog/azog.out`,
