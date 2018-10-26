@@ -224,8 +224,8 @@ Process.convert = function (path) {
           FileSystem.unlinkSync(outputPath)
         }
         catch (error) {
-          Log.error(`FileSystem.unlinkSync('${outputPath}')`)
-          Log.error(error)
+          // Log.error(`FileSystem.unlinkSync('${outputPath}')`)
+          // Log.error(error)
         }
 
         delete error.name
@@ -234,6 +234,7 @@ Process.convert = function (path) {
 
       })
       .on('end', () => {
+        Log.debug('Conversion.on(\'end\', () => { ... })')
         resolve(outputPath)
       })
       .run()
