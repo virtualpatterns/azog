@@ -190,6 +190,8 @@ Process.convert = function (path) {
     let percent = 0.00
 
     convert
+      .setFfmpegPath(Configuration.cli.ffmpegPath)
+      // .setFfprobePath(Configuration.cli.ffprobePath)
       .input(inputPath)
       .output(outputPath)
 

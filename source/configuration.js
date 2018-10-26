@@ -10,7 +10,9 @@ export default {
     'downloadedPath': `${Process.env.HOME}/Deluge/Downloaded`,
     'processedPath': `${Process.env.HOME}/Deluge/Processed`,
     'processingPath': `${Process.env.HOME}/Deluge/Processing`,
-    'failedPath': `${Process.env.HOME}/Deluge/Failed`
+    'failedPath': `${Process.env.HOME}/Deluge/Failed`,
+    'ffmpegPath': '/usr/local/bin/ffmpeg',
+    'ffprobePath': '/usr/local/bin/ffprobe'
   },
 
   'tasks': {
