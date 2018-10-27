@@ -13,7 +13,6 @@ Process.queue = new Queue(Configuration.cli.maximumConcurrentFiles, Configuratio
 
 Process.onTorrent = async function (torrentId, torrentName) {
   Log.debug(`Process.onTorrent('${torrentId}', '${torrentName}')`)
-  Log.debug(Configuration)
 
   await Process.onPath(Path.join(Configuration.cli.downloadedPath, torrentName), {
     'torrentId': torrentId,
@@ -92,6 +91,8 @@ Process.onBook = async function (path) { // , context) {
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
 
   targetPath = Path.join(targetPath, Path.basename(path))
+
+  Log.debug(`FileSystem.promisedCopy(path, '${targetPath}', { 'stopOnErr' : true })`)
   await FileSystem.promisedCopy(path, targetPath, { 'stopOnErr' : true })
 
 }
@@ -114,16 +115,11 @@ Process.onMusic = async function (path) { // , context) {
 }
 
 Process.onVideo = async function (path) { // , context) {
-
-  path = await Process.convert(path)
-
-  let tags = await ID3.parseFile(path)
-
-  Log.debug(tags, `ID3.parseFile('${Path.basename(path)}')`)
-
+  await Process.convert(path)
 }
 
 Process.onOther = async function (path) { // , context) {
+  Log.debug(`FileSystem.promisedCopy(path, '${Path.join(Configuration.cli.processingPath, Path.basename(path))}', { 'stopOnErr' : true })`)
   await FileSystem.promisedCopy(path, Path.join(Configuration.cli.processingPath, Path.basename(path)), { 'stopOnErr' : true })
 }
 
