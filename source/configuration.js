@@ -1,3 +1,4 @@
+import OS from 'os'
 import { Process } from '@virtualpatterns/mablung'
 
 export default {
@@ -15,8 +16,15 @@ export default {
     'failedPath': `${Process.env.HOME}/Deluge/Failed`,
 
     'ffmpegPath': '/usr/local/bin/ffmpeg',
-    'ffprobePath': '/usr/local/bin/ffprobe'
 
+    'maximumConcurrentFiles': OS.cpus().length,
+    'maximumQueuedFiles': Infinity,
+
+    'bookExtensions': [ '.epub', '.mobi', '.pdf' ],
+    'musicExtensions': [ '.flac', '.m4a', '.mp3' ],
+    'videoExtensions': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
+    'otherExtensions': [ '.rar', '.zip' ]
+        
   },
 
   'tasks': {
