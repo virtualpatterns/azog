@@ -12,7 +12,7 @@ Jake.addListener('start', () => {
   Jake.rmRf(Configuration.cli.errorPath, { 'silent': true })
   Jake.rmRf(Configuration.cli.outputPath, { 'silent': true })
 
-  Log.createFormattedLog(Configuration.tasks.logPath)
+  Log.createFormattedLog({ 'level': 'debug' }, Configuration.tasks.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
   
 })
