@@ -1,7 +1,7 @@
 import FFMPEG from 'fluent-ffmpeg'
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 
-import Configuration from '../../configuration'
+import Configuration from '../../config'
 
 import ConversionError from './errors/conversion-error'
 import ProbeError from './errors/probe-error'

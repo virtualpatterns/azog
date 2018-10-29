@@ -3,9 +3,9 @@
 SCRIPT_FULL_PATH="$0"
 SCRIPT_HOME_PATH="${SCRIPT_FULL_PATH%/*}"
 
-SCRIPT_LOG_PATH="$HOME/Library/Logs/azog"
-SCRIPT_ERR="$SCRIPT_LOG_PATH/azog.err"
-SCRIPT_OUT="$SCRIPT_LOG_PATH/azog.out"
+SCRIPT_LOG_PATH="$HOME/Deluge/Logs"
+SCRIPT_ERR="$SCRIPT_LOG_PATH/on-completed.err"
+SCRIPT_OUT="$SCRIPT_LOG_PATH/on-completed.out"
 
 mkdir \
   -p \

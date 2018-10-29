@@ -6,9 +6,7 @@ export default {
   'cli': {
 
     'logLevel': 'debug',
-    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog.log`,
-    'errorPath': `${Process.env.HOME}/Library/Logs/azog/azog.err`,
-    'outputPath': `${Process.env.HOME}/Library/Logs/azog/azog.out`,
+    'logPath': `${Process.env.HOME}/Deluge/Logs/azog.log`,
 
     'downloadedPath': `${Process.env.HOME}/Deluge/Downloaded`,
     'processingPath': `${Process.env.HOME}/Deluge/Processing`,
@@ -24,18 +22,18 @@ export default {
     'bookExtensions': [ '.epub', '.mobi', '.pdf' ],
     'musicExtensions': [ '.flac', '.m4a', '.mp3' ],
     'videoExtensions': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
-    'otherExtensions': [ '.rar', '.zip' ],
+    'otherExtensions': [ '.rar', '.zip' ]
         
   },
 
   'tasks': {
     'logLevel': 'trace',
-    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-tasks.log`
+    'logPath': `${Process.env.HOME}/Deluge/Logs/azog-tasks.log`
   },
 
   'tests': {
     'logLevel': 'trace',
-    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-tests.log`
+    'logPath': `${Process.env.HOME}/Deluge/Logs/azog-tests.log`
   }
 
 }

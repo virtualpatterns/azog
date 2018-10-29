@@ -2,7 +2,7 @@ import { FileSystem, Log, Path, Process as _Process } from '@virtualpatterns/mab
 import * as ID3 from 'music-metadata'
 import Queue from 'promise-queue'
 
-import Configuration from '../../configuration'
+import Configuration from '../../config'
 import Converter from './converter'
 
 const Process = Object.create(_Process)

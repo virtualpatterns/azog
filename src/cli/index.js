@@ -3,9 +3,9 @@ import Command from 'commander'
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 import Source from 'source-map-support'
 
-import Configuration from '../configuration'
+import Configuration from '../config'
 import Package from '../../package.json'
-import Process from './library/process'
+import Process from './lib/process'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
