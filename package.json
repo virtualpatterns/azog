@@ -2,9 +2,9 @@
   "author": "virtualpatterns.com <code@virtualpatterns.com> (http://www.virtualpatterns.com)",
   "description": "TBD",
   "files": [
-    "distributables/cli",
-    "distributables/configuration.js",
-    "distributables/configuration.js.map"
+    "dist/cli",
+    "dist/config.js",
+    "dist/config.js.map"
   ],
   "license": "GPL-3.0+",
   "name": "@virtualpatterns/azog",
@@ -13,20 +13,19 @@
     "url": "https://github.com/virtualpatterns/azog"
   },
   "scripts": {
-    "refresh": "rm -Rf node_modules distributables/* && npm install",
-    "clean": "rm -Rf distributables/configuration.js distributables/configuration.js.map distributables/tasks",
-    "lint": "npm run clean && eslint --ignore-path .gitignore source/tasks",
-    "build": "npm run lint && babel source/configuration.js --out-file distributables/configuration.js --quiet --source-maps && babel source/tasks --copy-files --out-dir distributables/tasks --quiet --source-maps",
-    "tasks": "npm run build && jake --jakefile distributables/tasks/index.js --tasks",
-    "jake": "npm run build && jake --jakefile distributables/tasks/index.js",
-    "process": "npm run jake build && ./distributables/cli/bin/on-completed.sh 0",
+    "refresh": "rm -Rf node_modules dist/* && npm install",
+    "clean": "rm -Rf dist/config.js dist/config.js.map dist/tasks",
+    "lint": "npm run clean && eslint --ignore-path .gitignore src/tasks",
+    "build": "npm run lint && babel src/config.js --out-file dist/config.js --quiet --source-maps && babel src/tasks --copy-files --out-dir dist/tasks --quiet --source-maps",
+    "tasks": "npm run build && jake --jakefile dist/tasks/index.js --tasks",
+    "jake": "npm run build && jake --jakefile dist/tasks/index.js",
+    "process": "npm run jake build && ./dist/cli/bin/on-completed.sh 0",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.2-197",
+  "version": "0.0.2-234",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "csv-write-stream": "^2.0.0",
     "eslint": "^5.6.1",
     "jake": "^8.0.15",
     "npm-check-updates": "^2.14.1"

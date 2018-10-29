@@ -1,11 +1,11 @@
 import 'babel-polyfill'
 import Command from 'commander'
-import { Log } from '@virtualpatterns/mablung'
+import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 import Source from 'source-map-support'
 
-import Configuration from '../configuration'
+import Configuration from '../config'
 import Package from '../../package.json'
-import Process from './process'
+import Process from './lib/process'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
@@ -18,6 +18,8 @@ Command
   .action(async (torrentId, torrentName) => {
 
     try {
+
+      await FileSystem.promisedMakeDir(Path.dirname(Configuration.cli.logPath), { 'recursive': true })
 
       Log.createFormattedLog({ 'level': Configuration.cli.logLevel }, Configuration.cli.logPath)
 
