@@ -1,6 +1,7 @@
 import Conversion from 'fluent-ffmpeg'
 import { FileSystem, Log, Path, Process as _Process } from '@virtualpatterns/mablung'
 import * as ID3 from 'music-metadata'
+import Sanitize from 'sanitize-filename'
 import Queue from 'promise-queue'
 
 import Configuration from '../configuration'
@@ -105,10 +106,10 @@ Process.onMusic = async function (path) { // , context) {
 
   Log.debug(tags, `ID3.parseFile('${Path.basename(path)}')`)
 
-  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', tags.common.albumartist || tags.common.artist || 'Unknown Artist', tags.common.album || 'Unknown Album')
+  let targetPath = Path.join(Configuration.cli.processedPath, 'Music', Sanitize(tags.common.albumartist || tags.common.artist || 'Unknown Artist'), Sanitize(tags.common.album || 'Unknown Album'))
   await FileSystem.promisedMakeDir(targetPath, { 'recursive': true })
 
-  let name = `${tags.common.track.no && tags.common.track.no.toString().padStart(2, '0') || '00'} ${tags.common.title || 'Unknown Title'}${Path.extname(path)}`
+  let name = `${tags.common.track.no && tags.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(tags.common.title || 'Unknown Title')}${Path.extname(path)}`
   targetPath = Path.join(targetPath, name)
   await FileSystem.promisedRename(path, targetPath)
 

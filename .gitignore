@@ -3,4 +3,5 @@
 *.bts
 /distributables
 /node_modules
+/resources
 /source/sandbox
