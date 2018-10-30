@@ -22,7 +22,7 @@ export default {
     'bookExtensions': [ '.epub', '.mobi', '.pdf' ],
     'musicExtensions': [ '.flac', '.m4a', '.mp3' ],
     'videoExtensions': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
-    'otherExtensions': [ '.rar', '.zip' ]
+    'otherExtensions': [ '.iso', '.rar', '.zip' ]
         
   },
 
