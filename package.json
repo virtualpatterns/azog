@@ -22,7 +22,7 @@
     "process": "npm run jake build && ./dist/cli/bin/on-completed.sh 0",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.2-242",
+  "version": "0.0.2-260",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",

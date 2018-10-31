@@ -13,13 +13,13 @@ Converter.convert = async function (path) {
   let inputPath = path
   let inputExtension = Path.extname(inputPath).toLowerCase()
 
-  let outputPath = Path.join(Configuration.cli.processingPath, Path.basename(inputPath, inputExtension))
+  let outputPath = Path.join(Configuration.cli.paths.processing, Path.basename(inputPath, inputExtension))
   let outputExtension = null
 
-  if (Configuration.cli.musicExtensions.includes(inputExtension)) {
+  if (Configuration.cli.extensions.music.includes(inputExtension)) {
     outputExtension = '.mp3'
   }
-  else if (Configuration.cli.videoExtensions.includes(inputExtension)) {
+  else if (Configuration.cli.extensions.video.includes(inputExtension)) {
     outputExtension = '.mp4'
   }
 
@@ -32,11 +32,11 @@ Converter.convert = async function (path) {
     let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
     ffmpeg
-      .setFfmpegPath(Configuration.cli.ffmpegPath)
+      .setFfmpegPath(Configuration.cli.paths.ffmpeg)
       .input(inputPath)
       .output(outputPath)
 
-    if (Configuration.cli.videoExtensions.includes(outputExtension)) {
+    if (Configuration.cli.extensions.video.includes(outputExtension)) {
 
       ffmpeg.outputOptions('-codec copy')
 
@@ -93,7 +93,7 @@ Converter.rename = async function (path) { // , context) {
     let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
     ffmpeg
-      .setFfprobePath(Configuration.cli.ffprobePath)
+      .setFfprobePath(Configuration.cli.paths.ffprobe)
       .input(path)
       .ffprobe((error, data) => {
 

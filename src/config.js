@@ -1,5 +1,16 @@
+import { FileSystem, Process } from '@virtualpatterns/mablung'
 import OS from 'os'
-import { Process } from '@virtualpatterns/mablung'
+
+let userExtensionsPath = `${Process.env.HOME}/Deluge/extensions.json`
+let userExtensions = {}
+
+try {
+  FileSystem.accessSync(userExtensionsPath, FileSystem.F_OK)
+  userExtensions = require(userExtensionsPath)
+}
+catch (error) {
+  // Do nothing
+}
 
 export default {
 
@@ -8,31 +19,39 @@ export default {
     'logLevel': 'debug',
     'logPath': `${Process.env.HOME}/Deluge/Logs/azog.log`,
 
-    'downloadedPath': `${Process.env.HOME}/Deluge/Downloaded`,
-    'processingPath': `${Process.env.HOME}/Deluge/Processing`,
-    'processedPath': `${Process.env.HOME}/Deluge/Processed`,
-    'failedPath': `${Process.env.HOME}/Deluge/Failed`,
-
-    'ffmpegPath': '/usr/local/bin/ffmpeg',
-    'ffprobePath': '/usr/local/bin/ffprobe',
-
-    'maximumConcurrentFiles': OS.cpus().length,
+    'maximumConcurrentFiles': OS.cpus().length - 1,
     'maximumQueuedFiles': Infinity,
 
-    'bookExtensions': [ '.epub', '.mobi', '.pdf' ],
-    'musicExtensions': [ '.flac', '.m4a', '.mp3' ],
-    'videoExtensions': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
-    'otherExtensions': [ '.iso', '.rar', '.zip' ]
+    'extensions': {
+
+      'book': [ '.epub', '.mobi', '.pdf', ...(userExtensions.book || [])],
+      'music': [ '.flac', '.m4a', '.mp3', ...(userExtensions.music || [])],
+      'video': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4', ...(userExtensions.video || [])],
+      'other': [ '.rar', '.zip', ...(userExtensions.other || [])]
+
+    },
+
+    'paths': {
+
+      'downloaded': `${Process.env.HOME}/Deluge/Downloaded`,
+      'processing': `${Process.env.HOME}/Deluge/Processing`,
+      'processed': `${Process.env.HOME}/Deluge/Processed`,
+      'failed': `${Process.env.HOME}/Deluge/Failed`,
+
+      'ffmpeg': '/usr/local/bin/ffmpeg',
+      'ffprobe': '/usr/local/bin/ffprobe'
+
+    }
         
   },
 
   'tasks': {
-    'logLevel': 'trace',
+    'logLevel': 'debug',
     'logPath': `${Process.env.HOME}/Deluge/Logs/azog-tasks.log`
   },
 
   'tests': {
-    'logLevel': 'trace',
+    'logLevel': 'debug',
     'logPath': `${Process.env.HOME}/Deluge/Logs/azog-tests.log`
   }
 

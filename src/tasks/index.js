@@ -5,12 +5,8 @@ import { Log } from '@virtualpatterns/mablung'
 import Configuration from '../config'
 
 Jake.addListener('start', () => {
-
-  // Jake.rmRf(Configuration.tasks.logPath, { 'silent': true })
-
-  Log.createFormattedLog({ 'level': 'debug' }, Configuration.tasks.logPath)
+  Log.createFormattedLog({ 'level': Configuration.tasks.logLevel }, Configuration.tasks.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
-  
 })
 
 task('clear', [], { 'async': true }, () => {
@@ -19,12 +15,8 @@ task('clear', [], { 'async': true }, () => {
 
 desc('Remove built folders and files')
 task('clean', [], { 'async': false }, () => {
-
-  // Jake.rmRf(Configuration.cli.logPath, { 'silent': true })
-
   Jake.rmRf('dist/sandbox', { 'silent': true })
   Jake.rmRf('dist/cli', { 'silent': true })
-
 })
 
 desc('Count the number of dirty files')
