@@ -1,6 +1,6 @@
 .DS_Store
 .gitbackup
-/dist
+/distributable
 /node_modules
 /resources
-/src/sandbox
+/source/sandbox

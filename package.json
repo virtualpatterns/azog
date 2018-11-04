@@ -2,9 +2,9 @@
   "author": "virtualpatterns.com <code@virtualpatterns.com> (http://www.virtualpatterns.com)",
   "description": "TBD",
   "files": [
-    "dist/cli",
-    "dist/config.js",
-    "dist/config.js.map"
+    "distributable/command",
+    "distributable/configuration.js",
+    "distributable/configuration.js.map"
   ],
   "license": "GPL-3.0+",
   "name": "@virtualpatterns/azog",
@@ -13,31 +13,41 @@
     "url": "https://github.com/virtualpatterns/azog"
   },
   "scripts": {
-    "refresh": "rm -Rf node_modules dist/* && npm install",
-    "clean": "rm -Rf dist/config.js dist/config.js.map dist/tasks",
-    "lint": "npm run clean && eslint --ignore-path .gitignore src/tasks",
-    "build": "npm run lint && babel src/config.js --out-file dist/config.js --quiet --source-maps && babel src/tasks --copy-files --out-dir dist/tasks --quiet --source-maps",
-    "tasks": "npm run build && jake --jakefile dist/tasks/index.js --tasks",
-    "jake": "npm run build && jake --jakefile dist/tasks/index.js",
-    "process": "npm run jake build && ./dist/cli/bin/on-completed.sh 0",
+    "refresh": "rm -Rf node_modules distributable/* && npm install",
+    "clean": "rm -Rf distributable/configuration.js distributable/configuration.js.map distributable/tasks",
+    "lint": "npm run clean && eslint --ignore-path .gitignore source/tasks",
+    "buildBabel": "npm run lint && babel --presets \"@babel/env\" source/babel.configuration.js --out-file distributable/babel.configuration.js --source-maps 1>/dev/null",
+    "buildConfiguration": "npm run buildBabel && babel --config-file ./distributable/babel.configuration source/configuration.js --out-file distributable/configuration.js --source-maps 1>/dev/null",
+    "buildTasks": "npm run buildConfiguration && babel --config-file ./distributable/babel.configuration source/tasks --copy-files --out-dir distributable/tasks --source-maps 1>/dev/null",
+    "buildAll": "npm run jake build",
+    "tasks": "npm run buildTasks && jake --jakefile distributable/tasks/index.js --tasks",
+    "jake": "npm run buildTasks && jake --jakefile distributable/tasks/index.js",
+    "process": "npm run jake build && ./distributable/command/scripts/on-completed.sh 0",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.2-260",
+  "version": "0.0.2-355",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "chai": "^4.2.0",
     "eslint": "^5.6.1",
+    "fs-extra": "^7.0.0",
     "jake": "^8.0.15",
+    "mocha": "^5.2.0",
     "npm-check-updates": "^2.14.1"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "@pwn/is": "^1.0.2",
-    "@virtualpatterns/mablung": "0.0.22",
+    "@virtualpatterns/mablung": "0.0.25",
     "commander": "^2.19.0",
     "fluent-ffmpeg": "^2.1.2",
+    "luxon": "^1.4.5",
+    "moviedb": "^0.2.10",
     "music-metadata": "^3.1.4",
     "node-tvdb": "^4.1.0",
-    "promise-queue": "^2.2.5",
+    "p-queue": "^3.0.0",
     "sanitize-filename": "^1.6.1",
     "source-map-support": "^0.5.9"
   }
