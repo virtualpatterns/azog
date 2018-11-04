@@ -7,6 +7,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Test",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--bail",
+        "--timeout",
+        "0",
+        "${workspaceFolder}/distributable/test/index.js"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Command",
       "program": "${workspaceFolder}/source/command/index.js",
       "outFiles": [ "${workspaceFolder}/distributable/command/index.js" ],
@@ -15,7 +28,8 @@
         "completed",
         "0",
         "Young Sheldon - 2x02 - A Rival Prodigy and Sir Isaac Neutron.mkv"
-      ]
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }

@@ -3,8 +3,11 @@ import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 
 import Configuration from '../../configuration'
 
-import ConvertError from './errors/convert-error'
-import ProbeError from './errors/probe-error'
+import ConvertError from './error/convert-error'
+import ProbeError from './error/probe-error'
+
+const EXTENSION_MOVIE = '.mp4'
+const EXTENSION_MUSIC = '.mp3'
 
 const Convert = Object.create({})
 
@@ -13,14 +16,14 @@ Convert.convertFile = async function (path) {
   let inputPath = path
   let inputExtension = Path.extname(inputPath).toLowerCase()
 
-  let outputPath = Path.join(Configuration.command.paths.processing, Path.basename(inputPath, inputExtension))
+  let outputPath = Path.join(Configuration.command.path.processing, Path.basename(inputPath, inputExtension))
   let outputExtension = null
 
-  if (Configuration.command.extensions.music.includes(inputExtension)) {
-    outputExtension = '.mp3'
+  if (Configuration.command.extension.music.includes(inputExtension)) {
+    outputExtension = EXTENSION_MUSIC
   }
-  else if (Configuration.command.extensions.video.includes(inputExtension)) {
-    outputExtension = '.mp4'
+  else if (Configuration.command.extension.video.includes(inputExtension)) {
+    outputExtension = EXTENSION_MOVIE
   }
 
   outputPath = `${outputPath}${outputExtension}`
@@ -32,11 +35,11 @@ Convert.convertFile = async function (path) {
     let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
     ffmpeg
-      .setFfmpegPath(Configuration.command.paths.ffmpeg)
+      .setFfmpegPath(Configuration.command.path.ffmpeg)
       .input(inputPath)
       .output(outputPath)
 
-    if (Configuration.command.extensions.video.includes(outputExtension)) {
+    if (Configuration.command.extension.video.includes(outputExtension)) {
 
       ffmpeg.outputOptions('-codec copy')
 
@@ -84,7 +87,7 @@ Convert.probeFile = function (path) { // , context) {
     let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
     ffmpeg
-      .setFfprobePath(Configuration.command.paths.ffprobe)
+      .setFfprobePath(Configuration.command.path.ffprobe)
       .input(path)
       .ffprobe((error, data) => {
 

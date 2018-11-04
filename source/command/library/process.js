@@ -11,23 +11,29 @@ const SECONDS_PER_NANOSECOND = 1 / 1000000000
 
 const Process = Object.create(_Process)
 
-Process.queue = new Queue(Configuration.command.options.queue)
+Process.queue = new Queue(Configuration.command.option.queue)
 
 Process.processTorrent = async function (torrentId, torrentName) {
   Log.debug(`START Process.processTorrent(torrentId, '${torrentName}')`)
 
   let start = Process.hrtime()
 
-  await Process.processPath(Path.join(Configuration.command.paths.downloaded, torrentName), {
-    'torrentId': torrentId,
-    'torrentName': torrentName
-  })
+  try {
 
-  await Process.start()
+    await Process.processPath(Path.join(Configuration.command.path.downloaded, torrentName), {
+      'torrentId': torrentId,
+      'torrentName': torrentName
+    })
+  
+    await Process.start()
+  
+  }
+  finally {
 
-  let [ seconds, nanoSeconds ] = Process.hrtime(start)
-
-  Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+    let [ seconds, nanoSeconds ] = Process.hrtime(start)
+    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+  
+  }
 
 }
 
@@ -76,16 +82,16 @@ Process.processFile = async function (path, context) {
 
     let extension = Path.extname(path).toLowerCase()
 
-    if (Configuration.command.extensions.book.includes(extension)) {
+    if (Configuration.command.extension.book.includes(extension)) {
       await Process.processBook(path, context)
     }
-    else if (Configuration.command.extensions.music.includes(extension)) {
+    else if (Configuration.command.extension.music.includes(extension)) {
       await Process.processMusic(path, context)
     }
-    else if (Configuration.command.extensions.video.includes(extension)) {
+    else if (Configuration.command.extension.video.includes(extension)) {
       await Process.processVideo(path, context)
     }
-    else if (Configuration.command.extensions.other.includes(extension)) {
+    else if (Configuration.command.extension.other.includes(extension)) {
       await Process.processOther(path, context)
     }
 
@@ -95,7 +101,7 @@ Process.processFile = async function (path, context) {
     Log.error(`Process.processFile('${Path.basename(path)}', context) { ... }`)
     Log.error(error)
 
-    let targetPath = Path.join(Configuration.command.paths.failed, Path.basename(path))
+    let targetPath = Path.join(Configuration.command.path.failed, Path.basename(path))
   
     await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
     await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
@@ -104,27 +110,27 @@ Process.processFile = async function (path, context) {
 
 }
 
-Process.processBook = async function (path) { // , context) {
+Process.processBook = async function (path) {
 
-  let targetPath = Path.join(Configuration.command.paths.processed, 'Books', Path.basename(path))
+  let targetPath = Path.join(Configuration.command.path.processed, 'Book', Path.basename(path))
 
   await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
   await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
 
 }
 
-Process.processMusic = async function (path) { // , context) {
+Process.processMusic = async function (path) {
 
   let inputPath = path
   let outputPath = await Convert.convertFile(inputPath)
-  let outputTags = await ID3.parseFile(outputPath)
+  let outputTag = await ID3.parseFile(outputPath)
 
-  delete outputTags.common.picture
+  delete outputTag.common.picture
   
-  Log.debug(outputTags.common, `ID3.parseFile('${Path.basename(outputPath)}')`)
+  Log.debug(outputTag.common, `ID3.parseFile('${Path.basename(outputPath)}')`)
 
-  let targetPath = Path.join(Configuration.command.paths.processed, 'Music', Sanitize(outputTags.common.albumartist || outputTags.common.artist || 'Unknown Artist'), Sanitize(outputTags.common.album || 'Unknown Album'))
-  let targetName = `${outputTags.common.track.no && outputTags.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTags.common.title || 'Unknown Title')}${Path.extname(outputPath)}`
+  let targetPath = Path.join(Configuration.command.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
+  let targetName = `${outputTag.common.track.no && outputTag.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTag.common.title || 'Unknown Title')}${Path.extname(outputPath)}`
 
   targetPath = Path.join(targetPath, targetName)
  
@@ -133,20 +139,13 @@ Process.processMusic = async function (path) { // , context) {
 
 }
 
-Process.processVideo = async function (path) { // , context) {
-
-  let inputPath = path
-  // let outputPath = await Match.renameFile(await Convert.convertFile(inputPath))
-  await Match.renameFile(await Convert.convertFile(inputPath))
-  // let outputTags = await ID3.parseFile(outputPath)
-  
-  // Log.debug(outputTags, `ID3.parseFile('${Path.basename(outputPath)}')`)
-
+Process.processVideo = async function (path) {
+  await Match.renameFile(await Convert.convertFile(path))
 }
 
-Process.processOther = async function (path) { // , context) {
+Process.processOther = async function (path) {
 
-  let targetPath = Path.join(Configuration.command.paths.processing, Path.basename(path))
+  let targetPath = Path.join(Configuration.command.path.processing, Path.basename(path))
 
   await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
   await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
