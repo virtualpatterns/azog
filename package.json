@@ -23,7 +23,7 @@
     "jake": "npm run buildTask && jake --jakefile distributable/task/index.js",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.2-364",
+  "version": "0.0.2",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
