@@ -1,5 +1,6 @@
-.DS_Store
 /distributable
 /node_modules
 /resource
 /source/sandbox
+.DS_Store
+*.log

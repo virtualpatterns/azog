@@ -19,7 +19,7 @@ Command
 
     try {
 
-      await FileSystem.promisedMakeDir(Path.dirname(Configuration.command.logPath), { 'recursive': true })
+      await FileSystem.mkdir(Path.dirname(Configuration.command.logPath), { 'recursive': true })
 
       Log.createFormattedLog({ 'level': Configuration.command.logLevel }, Configuration.command.logPath)
 
