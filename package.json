@@ -25,7 +25,7 @@
     "process": "npm run buildAll && node distributable/command/index.js --downloadedPath /Volumes/Deluge/Downloaded completed 0 ",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.3-299",
+  "version": "0.0.3-300",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
