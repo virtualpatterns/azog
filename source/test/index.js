@@ -1,22 +1,16 @@
 import '@babel/polyfill'
-import { Log, Path } from '@virtualpatterns/mablung'
+import { Log } from '@virtualpatterns/mablung'
 import Source from 'source-map-support'
 
 import Configuration from '../configuration'
 
-Source.install({ 'handleUncaughtExceptions': true })
+Source.install({ 'handleUncaughtExceptions': false })
 
-before(() => {
+Configuration.command.path.downloaded = './resource/deluge/downloaded'
+Configuration.command.path.processing = './resource/deluge/processing'
+Configuration.command.path.processed = './resource/deluge/processed'
+Configuration.command.path.failed = './resource/deluge/failed'
 
-  Log.createFormattedLog({ 'level': Configuration.test.logLevel }, Configuration.test.logPath)
-
-  Configuration.command.path.downloaded = `${Path.trim(__dirname)}/../../resource/deluge/downloaded`
-  Configuration.command.path.processing = `${Path.trim(__dirname)}/../../resource/deluge/processing`
-  Configuration.command.path.processed = `${Path.trim(__dirname)}/../../resource/deluge/processed`
-  Configuration.command.path.failed = `${Path.trim(__dirname)}/../../resource/deluge/failed`
-
-})
+Log.createFormattedLog({ 'level': Configuration.test.logLevel }, Configuration.test.logPath)
 
 require('./command/index')
-
-after(() => {})

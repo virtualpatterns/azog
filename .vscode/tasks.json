@@ -4,15 +4,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "jake",
-      "task": "build",
+      "type": "npm",
+      "script": "buildAll",
       "label": "Build",
-      "problemMatcher": []
-    },
-    {
-      "type": "jake",
-      "task": "test",
-      "label": "Test",
       "problemMatcher": []
     }
   ]

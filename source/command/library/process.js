@@ -38,7 +38,7 @@ Process.processTorrent = async function (torrentId, torrentName) {
 }
 
 Process.start = async function () {
-  Log.debug(`Process.start() queued=${Process.queue.size}`)
+  // Log.debug(`Process.start() queued=${Process.queue.size}`)
 
   Process.queue.start()
   await Process.queue.onIdle()
@@ -111,6 +111,7 @@ Process.processFile = async function (path, context) {
 }
 
 Process.processBook = async function (path) {
+  // Log.debug(`Process.processBook('${Path.basename(path)}')`)
 
   let targetPath = Path.join(Configuration.command.path.processed, 'Book', Path.basename(path))
 
@@ -120,35 +121,50 @@ Process.processBook = async function (path) {
 }
 
 Process.processMusic = async function (path) {
+  // Log.debug(`Process.processMusic('${Path.basename(path)}')`)
 
   let inputPath = path
   let outputPath = await Convert.convertFile(inputPath)
-  let outputTag = await ID3.parseFile(outputPath)
 
+  let outputTag = await ID3.parseFile(outputPath)
   delete outputTag.common.picture
-  
+
   Log.debug(outputTag.common, `ID3.parseFile('${Path.basename(outputPath)}')`)
 
-  let targetPath = Path.join(Configuration.command.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
-  let targetName = `${outputTag.common.track.no && outputTag.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTag.common.title || 'Unknown Title')}${Path.extname(outputPath)}`
+  let { parentPath, extension, name } = Match.fromPath(outputPath)
 
-  targetPath = Path.join(targetPath, targetName)
- 
+  parentPath = Path.join(Configuration.command.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
+  name = `${outputTag.common.track.no && outputTag.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTag.common.title || 'Unknown Title')}`
+
+  let targetPath = Match.toPath({ parentPath, extension, name })
+
   await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
   await FileSystem.rename(outputPath, targetPath)
 
 }
 
 Process.processVideo = async function (path) {
-  await Match.renameFile(await Convert.convertFile(path))
+  // Log.debug(`Process.processVideo('${Path.basename(path)}')`)
+  await Match.renameVideo(await Convert.convertFile(path))
 }
 
 Process.processOther = async function (path) {
 
   let targetPath = Path.join(Configuration.command.path.processing, Path.basename(path))
 
-  await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
-  await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
+  Log.debug(`START FileSystem.copy(path, '${Path.basename(targetPath)}', { 'stopOnErr' : true })`)
+  let start = Process.hrtime()
+
+  try {
+    await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
+    await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
+  }
+  finally {
+
+    let [ seconds, nanoSeconds ] = Process.hrtime(start)
+    Log.debug(`STOP FileSystem.copy(path, '${Path.basename(targetPath)}', { 'stopOnErr' : true }) ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+  
+  }
 
 }
 

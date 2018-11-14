@@ -5,8 +5,13 @@ import { Log } from '@virtualpatterns/mablung'
 import Configuration from '../configuration'
 
 Jake.addListener('start', () => {
+
+  Jake.rmRf(Configuration.task.logPath, { 'silent': true })
+  Jake.rmRf(Configuration.test.logPath, { 'silent': true })
+
   Log.createFormattedLog({ 'level': Configuration.task.logLevel }, Configuration.task.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
+  
 })
 
 desc('Remove built folders and files')

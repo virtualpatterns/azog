@@ -1,122 +1,189 @@
-// import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
-import { Log, Path } from '@virtualpatterns/mablung'
 import { DateTime } from 'luxon'
-import MovieDB from 'moviedb'
+import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
+import Is from '@pwn/is'
+import Sanitize from 'sanitize-filename'
 
 import Configuration from '../../configuration'
+import MovieDB from './movie-db'
+import TvDB from './tv-db'
 
-const MEDIA_TYPE_MOVIE = 'movie'
-const MEDIA_TYPE_TV = 'tv'
+import MatchError from './error/match-error'
+
+const NOW_YEAR = DateTime.local().year
 
 const Match = Object.create({})
 
-Match.renameFile = async function (path) {
-  Log.debug(`Match.renameFile('${Path.basename(path)}')`)
+Match.renameVideo = async function (path) {
+  Log.debug(`Match.renameVideo('${Path.basename(path)}')`)
 
-  let parentPath = Path.dirname(path)
-  let inputExtension = Path.extname(path)
-  let inputName = Path.basename(path, inputExtension)
+  let inputPath = path
+  let outputPath = await Match.getPath(inputPath)
 
-  // Log.debug(await Match.getVideos('Weekend'))
+  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+  await FileSystem.rename(inputPath, outputPath)
 
-  let outputName = inputName
-
-  // await FileSystem.promisedRename(Path.join(parentPath, inputName), Path.join(parentPath, outputName))
-
-  return Path.join(parentPath, `${outputName}${inputExtension}`)
+  return outputPath
 
 }
 
-// TVDB ... 3JY2IOFJVXC0H8LO
-// MovieDB ... f3a8fcbd92ec64401c74b6aa1936c605
-// Input is a path ... parent directory and name, all we care about is the name
-// Output is an array of objects ... { movieName, year, confidence } or { tvName, year, season, episode, episodeName, confidence } 
-// The Equalizer 2 (2018) [WEBRip] [720p] [YTS] [YIFY] ... { 'The Equalizer 2', 2018, N }
-// The.Equalizer.2.2018.HDRip.XviD AC3-220x ... same
-// The Flash 2014 S05E04 HDTV x264-SVA [eztv] ... { 'The Flash', 2014, 5, 4, N } 
-// The.Flash.2014.S05E04.HDTV.x264-SVA[rartv] ... same
-// Ink.Master.S11E10.Put.Up.or.Shut.Up.720p.PMNT.WEBRip.AAC2.0.H264- ... { 'Ink Master', N, 11, 10, N } 
-// Ch4.Great.Canal.Journeys.Series.8.2of2.Marne-Rhine.Canal.720p ... { 'Great Canal Journeys', N, 8, 2, N }
-// The.Daily.Show.2018.09.20.Tracey.Ullman.EXTENDED.720p.WEB ... { 'The Daily Show with Trevor Noah', N, S, E, N }
-// James.Corden.2018.09.18.Tracey.Ullman.WEB ... unknown
+Match.getPath = async function (path) {
 
-Match.getVideos = async function (query) {
-  Log.debug(`Match.getVideos('${query}')`)
+  let { parentPath, extension, name } = Match.fromPath(path)
 
-  let allVideos = []
+  let _name = Match.getName(name)
+  let year = Match.getYear(name)
+  let season = Match.getSeason(name)
+  let episode = Match.getEpisode(name)
 
-  let page = 0
-  let numberOfPages = Infinity
+  if (Is.not.null(_name) &&
+      Is.not.null(year) &&
+      Is.null(season) &&
+      Is.null(episode)) {
 
-  while (page < numberOfPages) {
+    let movie = await MovieDB.getMovie(_name, year)
 
-    let results = await Match.getSomeVideos(query, page + 1)
+    parentPath = Path.join(Configuration.command.path.processed, 'Movies')
+    name = `${Sanitize(movie.name)} (${movie.year})`
 
-    allVideos = allVideos.concat(results.videos)
+  }
+  else if ( Is.not.null(_name) &&
+            Is.not.null(episode)) {
 
-    page = results.page
-    numberOfPages = results.numberOfPages
+    season = Is.not.null(season) ? season : 1
+
+    let tvShow = await TvDB.getTVShow(_name, year, season, episode)
+
+    parentPath = Path.join(Configuration.command.path.processed, 'TV Shows', Sanitize(tvShow.name), `Season ${tvShow.season.toString()}`)
+    name = `${Sanitize(tvShow.name)} - ${tvShow.season.toString()}x${tvShow.episodeNumber.toString().padStart(2, '0')} - ${Sanitize(tvShow.episodeName)}`
+
+  }
+  else {
+    throw new MatchError(`Failed to find a match for the path '${path}'.`)
+  }
+
+  return Match.toPath({ parentPath, extension, name })
+
+}
+
+Match.fromPath = function (path) {
+
+  let parentPath = Path.dirname(path)
+  let extension = Path.extname(path)
+  let name = Path.basename(path, extension)
+
+  return { parentPath, extension, name }
+
+}
+
+Match.toPath = function ({ parentPath, extension, name }) {
+  return Path.join(parentPath, `${name}${extension}`)
+}
+
+Match.getYear = function (name) {
+
+  let pattern = /\d{4}/
+  let match = null
+
+  let year = null
+
+  if (Is.not.null(match = pattern.exec(name))) {
+
+    let [ yearAsString ] = match
+    let yearAsNumber = parseInt(yearAsString)
+
+    if (yearAsNumber >= 1888 && yearAsNumber <= NOW_YEAR + 1) {
+      year = yearAsNumber
+    }
 
   }
 
-  return allVideos
+  return year
 
 }
 
-Match.getSomeVideos = async function (query, page) {  
-  Log.debug('Match.getSomeVideos()')
+Match.getSeason = function (name) {
 
-  const movieDB = MovieDB(Configuration.command.keys.movieDB)
+  let pattern = /s(\d+)e\d+|(\d+)x\d+|series.(\d+)/i
+  let match = null
 
-  return new Promise((resolve, reject) => {
+  let season = null
 
-    movieDB.searchMulti({ 'page': page || 1, 'query': query }, (error, data) => {
+  if (Is.not.null(match = pattern.exec(name))) {
 
-      if (error) {
+    let [ , ...seasonsAsString ] = match
+    let seasonAsNumber = seasonsAsString
+      .map((value) => Is.undefined(value) ? 0 : parseInt(value))
+      .reduce((accumulator, value) => Math.max(accumulator, value), 0)
 
-        Log.error('MovieDB.searchMulti({ \'query\': ... }, (error, data) => {})')
-        Log.error(error)
+    season = seasonAsNumber
 
-        reject(error)
+  }
 
-      }
+  return season
 
-      let videos = data.results
-        .filter((video) => [ MEDIA_TYPE_MOVIE, MEDIA_TYPE_TV ].includes(video.media_type))
-        .map((video) => { 
+}
 
-          switch (video.media_type) {
-            case MEDIA_TYPE_MOVIE:
+Match.getEpisode = function (name) {
 
-              return {
-                'id': video.id,
-                'title': video.title,
-                'year': DateTime.fromISO(video.release_date).year
-              }
-    
-            case MEDIA_TYPE_TV:
-             
-              return {
-                'id': video.id,
-                'title': video.name,
-                'year': DateTime.fromISO(video.first_air_date).year
-              }
-    
-            default:
-              return {}
-          }
+  let pattern = /s\d+e(\d+)|\d+x(\d+)|(\d+)of\d+|part.(\d+)/i
+  let match = null
 
-        })
+  let episode = null
 
-      resolve({
-        'videos': videos, 
-        'page': data.page, 
-        'numberOfPages': data.total_pages
-      })
+  if (Is.not.null(match = pattern.exec(name))) {
 
+    let [ , ...episodesAsString ] = match
+    let episodeAsNumber = episodesAsString
+      .map((value) => Is.undefined(value) ? 0 : parseInt(value))
+      .reduce((accumulator, value) => Math.max(accumulator, value), 0)
+
+    episode = episodeAsNumber
+
+  }
+
+  return episode
+
+}
+
+Match.getName = function (name) {
+
+  let pattern = /^(.+?)(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})/i
+  let match = null
+
+  let _name = null
+
+  if (Is.not.null(match = pattern.exec(name))) {
+
+    [ , _name ] = match
+    _name = Match.transform(_name)
+
+  }
+
+  return _name
+
+}
+
+Match.transform = function (name) {
+
+  let inputName = name
+  let outputName = inputName
+
+  do {
+
+    Configuration.command.transform.replace.forEach((replace) => {
+      outputName = outputName.replace(replace.pattern, replace.with)
     })
+  
+    Configuration.command.transform.remove.forEach((pattern) => {
+      outputName = outputName.replace(pattern, '')
+    })
+  
+  } while ([
+    Configuration.command.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(outputName), false),
+    Configuration.command.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(outputName), false)
+  ].reduce((accumulator, test) => accumulator || test, false))
 
-  })
+  return outputName
 
 }
 

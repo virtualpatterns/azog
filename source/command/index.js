@@ -15,32 +15,56 @@ Command
 Command
   .command('completed <torrentId> <torrentName> [torrentPath]')
   .description('Process the indicated torrent')
-  .action(async (torrentId, torrentName) => {
+  .option('--logLevel <level>', `Log level, defaults to '${Configuration.command.logLevel}'`)
+  .option('--logPath <path>', `Log path, defaults to '${Path.trim(Configuration.command.logPath)}', 'stdout' outputs to the console`)
+  .option('--downloadedPath <path>', `Downloaded torrents path, defaults to '${Path.trim(Configuration.command.path.downloaded)}'`)
+  .option('--processingPath <path>', `Processing file path, defaults to '${Path.trim(Configuration.command.path.processing)}'`)
+  .option('--processedPath <path>', `Processed file path, defaults to '${Path.trim(Configuration.command.path.processed)}'`)
+  .option('--failedPath <path>', `Failed file path, defaults to '${Path.trim(Configuration.command.path.failed)}'`)
+  .action(async (torrentId, torrentName, torrentPath, options) => {
 
     try {
 
-      await FileSystem.mkdir(Path.dirname(Configuration.command.logPath), { 'recursive': true })
+      Configuration.command.logLevel = options.logLevel || Configuration.command.logLevel
+      Configuration.command.logPath = options.logPath ? (options.logPath == 'stdout' ? Process.stdout : options.logPath) : Configuration.command.logPath
+      Configuration.command.path.downloaded = options.downloadedPath || Configuration.command.path.downloaded
+      Configuration.command.path.processing = options.processingPath || Configuration.command.path.processing
+      Configuration.command.path.processed = options.processedPath || Configuration.command.path.processed
+      Configuration.command.path.failed = options.failedPath || Configuration.command.path.failed
 
-      Log.createFormattedLog({ 'level': Configuration.command.logLevel }, Configuration.command.logPath)
+      if (Configuration.command.logPath == Process.stdout) {
+        Log.createFormattedLog({ 'level': Configuration.command.logLevel })
+      }
+      else {
+        await FileSystem.mkdir(Path.dirname(Configuration.command.logPath), { 'recursive': true })
+        Log.createFormattedLog({ 'level': Configuration.command.logLevel }, Configuration.command.logPath)
+      }
+
+      if (options.downloadedPath ||
+          options.processingPath ||
+          options.processedPath ||
+          options.failedPath) {
+        Log.debug(Configuration.command.path, 'Configuration.command.path')
+      }
 
       try {
 
-        Process.once('SIGINT', async () => {
-          Log.debug('Process.once(\'SIGINT\', async () => { ... })')
+        Process.once('SIGINT', () => {
+          Log.debug('Process.once(\'SIGINT\', () => { ... })')
 
           Process.exit(1)
 
         })
 
-        Process.once('SIGTERM', async () => {
-          Log.debug('Process.once(\'SIGTERM\', async () => { ... })')
+        Process.once('SIGTERM', () => {
+          Log.debug('Process.once(\'SIGTERM\', () => { ... })')
 
           Process.exit(1)
 
         })
 
-        Process.once('uncaughtException', async (error) => {
-          Log.error('Process.once(\'uncaughtException\', async (error) => { ... })')
+        Process.once('uncaughtException', (error) => {
+          Log.error('Process.once(\'uncaughtException\', (error) => { ... })')
           Log.error(error)
 
           Process.exit(2)

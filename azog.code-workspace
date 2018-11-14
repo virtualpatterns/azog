@@ -1,16 +1,13 @@
 {
 	"folders": [
 		{
+			"path": "/Users/fficnar/Deluge"
+		},
+		{
 			"path": "."
 		},
 		{
 			"path": "/Users/fficnar/Projects/Shared Projects/JavaScript/mablung"
-		},
-		{
-			"path": "/Users/fficnar/Projects/Shared Projects/bin"
-		},
-		{
-			"path": "/Users/fficnar/Projects/Shared Projects/Miscellaneous/filebot"
 		}
 	]
 }

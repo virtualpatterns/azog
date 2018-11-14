@@ -73,6 +73,37 @@ describe('process', () => {
       })
     
       after(async () => {
+        await FileSystem.remove(Configuration.command.path.processing)
+        await FileSystem.remove(Configuration.command.path.processed)
+      })
+  
+    })
+
+    describe('(when called with a movie)', () => {
+
+      let torrentId = null
+      let torrentName = null
+      let processedMoviesPath = null
+      let processedMoviePath = null
+
+      before(async () => {
+
+        torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
+        torrentName = 'The.Equalizer.2.2018.720p.WEBRip.x264-[YTS.AM]'
+        processedMoviesPath = Path.join(Configuration.command.path.processed, 'Movies')
+        processedMoviePath = Path.join(processedMoviesPath, 'The Equalizer 2 (2018).mp4')
+
+        await FileSystem.remove(Configuration.command.path.processed)
+        await Process.processTorrent(torrentId, torrentName)
+
+      })
+
+      it('should produce the correct file', async () => {
+        await FileSystem.access(processedMoviePath, FileSystem.F_OK)
+      })
+    
+      after(async () => {
+        await FileSystem.remove(Configuration.command.path.processing)
         await FileSystem.remove(Configuration.command.path.processed)
       })
   
@@ -82,25 +113,32 @@ describe('process', () => {
 
       let torrentId = null
       let torrentName = null
-      let processingTVShowPath = null
+      let processedTVShowsPath = null
+      let processedTVShowPath = null
+      let processedSeasonPath = null
+      let processedEpisodePath = null
 
       before(async () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'South.Park.S22E05.720p.HDTV.x264-AVS'
-        processingTVShowPath = Path.join(Configuration.command.path.processing, `${torrentName}.mp4`)
+        processedTVShowsPath = Path.join(Configuration.command.path.processed, 'TV Shows')
+        processedTVShowPath = Path.join(processedTVShowsPath, 'South Park')
+        processedSeasonPath = Path.join(processedTVShowPath, 'Season 22')
+        processedEpisodePath = Path.join(processedSeasonPath, 'South Park - 22x05 - The Scoots.mp4')
 
-        await FileSystem.remove(Configuration.command.path.processing)
+        await FileSystem.remove(Configuration.command.path.processed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
 
       it('should produce the correct file', async () => {
-        await FileSystem.access(processingTVShowPath, FileSystem.F_OK)
+        await FileSystem.access(processedEpisodePath, FileSystem.F_OK)
       })
     
       after(async () => {
         await FileSystem.remove(Configuration.command.path.processing)
+        await FileSystem.remove(Configuration.command.path.processed)
       })
   
     })
@@ -117,7 +155,7 @@ describe('process', () => {
         torrentName = 'Archive'
         processingArchivePath = Path.join(Configuration.command.path.processing, `${torrentName}.zip`)
 
-        await FileSystem.remove(Configuration.command.path.processing)
+        await FileSystem.remove(processingArchivePath)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -127,7 +165,7 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processing)
+        await FileSystem.remove(processingArchivePath)
       })
   
     })

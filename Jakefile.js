@@ -1,1 +1,5 @@
-require('./distributable/task/index.js')
+"use strict";
+
+require("./distributable/task/index");
+
+//# sourceMappingURL=Jakefile.js.map

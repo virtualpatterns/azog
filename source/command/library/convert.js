@@ -4,7 +4,6 @@ import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 import Configuration from '../../configuration'
 
 import ConvertError from './error/convert-error'
-import ProbeError from './error/probe-error'
 
 const EXTENSION_MOVIE = '.mp4'
 const EXTENSION_MUSIC = '.mp3'
@@ -12,6 +11,7 @@ const EXTENSION_MUSIC = '.mp3'
 const Convert = Object.create({})
 
 Convert.convertFile = async function (path) {
+  // Log.debug(`Convert.convertFile('${Path.basename(path)}')`)
 
   let inputPath = path
   let inputExtension = Path.extname(inputPath).toLowerCase()
@@ -75,35 +75,6 @@ Convert.convertFile = async function (path) {
       })
       .run()
 
-  })
-
-}
-
-Convert.probeFile = function (path) { // , context) {
-  Log.debug(`Convert.probeFile('${Path.basename(path)}')`)
-
-  return new Promise((resolve, reject) => {
-
-    let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
-
-    ffmpeg
-      .setFfprobePath(Configuration.command.path.ffprobe)
-      .input(path)
-      .ffprobe((error, data) => {
-
-        if (error) {
-
-          Log.error(`FFMPEG.ffprobe((error, data) => { ... }) <-- '${Path.basename(path)}'`)
-          Log.error(error)
-  
-          reject(new ProbeError(`Failed to probe the file '${Path.trim(path)}'.`))
-
-        }
-      
-        resolve(data)
-
-      })
-      
   })
 
 }
