@@ -7,13 +7,12 @@ import Configuration from '../../configuration'
 import Convert from './convert'
 import Match from './match'
 
-const SECONDS_PER_NANOSECOND = 1 / 1000000000
-
 const Process = Object.create(_Process)
 
-Process.queue = new Queue(Configuration.command.option.queue)
+Process.queue = new Queue(Configuration.command.queue)
 
 Process.processTorrent = async function (torrentId, torrentName) {
+  Log.debug(Configuration.line)
   Log.debug(`START Process.processTorrent(torrentId, '${torrentName}')`)
 
   let start = Process.hrtime()
@@ -31,7 +30,7 @@ Process.processTorrent = async function (torrentId, torrentName) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -113,10 +112,22 @@ Process.processFile = async function (path, context) {
 Process.processBook = async function (path) {
   // Log.debug(`Process.processBook('${Path.basename(path)}')`)
 
-  let targetPath = Path.join(Configuration.command.path.processed, 'Book', Path.basename(path))
+  let inputPath = path
+  let outputPath = null
 
-  await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
-  await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
+  let { parentPath, extension, name } = Match.fromPath(inputPath)
+
+  parentPath = Path.join(Configuration.command.path.processed, 'Books')
+  name = Sanitize(Match.transform(name) )
+  
+  outputPath = Match.toPath({ parentPath, extension, name })
+
+  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+
+  // Log.debug(`FileSystem.copy('${Path.relative(Configuration.command.path.downloaded, inputPath)}', '${Path.relative(Configuration.command.path.processed, outputPath)}', { 'stopOnErr' : true })`)
+  await FileSystem.copy(inputPath, outputPath, { 'stopOnErr' : true })
+
+  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
 
 }
 
@@ -124,47 +135,71 @@ Process.processMusic = async function (path) {
   // Log.debug(`Process.processMusic('${Path.basename(path)}')`)
 
   let inputPath = path
-  let outputPath = await Convert.convertFile(inputPath)
-
+  let outputPath = await Convert.convertMusic(inputPath)
   let outputTag = await ID3.parseFile(outputPath)
-  delete outputTag.common.picture
-
-  Log.debug(outputTag.common, `ID3.parseFile('${Path.basename(outputPath)}')`)
 
   let { parentPath, extension, name } = Match.fromPath(outputPath)
 
   parentPath = Path.join(Configuration.command.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
   name = `${outputTag.common.track.no && outputTag.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTag.common.title || 'Unknown Title')}`
 
-  let targetPath = Match.toPath({ parentPath, extension, name })
+  inputPath = outputPath
+  outputPath = Match.toPath({ parentPath, extension, name })
 
-  await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
-  await FileSystem.rename(outputPath, targetPath)
+  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+
+  // Log.debug(`FileSystem.rename('${Path.relative(Configuration.command.path.processing, inputPath)}', '${Path.relative(Configuration.command.path.processed, outputPath)}')`)
+  await FileSystem.rename(inputPath, outputPath)
+
+  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
 
 }
 
 Process.processVideo = async function (path) {
   // Log.debug(`Process.processVideo('${Path.basename(path)}')`)
-  await Match.renameVideo(await Convert.convertFile(path))
+
+  let inputPath = path
+  let outputPath = await Convert.convertVideo(inputPath)
+
+  inputPath = outputPath
+  outputPath = await Match.getPath(inputPath)
+
+  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+
+  // Log.debug(`FileSystem.rename('${Path.basename(inputPath)}', '${Path.basename(outputPath)}')`)
+  await FileSystem.rename(inputPath, outputPath)
+
+  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+
 }
 
 Process.processOther = async function (path) {
+  // Log.debug(`Process.processOther('${Path.basename(path)}')`)
 
-  let targetPath = Path.join(Configuration.command.path.processing, Path.basename(path))
+  let inputPath = path
+  let outputPath = null
 
-  Log.debug(`START FileSystem.copy(path, '${Path.basename(targetPath)}', { 'stopOnErr' : true })`)
+  let { parentPath, extension, name } = Match.fromPath(inputPath)
+
+  parentPath = Path.join(Configuration.command.path.processed, 'Other')
+  outputPath = Match.toPath({ parentPath, extension, name })
+
+  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+
+  Log.trace(`START FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true })`)
   let start = Process.hrtime()
 
   try {
-    await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
-    await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
+    await FileSystem.copy(inputPath, outputPath, { 'stopOnErr' : true })
   }
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`STOP FileSystem.copy(path, '${Path.basename(targetPath)}', { 'stopOnErr' : true }) ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+    Log.trace(`STOP FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
+
+  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
 
 }
 

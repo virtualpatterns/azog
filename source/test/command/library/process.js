@@ -19,7 +19,7 @@ describe('process', () => {
 
         torrentId = '6fe895e52e803f58e640e3d8311e1e8e1231e599'
         torrentName = 'Sleeping Beauties by Stephen King'
-        processedBooksPath = Path.join(Configuration.command.path.processed, 'Book')
+        processedBooksPath = Path.join(Configuration.command.path.processed, 'Books')
         processedBookPath = Path.join(processedBooksPath, `${torrentName}.epub`)
 
         await FileSystem.remove(Configuration.command.path.processed)
@@ -147,25 +147,25 @@ describe('process', () => {
 
       let torrentId = null
       let torrentName = null
-      let processingArchivePath = null
+      let processedArchivePath = null
 
       before(async () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'Archive'
-        processingArchivePath = Path.join(Configuration.command.path.processing, `${torrentName}.zip`)
+        processedArchivePath = Path.join(Configuration.command.path.processed, 'Other', `${torrentName}.zip`)
 
-        await FileSystem.remove(processingArchivePath)
+        await FileSystem.remove(processedArchivePath)
         await Process.processTorrent(torrentId, torrentName)
 
       })
 
       it('should produce the correct file', async () => {
-        await FileSystem.access(processingArchivePath, FileSystem.F_OK)
+        await FileSystem.access(processedArchivePath, FileSystem.F_OK)
       })
     
       after(async () => {
-        await FileSystem.remove(processingArchivePath)
+        await FileSystem.remove(processedArchivePath)
       })
   
     })

@@ -22,10 +22,10 @@
     "buildAll": "npm run jake build",
     "tasks": "npm run buildTask && jake --jakefile distributable/task/index.js --tasks",
     "jake": "npm run buildTask && jake --jakefile distributable/task/index.js",
-    "process": "npm run buildAll && node distributable/command/index.js --downloadedPath /Volumes/Deluge/Downloaded completed 0 ",
+    "process": "npm run buildAll && clear && node distributable/command/index.js --logLevel trace --logPath stdout --downloadedPath /Volumes/Deluge/Downloaded --concurrency 1 completed 0 ",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.3",
+  "version": "0.0.4-46",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",

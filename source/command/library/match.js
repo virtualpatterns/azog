@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
+import { Path } from '@virtualpatterns/mablung'
 import Is from '@pwn/is'
 import Sanitize from 'sanitize-filename'
 
@@ -13,19 +13,6 @@ const NOW_YEAR = DateTime.local().year
 
 const Match = Object.create({})
 
-Match.renameVideo = async function (path) {
-  Log.debug(`Match.renameVideo('${Path.basename(path)}')`)
-
-  let inputPath = path
-  let outputPath = await Match.getPath(inputPath)
-
-  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
-  await FileSystem.rename(inputPath, outputPath)
-
-  return outputPath
-
-}
-
 Match.getPath = async function (path) {
 
   let { parentPath, extension, name } = Match.fromPath(path)
@@ -36,7 +23,6 @@ Match.getPath = async function (path) {
   let episode = Match.getEpisode(name)
 
   if (Is.not.null(_name) &&
-      Is.not.null(year) &&
       Is.null(season) &&
       Is.null(episode)) {
 

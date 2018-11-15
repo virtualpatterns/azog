@@ -238,7 +238,12 @@ describe('match', () => {
     {
       'inputPath': Path.join(Configuration.command.path.processing, 'The.Flash.S01E01.mkv'),
       'outputPath': Path.join(Configuration.command.path.processed, 'TV Shows', 'The Flash', 'Season 1', 'The Flash - 1x01 - Pilot.mkv')
+    },
+    {
+      'inputPath': Path.join(Configuration.command.path.processing, 'They.Shall.Not.Grow.Old.1080p.x264.AAC.MVGroup.Forum.mp4'),
+      'outputPath': Path.join(Configuration.command.path.processed, 'Movies', 'They Shall Not Grow Old (2018).mp4')
     }
+    // 
   ])
 
 })

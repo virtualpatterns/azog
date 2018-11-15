@@ -1,9 +1,11 @@
 import { Process } from '@virtualpatterns/mablung'
 import OS from 'os'
 
-let userExtension = require(`${Process.env.HOME}/Deluge/extension.json`)
-let userKey = require(`${Process.env.HOME}/Deluge/key.json`)
-let userTransform = require(`${Process.env.HOME}/Deluge/transform.json`)
+const SECONDS_PER_NANOSECOND = 1 / 1000000000
+
+const userExtension = require(`${Process.env.HOME}/Deluge/extension.json`)
+const userKey = require(`${Process.env.HOME}/Deluge/key.json`)
+const userTransform = require(`${Process.env.HOME}/Deluge/transform.json`)
 
 export default {
 
@@ -17,7 +19,7 @@ export default {
       'book': [ '.epub', '.mobi', '.pdf', ...userExtension.book ],
       'music': [ '.flac', '.m4a', '.mp3', ...userExtension.music ],
       'video': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4', ...userExtension.video ],
-      'other': [ '.rar', '.zip', ...userExtension.other ]
+      'other': [ '.rar', '.zip', ...userExtension.other ]      
 
     },
 
@@ -25,15 +27,6 @@ export default {
 
       'movieDB': userKey.movieDB,
       'tvDB': userKey.tvDB
-
-    },
-
-    'option': {
-
-      'queue': {
-        'autoStart': false,
-        'concurrency': OS.cpus().length
-      }
 
     },
 
@@ -47,6 +40,13 @@ export default {
       'ffmpeg': '/usr/local/bin/ffmpeg',
       'ffprobe': '/usr/local/bin/ffprobe'
 
+    },
+
+    'queue': {
+
+      'autoStart': false,
+      'concurrency': OS.cpus().length
+      
     },
 
     'transform': {
@@ -71,7 +71,7 @@ export default {
         }) )
       ]
 
-    },
+    }
         
   },
 
@@ -89,6 +89,14 @@ export default {
       'module': `${__dirname}/command/index.js`,
     }
 
-  }
+  },
+
+  'conversion': {
+
+    'toSeconds': (seconds, nanoSeconds) => (seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)
+
+  },
+
+  'line': '-'.repeat(80)
 
 }

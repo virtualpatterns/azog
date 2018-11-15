@@ -21,16 +21,20 @@ Command
   .option('--processingPath <path>', `Processing file path, defaults to '${Path.trim(Configuration.command.path.processing)}'`)
   .option('--processedPath <path>', `Processed file path, defaults to '${Path.trim(Configuration.command.path.processed)}'`)
   .option('--failedPath <path>', `Failed file path, defaults to '${Path.trim(Configuration.command.path.failed)}'`)
+  .option('--concurrency <integer>', `Number of files to process simultaneously, defaults to ${Configuration.command.queue.concurrency}`)
   .action(async (torrentId, torrentName, torrentPath, options) => {
 
     try {
 
       Configuration.command.logLevel = options.logLevel || Configuration.command.logLevel
       Configuration.command.logPath = options.logPath ? (options.logPath == 'stdout' ? Process.stdout : options.logPath) : Configuration.command.logPath
+
       Configuration.command.path.downloaded = options.downloadedPath || Configuration.command.path.downloaded
       Configuration.command.path.processing = options.processingPath || Configuration.command.path.processing
       Configuration.command.path.processed = options.processedPath || Configuration.command.path.processed
       Configuration.command.path.failed = options.failedPath || Configuration.command.path.failed
+
+      Configuration.command.queue.concurrency = options.concurrency || Configuration.command.queue.concurrency
 
       if (Configuration.command.logPath == Process.stdout) {
         Log.createFormattedLog({ 'level': Configuration.command.logLevel })
@@ -40,12 +44,8 @@ Command
         Log.createFormattedLog({ 'level': Configuration.command.logLevel }, Configuration.command.logPath)
       }
 
-      if (options.downloadedPath ||
-          options.processingPath ||
-          options.processedPath ||
-          options.failedPath) {
-        Log.debug(Configuration.command.path, 'Configuration.command.path')
-      }
+      Log.trace(Configuration.command.path, 'Configuration.command.path')
+      Log.trace(Configuration.command.queue, 'Configuration.command.queue')
 
       try {
 

@@ -7,8 +7,6 @@ import Process from './process'
 
 import MatchError from './error/match-error'
 
-const SECONDS_PER_NANOSECOND = 1 / 1000000000
-
 const TvDB = Object.create({})
 
 TvDB.getTVShow = async function (name, year, season, episode) {
@@ -18,7 +16,7 @@ TvDB.getTVShow = async function (name, year, season, episode) {
   let data = null
   let options = {}
   
-  Log.debug(`START _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options)`)
+  Log.trace(`START _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options)`)
   let start = Process.hrtime()
 
   try {
@@ -27,7 +25,7 @@ TvDB.getTVShow = async function (name, year, season, episode) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug({ options, data }, `STOP _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options) ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -79,7 +77,7 @@ TvDB.getEpisode = async function (tvDB, tvShow, season, episode) {
     }
   }
   
-  Log.debug(`START _TvDB.getEpisodesBySeriesId(${tvShow.id}, options)`)
+  Log.trace(`START _TvDB.getEpisodesBySeriesId(${tvShow.id}, options)`)
   let start = Process.hrtime()
 
   try {
@@ -88,7 +86,7 @@ TvDB.getEpisode = async function (tvDB, tvShow, season, episode) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${(seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
