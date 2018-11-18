@@ -6,10 +6,7 @@ import Configuration from '../configuration'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
-Configuration.command.path.downloaded = './resource/deluge/downloaded'
-Configuration.command.path.processing = './resource/deluge/processing'
-Configuration.command.path.processed = './resource/deluge/processed'
-Configuration.command.path.failed = './resource/deluge/failed'
+Configuration.merge(`${__dirname}/../../resource/deluge/configuration.json`)
 
 Log.createFormattedLog({ 'level': Configuration.test.logLevel }, Configuration.test.logPath)
 

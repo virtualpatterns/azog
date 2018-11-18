@@ -38,7 +38,7 @@ Convert.convertMusic = async function (path) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP Convert.convertMusic('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`STOP Convert.convertMusic('${Path.basename(path)}') ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -74,7 +74,7 @@ Convert.convertVideo = async function (path) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP Convert.convertVideo('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`STOP Convert.convertVideo('${Path.basename(path)}') ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -125,7 +125,7 @@ Convert.getDuration = async function (path) {
   let data = await Convert.getData(path)
   let format = data.format
 
-  return Duration.fromMillis(Configuration.conversion.toMilliseconds(format.duration))
+  return Duration.fromMillis(Configuration.command.conversion.toMilliseconds(format.duration))
 
 }
 

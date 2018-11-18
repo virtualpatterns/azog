@@ -12,7 +12,7 @@ const Process = Object.create(_Process)
 Process.queue = new Queue(Configuration.command.queue)
 
 Process.processTorrent = async function (torrentId, torrentName) {
-  Log.debug(Configuration.line)
+  Log.debug(Configuration.command.line)
   Log.debug(`START Process.processTorrent(torrentId, '${torrentName}')`)
 
   let start = Process.hrtime()
@@ -30,7 +30,7 @@ Process.processTorrent = async function (torrentId, torrentName) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -201,7 +201,7 @@ Process.processOther = async function (path) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`STOP FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 

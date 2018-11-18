@@ -4,7 +4,7 @@ import { FileSystem } from '@virtualpatterns/mablung'
 
 import Configuration from '../../configuration'
 
-describe('command', () => {
+describe.only('command', () => {
 
   describe('index', () => {
 
@@ -13,14 +13,9 @@ describe('command', () => {
       let childProcess = null
 
       before(() => {
-        childProcess = ChildProcess.fork(Configuration.test.path.module, [ 
-          'completed', '0', '0',
-          '--logLevel', Configuration.test.logLevel,
-          '--logPath', Configuration.test.logPath,
-          '--downloadedPath', Configuration.command.path.downloaded,
-          '--processingPath', Configuration.command.path.processing,
-          '--processedPath', Configuration.command.path.processed,
-          '--failedPath', Configuration.command.path.failed ], { 'silent': true })
+        childProcess = ChildProcess.fork(Configuration.test.path.module, [
+          '--configurationPath', './resource/deluge/configuration.json',
+          'completed', '0', '0' ], { 'silent': true })
       })
     
       it('should exit with the correct code', (complete) => {
@@ -47,13 +42,8 @@ describe('command', () => {
         await FileSystem.remove(Configuration.command.path.processed)
 
         childProcess = ChildProcess.fork(Configuration.test.path.module, [ 
-          'completed', torrentId, torrentName,
-          '--logLevel', Configuration.test.logLevel,
-          '--logPath', Configuration.test.logPath,
-          '--downloadedPath', Configuration.command.path.downloaded,
-          '--processingPath', Configuration.command.path.processing,
-          '--processedPath', Configuration.command.path.processed,
-          '--failedPath', Configuration.command.path.failed ], { 'silent': true })
+          '--configurationPath', './resource/deluge/configuration.json',
+          'completed', torrentId, torrentName ], { 'silent': true })
 
       })
     

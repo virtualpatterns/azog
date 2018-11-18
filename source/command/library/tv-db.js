@@ -25,7 +25,7 @@ TvDB.getTVShow = async function (name, year, season, episode) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -86,7 +86,7 @@ TvDB.getEpisode = async function (tvDB, tvShow, season, episode) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 

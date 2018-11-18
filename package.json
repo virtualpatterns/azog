@@ -24,7 +24,7 @@
     "runCompleted": "npm run buildAll && node distributable/command/index.js --logLevel debug --logPath \"/Users/fficnar/Library/Logs/azog/azog.log\" --downloadedPath \"resource/deluge/downloaded\" --processingPath \"resource/deluge/processing\" --processedPath \"resource/deluge/processed\" --failedPath \"resource/deluge/failed\" completed 0001 ",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.5",
+  "version": "0.0.6-16",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
@@ -41,11 +41,13 @@
     "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung": "0.0.25",
     "commander": "^2.19.0",
+    "deepmerge": "^2.2.1",
     "fluent-ffmpeg": "^2.1.2",
     "luxon": "^1.4.5",
     "moviedb": "^0.2.10",
     "music-metadata": "^3.1.4",
     "node-tvdb": "^4.1.0",
+    "object-path": "^0.11.4",
     "p-queue": "^3.0.0",
     "sanitize-filename": "^1.6.1",
     "source-map-support": "^0.5.9"

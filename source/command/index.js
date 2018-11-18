@@ -15,28 +15,16 @@ Command
 Command
   .command('completed <torrentId> <torrentName> [torrentPath]')
   .description('Process the indicated torrent')
-  .option('--logLevel <level>', `Log level, defaults to '${Configuration.command.logLevel}'`)
-  .option('--logPath <path>', `Log path, defaults to '${Path.trim(Configuration.command.logPath)}', 'stdout' outputs to the console`)
-  .option('--downloadedPath <path>', `Downloaded torrents path, defaults to '${Path.trim(Configuration.command.path.downloaded)}'`)
-  .option('--processingPath <path>', `Processing file path, defaults to '${Path.trim(Configuration.command.path.processing)}'`)
-  .option('--processedPath <path>', `Processed file path, defaults to '${Path.trim(Configuration.command.path.processed)}'`)
-  .option('--failedPath <path>', `Failed file path, defaults to '${Path.trim(Configuration.command.path.failed)}'`)
-  .option('--concurrency <integer>', `Number of files to process simultaneously, defaults to ${Configuration.command.queue.concurrency}`)
+  .option('--configurationPath <path>', 'Configuration path (configuration overrides defaults)')
   .action(async (torrentId, torrentName, torrentPath, options) => {
 
     try {
 
-      Configuration.command.logLevel = options.logLevel || Configuration.command.logLevel
-      Configuration.command.logPath = options.logPath ? (options.logPath == 'stdout' ? Process.stdout : options.logPath) : Configuration.command.logPath
+      if (options.configurationPath) {
+        Configuration.merge(options.configurationPath)
+      }
 
-      Configuration.command.path.downloaded = options.downloadedPath || Configuration.command.path.downloaded
-      Configuration.command.path.processing = options.processingPath || Configuration.command.path.processing
-      Configuration.command.path.processed = options.processedPath || Configuration.command.path.processed
-      Configuration.command.path.failed = options.failedPath || Configuration.command.path.failed
-
-      Configuration.command.queue.concurrency = options.concurrency || Configuration.command.queue.concurrency
-
-      if (Configuration.command.logPath == Process.stdout) {
+      if (Configuration.command.logPath == 'stdout') {
         Log.createFormattedLog({ 'level': Configuration.command.logLevel })
       }
       else {
@@ -44,8 +32,7 @@ Command
         Log.createFormattedLog({ 'level': Configuration.command.logLevel }, Configuration.command.logPath)
       }
 
-      Log.trace(Configuration.command.path, 'Configuration.command.path')
-      Log.trace(Configuration.command.queue, 'Configuration.command.queue')
+      Log.trace(Configuration.command, 'Configuration.command')
 
       try {
 

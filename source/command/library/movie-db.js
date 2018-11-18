@@ -36,7 +36,7 @@ MovieDB.getMovie = async function (name, year) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _MovieDB.searchMovie(options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _MovieDB.searchMovie(options) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
   
