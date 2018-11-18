@@ -1,3 +1,4 @@
+import { Duration } from 'luxon'
 import FFMPEG from 'fluent-ffmpeg'
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 
@@ -29,8 +30,7 @@ Convert.convertMusic = async function (path) {
   
     outputPath = Match.toPath({ parentPath, extension, name })
   
-    await Convert.probeFile(inputPath)
-    await Convert.convertFile(inputPath, outputPath)
+    await Convert.convertPath(inputPath, outputPath)
       
     return outputPath
   
@@ -61,8 +61,7 @@ Convert.convertVideo = async function (path) {
 
     outputPath = Match.toPath({ parentPath, extension, name })
 
-    await Convert.probeFile(inputPath)
-    await Convert.convertFile(inputPath, outputPath, (ffmpeg) => {
+    await Convert.convertPath(inputPath, outputPath, (ffmpeg) => {
       ffmpeg
         .outputOptions('-codec copy')
         // .videoCodec('h264')
@@ -81,7 +80,7 @@ Convert.convertVideo = async function (path) {
 
 }
 
-Convert.convertFile = function (inputPath, outputPath, outputFn) {
+Convert.convertPath = function (inputPath, outputPath, outputFn) {
 
   return new Promise((resolve, reject) => {
 
@@ -121,7 +120,16 @@ Convert.convertFile = function (inputPath, outputPath, outputFn) {
 
 }
 
-Convert.probeFile = function (path) {
+Convert.getDuration = async function (path) {
+
+  let data = await Convert.getData(path)
+  let format = data.format
+
+  return Duration.fromMillis(Configuration.conversion.toMilliseconds(format.duration))
+
+}
+
+Convert.getData = function (path) {
 
   return new Promise((resolve, reject) => {
 
@@ -141,11 +149,8 @@ Convert.probeFile = function (path) {
 
         }
         else {
-          Log.trace({ path, data }, 'FFMPEG.ffprobe(error, data) => { ... })')
-          resolve()
+          resolve(data)
         }
-
-        resolve()
 
       })
 

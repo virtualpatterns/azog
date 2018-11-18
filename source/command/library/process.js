@@ -159,17 +159,23 @@ Process.processVideo = async function (path) {
   // Log.debug(`Process.processVideo('${Path.basename(path)}')`)
 
   let inputPath = path
-  let outputPath = await Convert.convertVideo(inputPath)
+  let duration = await Convert.getDuration(inputPath)
 
-  inputPath = outputPath
-  outputPath = await Match.getPath(inputPath)
+  if (duration.as('minutes') >= Configuration.command.minimum.minutes) {
 
-  await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+    let outputPath = await Convert.convertVideo(inputPath)
 
-  // Log.debug(`FileSystem.rename('${Path.basename(inputPath)}', '${Path.basename(outputPath)}')`)
-  await FileSystem.rename(inputPath, outputPath)
-
-  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+    inputPath = outputPath
+    outputPath = await Match.getPath(inputPath)
+  
+    await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
+  
+    // Log.debug(`FileSystem.rename('${Path.basename(inputPath)}', '${Path.basename(outputPath)}')`)
+    await FileSystem.rename(inputPath, outputPath)
+  
+    Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+  
+  }
 
 }
 

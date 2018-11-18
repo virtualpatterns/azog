@@ -4,6 +4,8 @@ import { FileSystem, Path } from '@virtualpatterns/mablung'
 import Configuration from '../../../configuration'
 import Process from '../../../command/library/process'
 
+import TestError from '../../error/test-error'
+
 describe('process', () => {
 
   describe('processTorrent', () => {
@@ -100,6 +102,46 @@ describe('process', () => {
 
       it('should produce the correct file', async () => {
         await FileSystem.access(processedMoviePath, FileSystem.F_OK)
+      })
+    
+      after(async () => {
+        await FileSystem.remove(Configuration.command.path.processing)
+        await FileSystem.remove(Configuration.command.path.processed)
+      })
+  
+    })
+
+    describe('(when called with a short movie)', () => {
+
+      let torrentId = null
+      let torrentName = null
+      let processedMoviesPath = null
+      let processedMoviePath = null
+
+      before(async () => {
+
+        torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
+        torrentName = 'Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT'
+        processedMoviesPath = Path.join(Configuration.command.path.processed, 'Movies')
+        processedMoviePath = Path.join(processedMoviesPath, 'Jonathan (2018).mp4')
+
+        await FileSystem.remove(Configuration.command.path.processed)
+        await Process.processTorrent(torrentId, torrentName)
+
+      })
+
+      it('should not produce the correct file', async () => {
+
+        try {
+          await FileSystem.access(processedMoviePath, FileSystem.F_OK)
+          throw new TestError(`The file '${Path.trim(processedMoviePath)}' exists.`)
+        }
+        catch (error) {
+          if (error instanceof TestError) {
+            throw error
+          }
+        }
+
       })
     
       after(async () => {

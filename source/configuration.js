@@ -1,6 +1,7 @@
 import { Process } from '@virtualpatterns/mablung'
 import OS from 'os'
 
+const MILLISECONDS_PER_SECOND = 1000
 const SECONDS_PER_NANOSECOND = 1 / 1000000000
 
 const userExtension = require(`${Process.env.HOME}/Deluge/extension.json`)
@@ -27,6 +28,12 @@ export default {
 
       'movieDB': userKey.movieDB,
       'tvDB': userKey.tvDB
+
+    },
+
+    'minimum': {
+
+      'minutes': 15
 
     },
 
@@ -93,6 +100,7 @@ export default {
 
   'conversion': {
 
+    'toMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
     'toSeconds': (seconds, nanoSeconds) => (seconds + nanoSeconds * SECONDS_PER_NANOSECOND).toFixed(2)
 
   },

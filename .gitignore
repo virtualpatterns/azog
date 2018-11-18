@@ -1,5 +1,6 @@
 /distributable
 /node_modules
+/process
 /resource
 /source/sandbox
 .DS_Store
