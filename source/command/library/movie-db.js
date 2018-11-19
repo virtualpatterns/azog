@@ -4,7 +4,7 @@ import { Log } from '@virtualpatterns/mablung'
 import _MovieDB from 'moviedb'
 import Utilities from 'util'
 
-import Configuration from '../../configuration'
+import { Command as Configuration } from '../../configuration'
 import Process from './process'
 
 import MatchError from './error/match-error'
@@ -13,7 +13,7 @@ const MovieDB = Object.create({})
 
 MovieDB.getMovie = async function (name, year) {
 
-  const movieDB = _MovieDB(Configuration.command.key.movieDB)
+  const movieDB = _MovieDB(Configuration.key.movieDB)
 
   movieDB.searchMovie = Utilities.promisify(movieDB.searchMovie)
 
@@ -36,7 +36,7 @@ MovieDB.getMovie = async function (name, year) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _MovieDB.searchMovie(options) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _MovieDB.searchMovie(options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
   

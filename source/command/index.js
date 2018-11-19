@@ -3,7 +3,7 @@ import Command from 'commander'
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 import Source from 'source-map-support'
 
-import Configuration from '../configuration'
+import { Command as Configuration } from '../configuration'
 import Package from '../../package.json'
 import Process from './library/process'
 
@@ -15,24 +15,22 @@ Command
 Command
   .command('completed <torrentId> <torrentName> [torrentPath]')
   .description('Process the indicated torrent')
-  .option('--configurationPath <path>', 'Configuration path (configuration overrides defaults)')
+  .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
   .action(async (torrentId, torrentName, torrentPath, options) => {
 
     try {
 
       if (options.configurationPath) {
-        Configuration.merge(options.configurationPath)
+        Configuration.merge(options.configurationPath.split(','))
       }
-
-      if (Configuration.command.logPath == 'stdout') {
-        Log.createFormattedLog({ 'level': Configuration.command.logLevel })
+    
+      if (Configuration.logPath == 'stdout') {
+        Log.createFormattedLog({ 'level': Configuration.logLevel })
       }
       else {
-        await FileSystem.mkdir(Path.dirname(Configuration.command.logPath), { 'recursive': true })
-        Log.createFormattedLog({ 'level': Configuration.command.logLevel }, Configuration.command.logPath)
+        await FileSystem.mkdir(Path.dirname(Configuration.logPath), { 'recursive': true })
+        Log.createFormattedLog({ 'level': Configuration.logLevel }, Configuration.logPath)
       }
-
-      Log.trace(Configuration.command, 'Configuration.command')
 
       try {
 
@@ -81,6 +79,8 @@ Command
       Process.exit(3)
 
     }
+
+    Process.exit(0)
 
   })
 

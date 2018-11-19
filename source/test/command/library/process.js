@@ -1,7 +1,7 @@
 import { assert as Assert } from 'chai'
 import { FileSystem, Path } from '@virtualpatterns/mablung'
 
-import Configuration from '../../../configuration'
+import { Command as Configuration } from '../../../configuration'
 import Process from '../../../command/library/process'
 
 import TestError from '../../error/test-error'
@@ -21,10 +21,10 @@ describe('process', () => {
 
         torrentId = '6fe895e52e803f58e640e3d8311e1e8e1231e599'
         torrentName = 'Sleeping Beauties by Stephen King'
-        processedBooksPath = Path.join(Configuration.command.path.processed, 'Books')
+        processedBooksPath = Path.join(Configuration.path.processed, 'Books')
         processedBookPath = Path.join(processedBooksPath, `${torrentName}.epub`)
 
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -34,7 +34,7 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processed)
       })
   
     })
@@ -52,12 +52,12 @@ describe('process', () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'Jimi Hendrix - Axis Bold as Love (320)'
-        processedMusicPath = Path.join(Configuration.command.path.processed, 'Music')
+        processedMusicPath = Path.join(Configuration.path.processed, 'Music')
         processedArtistPath = Path.join(processedMusicPath, 'The Jimi Hendrix Experience')
         processedAlbumPath = Path.join(processedArtistPath, 'Axis Bold as Love')
         processedSongPath = Path.join(processedAlbumPath, '26 Bold as Love.mp3')
 
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -75,8 +75,8 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processing)
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processing)
+        await FileSystem.remove(Configuration.path.processed)
       })
   
     })
@@ -92,10 +92,10 @@ describe('process', () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'The.Equalizer.2.2018.720p.WEBRip.x264-[YTS.AM]'
-        processedMoviesPath = Path.join(Configuration.command.path.processed, 'Movies')
+        processedMoviesPath = Path.join(Configuration.path.processed, 'Movies')
         processedMoviePath = Path.join(processedMoviesPath, 'The Equalizer 2 (2018).mp4')
 
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -105,8 +105,8 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processing)
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processing)
+        await FileSystem.remove(Configuration.path.processed)
       })
   
     })
@@ -122,10 +122,10 @@ describe('process', () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT'
-        processedMoviesPath = Path.join(Configuration.command.path.processed, 'Movies')
+        processedMoviesPath = Path.join(Configuration.path.processed, 'Movies')
         processedMoviePath = Path.join(processedMoviesPath, 'Jonathan (2018).mp4')
 
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -145,8 +145,8 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processing)
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processing)
+        await FileSystem.remove(Configuration.path.processed)
       })
   
     })
@@ -164,12 +164,12 @@ describe('process', () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'South.Park.S22E05.720p.HDTV.x264-AVS'
-        processedTVShowsPath = Path.join(Configuration.command.path.processed, 'TV Shows')
+        processedTVShowsPath = Path.join(Configuration.path.processed, 'TV Shows')
         processedTVShowPath = Path.join(processedTVShowsPath, 'South Park')
         processedSeasonPath = Path.join(processedTVShowPath, 'Season 22')
         processedEpisodePath = Path.join(processedSeasonPath, 'South Park - 22x05 - The Scoots.mp4')
 
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -179,8 +179,8 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processing)
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Configuration.path.processing)
+        await FileSystem.remove(Configuration.path.processed)
       })
   
     })
@@ -195,7 +195,7 @@ describe('process', () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'Archive'
-        processedArchivePath = Path.join(Configuration.command.path.processed, 'Other', `${torrentName}.zip`)
+        processedArchivePath = Path.join(Configuration.path.processed, 'Other', `${torrentName}.zip`)
 
         await FileSystem.remove(processedArchivePath)
         await Process.processTorrent(torrentId, torrentName)
@@ -222,10 +222,10 @@ describe('process', () => {
 
         torrentId = '6618f02fbb83c5fbccb7ef7b86e54761f9bf5e8b'
         torrentName = 'Invalid Music'
-        failedFilePath = Path.join(Configuration.command.path.failed, `${torrentName}.flac`)
+        failedFilePath = Path.join(Configuration.path.failed, `${torrentName}.flac`)
 
-        await FileSystem.remove(Configuration.command.path.processing)
-        await FileSystem.remove(Configuration.command.path.failed)
+        await FileSystem.remove(Configuration.path.processing)
+        await FileSystem.remove(Configuration.path.failed)
         await Process.processTorrent(torrentId, torrentName)
 
       })
@@ -235,8 +235,8 @@ describe('process', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processing)
-        await FileSystem.remove(Configuration.command.path.failed)
+        await FileSystem.remove(Configuration.path.processing)
+        await FileSystem.remove(Configuration.path.failed)
       })
   
     })

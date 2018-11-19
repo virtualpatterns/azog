@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { Log } from '@virtualpatterns/mablung'
 import _TvDB from 'node-tvdb'
 
-import Configuration from '../../configuration'
+import { Command as Configuration } from '../../configuration'
 import Process from './process'
 
 import MatchError from './error/match-error'
@@ -11,7 +11,7 @@ const TvDB = Object.create({})
 
 TvDB.getTVShow = async function (name, year, season, episode) {
 
-  const tvDB = new _TvDB(Configuration.command.key.tvDB)
+  const tvDB = new _TvDB(Configuration.key.tvDB)
 
   let data = null
   let options = {}
@@ -25,7 +25,7 @@ TvDB.getTVShow = async function (name, year, season, episode) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${year ? `${name} ${year}` : name}', options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -86,7 +86,7 @@ TvDB.getEpisode = async function (tvDB, tvShow, season, episode) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 

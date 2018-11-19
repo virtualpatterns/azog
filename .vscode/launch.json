@@ -20,11 +20,23 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Video",
+      "name": "Launch w/ Invalid",
       "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
-        "--configurationPath", "./resource/deluge/configuration.json",
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "completed", "0", "0"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch w/ Short Video",
+      "program": "${workspaceFolder}/distributable/command/index.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "completed", "0001", "Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT"
       ],
       "internalConsoleOptions": "openOnSessionStart"

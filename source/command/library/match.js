@@ -3,7 +3,7 @@ import { Path } from '@virtualpatterns/mablung'
 import Is from '@pwn/is'
 import Sanitize from 'sanitize-filename'
 
-import Configuration from '../../configuration'
+import { Command as Configuration} from '../../configuration'
 import MovieDB from './movie-db'
 import TvDB from './tv-db'
 
@@ -28,7 +28,7 @@ Match.getPath = async function (path) {
 
     let movie = await MovieDB.getMovie(_name, year)
 
-    parentPath = Path.join(Configuration.command.path.processed, 'Movies')
+    parentPath = Path.join(Configuration.path.processed, 'Movies')
     name = `${Sanitize(movie.name)} (${movie.year})`
 
   }
@@ -39,7 +39,7 @@ Match.getPath = async function (path) {
 
     let tvShow = await TvDB.getTVShow(_name, year, season, episode)
 
-    parentPath = Path.join(Configuration.command.path.processed, 'TV Shows', Sanitize(tvShow.name), `Season ${tvShow.season.toString()}`)
+    parentPath = Path.join(Configuration.path.processed, 'TV Shows', Sanitize(tvShow.name), `Season ${tvShow.season.toString()}`)
     name = `${Sanitize(tvShow.name)} - ${tvShow.season.toString()}x${tvShow.episodeNumber.toString().padStart(2, '0')} - ${Sanitize(tvShow.episodeName)}`
 
   }
@@ -156,17 +156,17 @@ Match.transform = function (name) {
 
   do {
 
-    Configuration.command.transform.replace.forEach((replace) => {
+    Configuration.transform.replace.forEach((replace) => {
       outputName = outputName.replace(replace.pattern, replace.with)
     })
   
-    Configuration.command.transform.remove.forEach((pattern) => {
+    Configuration.transform.remove.forEach((pattern) => {
       outputName = outputName.replace(pattern, '')
     })
   
   } while ([
-    Configuration.command.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(outputName), false),
-    Configuration.command.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(outputName), false)
+    Configuration.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(outputName), false),
+    Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(outputName), false)
   ].reduce((accumulator, test) => accumulator || test, false))
 
   return outputName

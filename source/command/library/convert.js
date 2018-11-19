@@ -2,7 +2,7 @@ import { Duration } from 'luxon'
 import FFMPEG from 'fluent-ffmpeg'
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 
-import Configuration from '../../configuration'
+import { Command as Configuration } from '../../configuration'
 import Match from './match'
 import Process from './process'
 
@@ -25,7 +25,7 @@ Convert.convertMusic = async function (path) {
   
     let { parentPath, extension, name } = Match.fromPath(inputPath)
   
-    parentPath = Configuration.command.path.processing
+    parentPath = Configuration.path.processing
     extension = EXTENSION_MUSIC
   
     outputPath = Match.toPath({ parentPath, extension, name })
@@ -38,7 +38,7 @@ Convert.convertMusic = async function (path) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP Convert.convertMusic('${Path.basename(path)}') ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`STOP Convert.convertMusic('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -56,7 +56,7 @@ Convert.convertVideo = async function (path) {
 
     let { parentPath, extension, name } = Match.fromPath(inputPath)
 
-    parentPath = Configuration.command.path.processing
+    parentPath = Configuration.path.processing
     extension = EXTENSION_VIDEO
 
     outputPath = Match.toPath({ parentPath, extension, name })
@@ -74,7 +74,7 @@ Convert.convertVideo = async function (path) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP Convert.convertVideo('${Path.basename(path)}') ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`STOP Convert.convertVideo('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -89,7 +89,7 @@ Convert.convertPath = function (inputPath, outputPath, outputFn) {
     let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
     ffmpeg
-      .setFfmpegPath(Configuration.command.path.ffmpeg)
+      .setFfmpegPath(Configuration.path.ffmpeg)
       .input(inputPath)
       .output(outputPath)
 
@@ -125,7 +125,10 @@ Convert.getDuration = async function (path) {
   let data = await Convert.getData(path)
   let format = data.format
 
-  return Duration.fromMillis(Configuration.command.conversion.toMilliseconds(format.duration))
+  let durationInSeconds = format.duration
+  let durationInMilliseconds = Configuration.conversion.secondsToMilliseconds(durationInSeconds)
+
+  return Duration.fromMillis(durationInMilliseconds)
 
 }
 
@@ -136,7 +139,7 @@ Convert.getData = function (path) {
     let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
     ffmpeg
-      .setFfprobePath(Configuration.command.path.ffprobe)
+      .setFfprobePath(Configuration.path.ffprobe)
       .input(path)
       .ffprobe(function(error, data) {
 

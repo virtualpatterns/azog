@@ -3,23 +3,23 @@ import * as ID3 from 'music-metadata'
 import Queue from 'p-queue'
 import Sanitize from 'sanitize-filename'
 
-import Configuration from '../../configuration'
+import { Command as Configuration } from '../../configuration'
 import Convert from './convert'
 import Match from './match'
 
 const Process = Object.create(_Process)
 
-Process.queue = new Queue(Configuration.command.queue)
+Process.queue = new Queue(Configuration.queue)
 
 Process.processTorrent = async function (torrentId, torrentName) {
-  Log.debug(Configuration.command.line)
+  Log.debug(Configuration.line)
   Log.debug(`START Process.processTorrent(torrentId, '${torrentName}')`)
 
   let start = Process.hrtime()
 
   try {
 
-    await Process.processPath(Path.join(Configuration.command.path.downloaded, torrentName), {
+    await Process.processPath(Path.join(Configuration.path.downloaded, torrentName), {
       'torrentId': torrentId,
       'torrentName': torrentName
     })
@@ -30,7 +30,7 @@ Process.processTorrent = async function (torrentId, torrentName) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -81,16 +81,16 @@ Process.processFile = async function (path, context) {
 
     let extension = Path.extname(path).toLowerCase()
 
-    if (Configuration.command.extension.book.includes(extension)) {
+    if (Configuration.extension.book.includes(extension)) {
       await Process.processBook(path, context)
     }
-    else if (Configuration.command.extension.music.includes(extension)) {
+    else if (Configuration.extension.music.includes(extension)) {
       await Process.processMusic(path, context)
     }
-    else if (Configuration.command.extension.video.includes(extension)) {
+    else if (Configuration.extension.video.includes(extension)) {
       await Process.processVideo(path, context)
     }
-    else if (Configuration.command.extension.other.includes(extension)) {
+    else if (Configuration.extension.other.includes(extension)) {
       await Process.processOther(path, context)
     }
 
@@ -100,7 +100,7 @@ Process.processFile = async function (path, context) {
     Log.error(`Process.processFile('${Path.basename(path)}', context) { ... }`)
     Log.error(error)
 
-    let targetPath = Path.join(Configuration.command.path.failed, Path.basename(path))
+    let targetPath = Path.join(Configuration.path.failed, Path.basename(path))
   
     await FileSystem.mkdir(Path.dirname(targetPath), { 'recursive': true })
     await FileSystem.copy(path, targetPath, { 'stopOnErr' : true })
@@ -117,17 +117,17 @@ Process.processBook = async function (path) {
 
   let { parentPath, extension, name } = Match.fromPath(inputPath)
 
-  parentPath = Path.join(Configuration.command.path.processed, 'Books')
+  parentPath = Path.join(Configuration.path.processed, 'Books')
   name = Sanitize(Match.transform(name) )
   
   outputPath = Match.toPath({ parentPath, extension, name })
 
   await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
 
-  // Log.debug(`FileSystem.copy('${Path.relative(Configuration.command.path.downloaded, inputPath)}', '${Path.relative(Configuration.command.path.processed, outputPath)}', { 'stopOnErr' : true })`)
+  // Log.debug(`FileSystem.copy('${Path.relative(Configuration.path.downloaded, inputPath)}', '${Path.relative(Configuration.path.processed, outputPath)}', { 'stopOnErr' : true })`)
   await FileSystem.copy(inputPath, outputPath, { 'stopOnErr' : true })
 
-  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+  Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
 
 }
 
@@ -140,7 +140,7 @@ Process.processMusic = async function (path) {
 
   let { parentPath, extension, name } = Match.fromPath(outputPath)
 
-  parentPath = Path.join(Configuration.command.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
+  parentPath = Path.join(Configuration.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
   name = `${outputTag.common.track.no && outputTag.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTag.common.title || 'Unknown Title')}`
 
   inputPath = outputPath
@@ -148,10 +148,10 @@ Process.processMusic = async function (path) {
 
   await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
 
-  // Log.debug(`FileSystem.rename('${Path.relative(Configuration.command.path.processing, inputPath)}', '${Path.relative(Configuration.command.path.processed, outputPath)}')`)
+  // Log.debug(`FileSystem.rename('${Path.relative(Configuration.path.processing, inputPath)}', '${Path.relative(Configuration.path.processed, outputPath)}')`)
   await FileSystem.rename(inputPath, outputPath)
 
-  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+  Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
 
 }
 
@@ -161,7 +161,9 @@ Process.processVideo = async function (path) {
   let inputPath = path
   let duration = await Convert.getDuration(inputPath)
 
-  if (duration.as('minutes') >= Configuration.command.minimum.minutes) {
+  let [ minimumDurationInMinutes ] = Configuration.range.videoDurationInMinutes
+
+  if (duration.as('minutes') >= minimumDurationInMinutes) {
 
     let outputPath = await Convert.convertVideo(inputPath)
 
@@ -173,7 +175,7 @@ Process.processVideo = async function (path) {
     // Log.debug(`FileSystem.rename('${Path.basename(inputPath)}', '${Path.basename(outputPath)}')`)
     await FileSystem.rename(inputPath, outputPath)
   
-    Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+    Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
   
   }
 
@@ -187,7 +189,7 @@ Process.processOther = async function (path) {
 
   let { parentPath, extension, name } = Match.fromPath(inputPath)
 
-  parentPath = Path.join(Configuration.command.path.processed, 'Other')
+  parentPath = Path.join(Configuration.path.processed, 'Other')
   outputPath = Match.toPath({ parentPath, extension, name })
 
   await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
@@ -201,11 +203,11 @@ Process.processOther = async function (path) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`STOP FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
-  Log.debug(`CREATE '${Path.relative(Configuration.command.path.processed, outputPath)}'`)
+  Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
 
 }
 

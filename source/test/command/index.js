@@ -2,9 +2,9 @@ import { assert as Assert } from 'chai'
 import ChildProcess from 'child_process'
 import { FileSystem } from '@virtualpatterns/mablung'
 
-import Configuration from '../../configuration'
+import { Command, Test } from '../../configuration'
 
-describe.only('command', () => {
+describe('command', () => {
 
   describe('index', () => {
 
@@ -13,9 +13,9 @@ describe.only('command', () => {
       let childProcess = null
 
       before(() => {
-        childProcess = ChildProcess.fork(Configuration.test.path.module, [
-          '--configurationPath', './resource/deluge/configuration.json',
-          'completed', '0', '0' ], { 'silent': true })
+        childProcess = ChildProcess.fork(Test.path.module, [
+          '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
+          'completed', '0', '0' ], { 'stdio': 'inherit' })
       })
     
       it('should exit with the correct code', (complete) => {
@@ -39,11 +39,11 @@ describe.only('command', () => {
         torrentId = '6fe895e52e803f58e640e3d8311e1e8e1231e599'
         torrentName = 'Sleeping Beauties by Stephen King'
     
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Command.path.processed)
 
-        childProcess = ChildProcess.fork(Configuration.test.path.module, [ 
-          '--configurationPath', './resource/deluge/configuration.json',
-          'completed', torrentId, torrentName ], { 'silent': true })
+        childProcess = ChildProcess.fork(Test.path.module, [ 
+          '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
+          'completed', torrentId, torrentName ], { 'stdio': 'inherit' })
 
       })
     
@@ -55,7 +55,7 @@ describe.only('command', () => {
       })
     
       after(async () => {
-        await FileSystem.remove(Configuration.command.path.processed)
+        await FileSystem.remove(Command.path.processed)
       })
 
     })

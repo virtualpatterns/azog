@@ -2,14 +2,14 @@ import '@babel/polyfill'
 import Jake from 'jake'
 import { Log } from '@virtualpatterns/mablung'
 
-import Configuration from '../configuration'
+import { Task, Test } from '../configuration'
 
 Jake.addListener('start', () => {
 
-  Jake.rmRf(Configuration.task.logPath, { 'silent': true })
-  Jake.rmRf(Configuration.test.logPath, { 'silent': true })
+  Jake.rmRf(Task.logPath, { 'silent': true })
+  Jake.rmRf(Test.logPath, { 'silent': true })
 
-  Log.createFormattedLog({ 'level': Configuration.task.logLevel }, Configuration.task.logPath)
+  Log.createFormattedLog({ 'level': Task.logLevel }, Task.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
   
 })
@@ -47,6 +47,7 @@ desc('Publish package')
 task('publish', [ 'test' ], { 'async': true }, () => {
   Jake.exec([
     'npm publish --access public',
+    'git push',
     'npm --no-git-tag-version version patch',
     'git add package.json',
     'git commit --message="Increment version"'
