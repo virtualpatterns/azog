@@ -24,7 +24,7 @@
     "runCompleted": "npm run buildAll && node distributable/command/index.js --logLevel debug --logPath \"/Users/fficnar/Library/Logs/azog/azog.log\" --downloadedPath \"resource/deluge/downloaded\" --processingPath \"resource/deluge/processing\" --processedPath \"resource/deluge/processed\" --failedPath \"resource/deluge/failed\" completed 0001 ",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.8-41",
+  "version": "0.0.8",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
