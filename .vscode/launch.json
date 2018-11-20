@@ -32,6 +32,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch w/ Album",
+      "program": "${workspaceFolder}/distributable/command/index.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "trace", "--logPath", "console",
+        "0001", "Jimi Hendrix - Axis Bold as Love (320)", "${workspaceFolder}/resource/deluge/downloaded"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch w/ Short Video",
       "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",

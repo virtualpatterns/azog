@@ -12,6 +12,8 @@ Source.install({ 'handleUncaughtExceptions': false })
 Command
   .arguments('<torrentId> <torrentName> <torrentPath>')
   .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
+  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
+  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
   .action(async (torrentId, torrentName, torrentPath, options) => {
 
     try {
@@ -20,7 +22,10 @@ Command
         Configuration.merge(options.configurationPath.split(','))
       }
 
-      if (Configuration.logPath == 'stdout') {
+      Configuration.logLevel = options.logLevel || Configuration.logLevel
+      Configuration.logPath = options.logPath || Configuration.logPath
+  
+      if (Configuration.logPath == 'console') {
         Log.createFormattedLog({ 'level': Configuration.logLevel })
       }
       else {
@@ -33,7 +38,7 @@ Command
       }
 
       Log.debug(Configuration.line)
-      Log.debug(`${torrentId} '${torrentName}' '${Path.trim(Path.normalize(torrentPath))}'`)
+      Log.debug(`${torrentId} '${torrentName}' '${Path.normalize(torrentPath)}'`)
       Log.debug(Configuration.line)
 
       try {

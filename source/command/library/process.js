@@ -131,7 +131,11 @@ Process.processMusic = async function (path) {
 
   let inputPath = path
   let outputPath = await Convert.convertMusic(inputPath)
+
   let outputTag = await ID3.parseFile(outputPath)
+
+  delete outputTag.picture
+  Log.trace(outputTag.common, `ID3.parseFile('${Path.basename(outputPath)}')`)
 
   let { parentPath, extension, name } = Match.fromPath(outputPath)
 
@@ -156,9 +160,10 @@ Process.processVideo = async function (path) {
   let inputPath = path
   let duration = await Convert.getDuration(inputPath)
 
+  let durationInMinutes = duration.as('minutes')
   let [ minimumDurationInMinutes ] = Configuration.range.videoDurationInMinutes
 
-  if (duration.as('minutes') >= minimumDurationInMinutes) {
+  if (durationInMinutes >= minimumDurationInMinutes) {
 
     let outputPath = await Convert.convertVideo(inputPath)
 
@@ -172,6 +177,9 @@ Process.processVideo = async function (path) {
   
     Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
   
+  }
+  else {
+    Log.debug(`SKIP '${Path.basename(path)}' ${durationInMinutes.toFixed(2)}m`)
   }
 
 }
