@@ -15,7 +15,7 @@ describe('command', () => {
       before(() => {
         childProcess = ChildProcess.fork(Test.path.module, [
           '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
-          'completed', '0', '0' ], { 'stdio': 'inherit' })
+          '0', '0', `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })
       })
     
       it('should exit with the correct code', (complete) => {
@@ -43,7 +43,7 @@ describe('command', () => {
 
         childProcess = ChildProcess.fork(Test.path.module, [ 
           '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
-          'completed', torrentId, torrentName ], { 'stdio': 'inherit' })
+          torrentId, torrentName, `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })
 
       })
     

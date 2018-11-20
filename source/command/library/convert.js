@@ -14,69 +14,43 @@ const EXTENSION_VIDEO = '.mp4'
 const Convert = Object.create({})
 
 Convert.convertMusic = async function (path) {
-  Log.trace(`START Convert.convertMusic('${Path.basename(path)}')`)
 
-  let start = Process.hrtime()
+  let inputPath = path
+  let outputPath = null
 
-  try {
+  let { parentPath, extension, name } = Match.fromPath(inputPath)
 
-    let inputPath = path
-    let outputPath = null
-  
-    let { parentPath, extension, name } = Match.fromPath(inputPath)
-  
-    parentPath = Configuration.path.processing
-    extension = EXTENSION_MUSIC
-  
-    outputPath = Match.toPath({ parentPath, extension, name })
-  
-    await Convert.convertPath(inputPath, outputPath)
-      
-    return outputPath
-  
-  }
-  finally {
+  parentPath = Configuration.path.processing
+  extension = EXTENSION_MUSIC
 
-    let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP Convert.convertMusic('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
-  
-  }
+  outputPath = Match.toPath({ parentPath, extension, name })
 
+  await Convert.convertPath(inputPath, outputPath)
+    
+  return outputPath
+  
 }
 
 Convert.convertVideo = async function (path) {
-  Log.trace(`START Convert.convertVideo('${Path.basename(path)}')`)
 
-  let start = Process.hrtime()
+  let inputPath = path
+  let outputPath = null
 
-  try {
+  let { parentPath, extension, name } = Match.fromPath(inputPath)
 
-    let inputPath = path
-    let outputPath = null
+  parentPath = Configuration.path.processing
+  extension = EXTENSION_VIDEO
 
-    let { parentPath, extension, name } = Match.fromPath(inputPath)
+  outputPath = Match.toPath({ parentPath, extension, name })
 
-    parentPath = Configuration.path.processing
-    extension = EXTENSION_VIDEO
-
-    outputPath = Match.toPath({ parentPath, extension, name })
-
-    await Convert.convertPath(inputPath, outputPath, (ffmpeg) => {
-      ffmpeg
-        .outputOptions('-codec copy')
-        // .videoCodec('h264')
-        // .audioCodec('aac')
-    })
-      
-    return outputPath
-  
-  }
-  finally {
-
-    let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP Convert.convertVideo('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
-  
-  }
+  await Convert.convertPath(inputPath, outputPath, (ffmpeg) => {
+    ffmpeg
+      .outputOptions('-codec copy')
+      // .videoCodec('h264')
+      // .audioCodec('aac')
+  })
+    
+  return outputPath
 
 }
 
@@ -97,10 +71,16 @@ Convert.convertPath = function (inputPath, outputPath, outputFn) {
       outputFn(ffmpeg)
     }
     
+    let start = null
+
     ffmpeg
       .on('start', (command) => {
+
         Log.trace('FFMPEG.on(\'start\', (command) => { ... })')
         Log.trace(command)
+
+        start = Process.hrtime()
+
       })
       .on('error', (error, stdout, stderr) => {
 
@@ -111,8 +91,12 @@ Convert.convertPath = function (inputPath, outputPath, outputFn) {
 
       })
       .on('end', () => {
-        Log.trace('FFMPEG.on(\'end\', () => { ... })')
+
+        let [ seconds, nanoSeconds ] = Process.hrtime(start)
+        Log.trace(`FFMPEG.on('end', () => { ... }) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+
         resolve()
+
       })
       .run()
 

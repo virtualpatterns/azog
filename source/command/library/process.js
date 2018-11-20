@@ -11,93 +11,88 @@ const Process = Object.create(_Process)
 
 Process.queue = new Queue(Configuration.queue)
 
-Process.processTorrent = async function (torrentId, torrentName) {
-  Log.debug(Configuration.line)
-  Log.debug(`START Process.processTorrent(torrentId, '${torrentName}')`)
+Process.processTorrent = async function (path) {
+  Log.debug(`START Process.processTorrent('${Path.basename(path)}')`)
 
   let start = Process.hrtime()
 
   try {
 
-    await Process.processPath(Path.join(Configuration.path.downloaded, torrentName), {
-      'torrentId': torrentId,
-      'torrentName': torrentName
-    })
+    let information = await FileSystem.stat(path)
+
+    if (information.isDirectory()) {
+      await Process.processDirectory(path)
+    }
+    else if (information.isFile()) {
+      Process.addToQueue(path)
+    }
   
-    await Process.start()
-  
+    await Process.runQueue()
+    
   }
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`STOP Process.processTorrent(torrentId, '${torrentName}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.debug(`STOP Process.processTorrent('${Path.basename(path)}') ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
 }
 
-Process.start = async function () {
-  // Log.debug(`Process.start() queued=${Process.queue.size}`)
+Process.processDirectory = async function (path) {
+
+  let files = await FileSystem.readdir(path, {
+    'encoding': 'utf-8',
+    'withFileTypes': true
+  })
+
+  for (let file of files) {
+    if (file.isDirectory()) {
+      await Process.processDirectory(Path.join(path, file.name))
+    }
+    else if (file.isFile()) {
+      Process.addToQueue(Path.join(path, file.name))
+    }
+  }
+
+}
+
+Process.addToQueue = function (path) {
+  // Log.debug(`Process.addToQueue('${Path.basename(path)}')`)
+  Process.queue.add(Process.processFile.bind(Process, path))
+}
+
+Process.runQueue = async function () {
+  // Log.debug('Process.runQueue()')
 
   Process.queue.start()
   await Process.queue.onIdle()
 
 }
 
-Process.processPath = async function (path, context) {
-
-  let pathInformation = await FileSystem.stat(path)
-
-  if (pathInformation.isDirectory()) {
-    await Process.processDirectory(path, context)
-  }
-  else if (pathInformation.isFile()) {
-    Process.queue.add(Process.processFile.bind(Process, path, context))
-  }
-
-}
-
-Process.processDirectory = async function (path, context) {
-
-  let filesInformation = await FileSystem.readdir(path, {
-    'encoding': 'utf-8',
-    'withFileTypes': true
-  })
-
-  for (let fileInformation of filesInformation) {
-    if (fileInformation.isDirectory()) {
-      await Process.processDirectory(Path.join(path, fileInformation.name), context)
-    }
-    else if (fileInformation.isFile()) {
-      Process.queue.add(Process.processFile.bind(Process, Path.join(path, fileInformation.name), context))
-    }
-  }
-
-}
-
-Process.processFile = async function (path, context) {
+Process.processFile = async function (path) {
  
   try {
 
     let extension = Path.extname(path).toLowerCase()
 
     if (Configuration.extension.book.includes(extension)) {
-      await Process.processBook(path, context)
+      await Process.processBook(path)
     }
     else if (Configuration.extension.music.includes(extension)) {
-      await Process.processMusic(path, context)
+      await Process.processMusic(path)
     }
     else if (Configuration.extension.video.includes(extension)) {
-      await Process.processVideo(path, context)
+      await Process.processVideo(path)
     }
     else if (Configuration.extension.other.includes(extension)) {
-      await Process.processOther(path, context)
+      await Process.processOther(path)
     }
 
   }
   catch (error) {
 
-    Log.error(`Process.processFile('${Path.basename(path)}', context) { ... }`)
+    Log.error(`Process.processFile('${Path.basename(path)}') { ... }`)
     Log.error(error)
 
     let targetPath = Path.join(Configuration.path.failed, Path.basename(path))

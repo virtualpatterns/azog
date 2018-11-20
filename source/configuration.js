@@ -28,7 +28,6 @@ const command = {
   'logLevel': 'debug',
   'logPath': `${Process.env.HOME}/Deluge/Log/azog.log`,
   'path': {
-    'downloaded': `${Process.env.HOME}/Deluge/Downloaded`,
     'processing': `${Process.env.HOME}/Deluge/Processing`,
     'processed': `${Process.env.HOME}/Deluge/Processed`,
     'failed': `${Process.env.HOME}/Deluge/Failed`,
@@ -84,7 +83,7 @@ Command.merge = function (path) {
   for (let _path of paths) {
 
     _path = Path.normalize(_path)
-    
+
     let configuration = null
     let transform = null
 

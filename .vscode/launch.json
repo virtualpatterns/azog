@@ -25,7 +25,7 @@
       "preLaunchTask": "Build",
       "args": [
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "completed", "0", "0"
+        "0", "0", "${workspaceFolder}/resource/deluge/downloaded"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     },
@@ -37,7 +37,7 @@
       "preLaunchTask": "Build",
       "args": [
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "completed", "0001", "Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT"
+        "0001", "Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT", "${workspaceFolder}/resource/deluge/downloaded"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     }

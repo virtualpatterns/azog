@@ -10,11 +10,7 @@ import Process from './library/process'
 Source.install({ 'handleUncaughtExceptions': false })
 
 Command
-  .version(Package.version)
-
-Command
-  .command('completed <torrentId> <torrentName> [torrentPath]')
-  .description('Process the indicated torrent')
+  .arguments('<torrentId> <torrentName> <torrentPath>')
   .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
   .action(async (torrentId, torrentName, torrentPath, options) => {
 
@@ -23,14 +19,22 @@ Command
       if (options.configurationPath) {
         Configuration.merge(options.configurationPath.split(','))
       }
-    
+
       if (Configuration.logPath == 'stdout') {
         Log.createFormattedLog({ 'level': Configuration.logLevel })
       }
       else {
+
         await FileSystem.mkdir(Path.dirname(Configuration.logPath), { 'recursive': true })
+
+        console.log(`\nLogging '${Configuration.logLevel}' to '${Path.trim(Configuration.logPath)}' ...\n`) // eslint-disable-line no-console
         Log.createFormattedLog({ 'level': Configuration.logLevel }, Configuration.logPath)
+
       }
+
+      Log.debug(Configuration.line)
+      Log.debug(`${torrentId} '${torrentName}' '${Path.trim(Path.normalize(torrentPath))}'`)
+      Log.debug(Configuration.line)
 
       try {
 
@@ -61,7 +65,7 @@ Command
           Log.error(error)
         })
 
-        await Process.processTorrent(torrentId, torrentName)
+        await Process.processTorrent(Path.join(torrentPath, torrentName))
 
       } catch (error) {
 
@@ -83,6 +87,5 @@ Command
     Process.exit(0)
 
   })
-
-Command
+  .version(Package.version)
   .parse(Process.argv)
