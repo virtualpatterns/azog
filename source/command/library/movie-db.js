@@ -11,7 +11,7 @@ import MatchError from './error/match-error'
 
 const MovieDB = Object.create({})
 
-MovieDB.getMovie = async function (name, year) {
+MovieDB.getMovie = async function (name, yearReleased) {
 
   const movieDB = _MovieDB(Configuration.key.movieDB)
 
@@ -23,8 +23,8 @@ MovieDB.getMovie = async function (name, year) {
   options.query = name
   options.include_adult = true
 
-  if (Is.not.null(year)) {
-    options.year = year
+  if (Is.not.null(yearReleased)) {
+    options.year = yearReleased
   }
 
   Log.trace('START _MovieDB.searchMovie(options)')
@@ -36,7 +36,7 @@ MovieDB.getMovie = async function (name, year) {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _MovieDB.searchMovie(options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options }, `STOP _MovieDB.searchMovie(options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
   
@@ -45,12 +45,13 @@ MovieDB.getMovie = async function (name, year) {
     let movie = data.results
       .map((movie) => { 
 
+        Log.trace({ movie }, '_MovieDB.searchMovie(options)')
+
         return {
           'id': movie.id,
           'name': movie.title,
-          'year': DateTime.fromISO(movie.release_date).year,
-          'score': movie.vote_count,
-          'numberOfMovies': data.total_results
+          'yearReleased': DateTime.fromISO(movie.release_date).year,
+          'score': movie.vote_count
         }
 
       })
@@ -62,7 +63,7 @@ MovieDB.getMovie = async function (name, year) {
 
   }
   else {
-    throw new MatchError(`Failed to find a matching movie for the name '${name}' and year ${year}.`)
+    throw new MatchError(`Failed to find a matching movie for the name '${name}' and release year ${yearReleased}.`)
   }
 
 }

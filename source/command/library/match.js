@@ -18,26 +18,29 @@ Match.getPath = async function (path) {
   let { parentPath, extension, name } = Match.fromPath(path)
 
   let _name = Match.getName(name)
-  let year = Match.getYear(name)
+  let yearReleased = Match.getYearReleased(name)
   let season = Match.getSeason(name)
   let episode = Match.getEpisode(name)
+  let dateAired = Match.getDateAired(name)
 
   if (Is.not.null(_name) &&
       Is.null(season) &&
-      Is.null(episode)) {
+      Is.null(episode) &&
+      Is.null(dateAired)) {
 
-    let movie = await MovieDB.getMovie(_name, year)
+    let movie = await MovieDB.getMovie(_name, yearReleased)
 
     parentPath = Path.join(Configuration.path.processed, 'Movies')
-    name = `${Sanitize(movie.name)} (${movie.year})`
+    name = `${Sanitize(movie.name)} (${movie.yearReleased})`
 
   }
   else if ( Is.not.null(_name) &&
-            Is.not.null(episode)) {
+            ( Is.not.null(episode) ||
+              Is.not.null(dateAired))) {
 
-    season = Is.not.null(season) ? season : 1
+    season = Is.not.null(season) ? season : (Is.not.null(episode) ? 1 : null)
 
-    let tvShow = await TvDB.getTVShow(_name, year, season, episode)
+    let tvShow = await TvDB.getTVShow(_name, yearReleased, season, episode, dateAired)
 
     parentPath = Path.join(Configuration.path.processed, 'TV Shows', Sanitize(tvShow.name), `Season ${tvShow.season.toString()}`)
     name = `${Sanitize(tvShow.name)} - ${tvShow.season.toString()}x${tvShow.episodeNumber.toString().padStart(2, '0')} - ${Sanitize(tvShow.episodeName)}`
@@ -65,25 +68,52 @@ Match.toPath = function ({ parentPath, extension, name }) {
   return Path.join(parentPath, `${name}${extension}`)
 }
 
-Match.getYear = function (name) {
+Match.getYearReleased = function (name) {
 
-  let pattern = /\d{4}/
+  let pattern = /\d{4}(?!.\d{2}.\d{2})/
   let match = null
 
-  let year = null
+  let yearReleased = null
 
   if (Is.not.null(match = pattern.exec(name))) {
 
-    let [ yearAsString ] = match
-    let yearAsNumber = parseInt(yearAsString)
+    let [ yearReleasedAsString ] = match
+    let yearReleasedAsNumber = parseInt(yearReleasedAsString)
 
-    if (yearAsNumber >= 1888 && yearAsNumber <= NOW_YEAR + 1) {
-      year = yearAsNumber
+    if (yearReleasedAsNumber >= 1888 && yearReleasedAsNumber <= NOW_YEAR + 1) {
+      yearReleased = yearReleasedAsNumber
     }
 
   }
 
-  return year
+  return yearReleased
+
+}
+
+Match.getDateAired = function (name) {
+
+  let pattern = /(\d{4})(.)(\d{2})\2(\d{2})/
+  let match = null
+
+  let dateAired = null
+
+  if (Is.not.null(match = pattern.exec(name))) {
+
+    let [ , yearAsString,, monthAsString, dayAsString ] = match
+
+    let yearAsNumber = parseInt(yearAsString)
+    let monthAsNumber = parseInt(monthAsString)
+    let dayAsNumber = parseInt(dayAsString)
+
+    dateAired = DateTime.fromObject({ 
+      'year': yearAsNumber, 
+      'month': monthAsNumber, 
+      'day': dayAsNumber 
+    })
+
+  }
+
+  return dateAired
 
 }
 

@@ -7,6 +7,29 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Sandbox Convert w/ Short Video",
+      "program": "${workspaceFolder}/distributable/sandbox/convert.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "--configurationPath", "${workspaceFolder}/distributable/sandbox/convert-configuration.json",
+        "${workspaceFolder}/resource/deluge/downloaded/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Sandbox Probe w/ Short Video",
+      "program": "${workspaceFolder}/distributable/sandbox/probe.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "${workspaceFolder}/resource/deluge/downloaded/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Test",
       "program": "${workspaceFolder}/node_modules/.bin/_mocha",
       "preLaunchTask": "Build",

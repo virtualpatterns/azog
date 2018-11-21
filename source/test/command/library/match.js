@@ -1,4 +1,6 @@
 import { assert as Assert } from 'chai'
+import { DateTime } from 'luxon'
+import Is from '@pwn/is'
 import { Path } from '@virtualpatterns/mablung'
 
 import { Command as Configuration } from '../../../configuration'
@@ -6,16 +8,50 @@ import Match from '../../../command/library/match'
 
 describe('match', () => {
 
-  function shouldGetYear (tests) {
+  function shouldGetYearReleased (tests) {
 
-    describe('getYear', () => {
+    describe('getYearReleased', () => {
 
       for (let test of tests) {
 
         describe(`(when passing '${test.path}')`, () => {
 
-          it(`should return ${test.year}`, () => {
-            Assert.equal(Match.getYear(test.path), test.year)
+          it(`should return ${test.yearReleased}`, () => {
+            Assert.equal(Match.getYearReleased(test.path), test.yearReleased)
+          })
+
+        })
+
+      }
+
+    })
+
+  }
+
+  function shouldGetDateAired (tests) {
+
+    describe('getDateAired', () => {
+
+      for (let test of tests) {
+
+        describe(`(when passing '${test.path}')`, () => {
+
+          it(`should return ${Is.not.null(test.dateAired) ? test.dateAired.toISO() : null}`, () => {
+
+            let dateAired = Match.getDateAired(test.path)
+
+            if (Is.not.null(test.dateAired) &&
+                Is.not.null(dateAired)) {
+              Assert.ok(dateAired.equals(test.dateAired))
+            }
+            else if ( Is.null(test.dateAired) &&
+                      Is.null(dateAired)) {
+              // Do nothing
+            }
+            else {
+              Assert.fail()
+            }
+
           })
 
         })
@@ -106,22 +142,41 @@ describe('match', () => {
 
   }
 
-  shouldGetYear([
+  shouldGetYearReleased([
     {
       'path': 'abc.(1970)-def',
-      'year': 1970
+      'yearReleased': 1970
     },
     {
       'path': 'abc.1970.def',
-      'year': 1970
+      'yearReleased': 1970
     },
     {
       'path': 'abc.1970.S98E99-def',
-      'year': 1970
+      'yearReleased': 1970
     },
     {
       'path': 'abc.S98E99-def',
-      'year': null
+      'yearReleased': null
+    }
+  ])
+
+  shouldGetDateAired([
+    {
+      'path': 'abc.1970.01.01-def',
+      'dateAired': DateTime.fromObject({ 'year': 1970, 'month': 1, 'day': 1 })
+    },
+    {
+      'path': 'jimmy.kimmel.2018.11.19.bono.web.x264-tbs[eztv].mkv',
+      'dateAired': DateTime.fromObject({ 'year': 2018, 'month': 11, 'day': 19 })
+    },
+    {
+      'path': 'abc.1970.01-01-def',
+      'dateAired': null
+    },
+    {
+      'path': 'abc.S98E99-def',
+      'dateAired': null
     }
   ])
 
@@ -242,8 +297,11 @@ describe('match', () => {
     {
       'inputPath': Path.join(Configuration.path.processing, 'They.Shall.Not.Grow.Old.1080p.x264.AAC.MVGroup.Forum.mp4'),
       'outputPath': Path.join(Configuration.path.processed, 'Movies', 'They Shall Not Grow Old (2018).mp4')
-    }
-    // 
+    },
+    {
+      'inputPath': Path.join(Configuration.path.processing, 'jimmy.kimmel.2018.11.19.bono.web.x264-tbs[eztv].mkv'),
+      'outputPath': Path.join(Configuration.path.processed, 'TV Shows', 'Jimmy Kimmel Live', 'Season 16', 'Jimmy Kimmel Live - 16x159 - Bono, Chris Rock, Will Ferrell, Kristen Bell, Channing Tatum, Snoop Dogg, Mila Kunis, Pharrell.mkv')
+    } 
   ])
 
 })
