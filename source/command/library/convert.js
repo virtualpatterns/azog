@@ -15,17 +15,14 @@ const Convert = Object.create({})
 
 Convert.convertMusic = async function (path) {
 
-  let inputPath = path
-  let outputPath = null
-
-  let { parentPath, extension, name } = Match.fromPath(inputPath)
+  let [ parentPath, name, extension ] = Match.fromPath(path)
 
   parentPath = Configuration.path.processing
   extension = EXTENSION_MUSIC
 
-  outputPath = Match.toPath({ parentPath, extension, name })
+  let outputPath = Match.toPath([ parentPath, name, extension ])
 
-  await Convert.convertPath(inputPath, outputPath)
+  await Convert.convertAll(path, outputPath)
     
   return outputPath
   
@@ -33,17 +30,14 @@ Convert.convertMusic = async function (path) {
 
 Convert.convertVideo = async function (path) {
 
-  let inputPath = path
-  let outputPath = null
-
-  let { parentPath, extension, name } = Match.fromPath(inputPath)
+  let [ parentPath, name, extension ] = Match.fromPath(path)
 
   parentPath = Configuration.path.processing
   extension = EXTENSION_VIDEO
 
-  outputPath = Match.toPath({ parentPath, extension, name })
+  let outputPath = Match.toPath([ parentPath, name, extension ])
 
-  await Convert.convertPath(inputPath, outputPath, (ffmpeg) => {
+  await Convert.convertAll(path, outputPath, (ffmpeg) => {
     ffmpeg
       .outputOptions('-codec copy')
       // .videoCodec('h264')
@@ -54,7 +48,7 @@ Convert.convertVideo = async function (path) {
 
 }
 
-Convert.convertPath = function (inputPath, outputPath, outputFn) {
+Convert.convertAll = function (inputPath, outputPath, outputFn) {
 
   return new Promise((resolve, reject) => {
 

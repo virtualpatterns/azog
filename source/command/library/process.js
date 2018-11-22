@@ -12,6 +12,7 @@ const Process = Object.create(_Process)
 Process.queue = new Queue(Configuration.queue)
 
 Process.processTorrent = async function (path) {
+  
   Log.debug(`START Process.processTorrent('${Path.basename(path)}')`)
 
   let start = Process.hrtime()
@@ -107,20 +108,15 @@ Process.processFile = async function (path) {
 Process.processBook = async function (path) {
   // Log.debug(`Process.processBook('${Path.basename(path)}')`)
 
-  let inputPath = path
-  let outputPath = null
-
-  let { parentPath, extension, name } = Match.fromPath(inputPath)
+  let [ parentPath, name, extension ] = Match.fromPath(path)
 
   parentPath = Path.join(Configuration.path.processed, 'Books')
   name = Sanitize(Match.transform(name) )
   
-  outputPath = Match.toPath({ parentPath, extension, name })
+  let outputPath = Match.toPath([ parentPath, name, extension ])
 
   await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
-
-  // Log.debug(`FileSystem.copy('${Path.relative(Configuration.path.downloaded, inputPath)}', '${Path.relative(Configuration.path.processed, outputPath)}', { 'stopOnErr' : true })`)
-  await FileSystem.copy(inputPath, outputPath, { 'stopOnErr' : true })
+  await FileSystem.copy(path, outputPath, { 'stopOnErr' : true })
 
   Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
 
@@ -130,24 +126,22 @@ Process.processMusic = async function (path) {
   // Log.debug(`Process.processMusic('${Path.basename(path)}')`)
 
   let inputPath = path
-  let outputPath = await Convert.convertMusic(inputPath)
 
+  let outputPath = await Convert.convertMusic(inputPath)
   let outputTag = await ID3.parseFile(outputPath)
 
   delete outputTag.picture
   Log.trace(outputTag.common, `ID3.parseFile('${Path.basename(outputPath)}')`)
 
-  let { parentPath, extension, name } = Match.fromPath(outputPath)
+  let [ parentPath, name, extension ] = Match.fromPath(outputPath)
 
   parentPath = Path.join(Configuration.path.processed, 'Music', Sanitize(outputTag.common.albumartist || outputTag.common.artist || 'Unknown Artist'), Sanitize(outputTag.common.album || 'Unknown Album'))
   name = `${outputTag.common.track.no && outputTag.common.track.no.toString().padStart(2, '0') || '00'} ${Sanitize(outputTag.common.title || 'Unknown Title')}`
 
   inputPath = outputPath
-  outputPath = Match.toPath({ parentPath, extension, name })
+  outputPath = Match.toPath([ parentPath, name, extension ])
 
   await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
-
-  // Log.debug(`FileSystem.rename('${Path.relative(Configuration.path.processing, inputPath)}', '${Path.relative(Configuration.path.processed, outputPath)}')`)
   await FileSystem.rename(inputPath, outputPath)
 
   Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
@@ -158,9 +152,10 @@ Process.processVideo = async function (path) {
   // Log.debug(`Process.processVideo('${Path.basename(path)}')`)
 
   let inputPath = path
-  let duration = await Convert.getDuration(inputPath)
 
+  let duration = await Convert.getDuration(inputPath)
   let durationInMinutes = duration.as('minutes')
+  
   let [ minimumDurationInMinutes ] = Configuration.range.videoDurationInMinutes
 
   if (durationInMinutes >= minimumDurationInMinutes) {
@@ -168,11 +163,9 @@ Process.processVideo = async function (path) {
     let outputPath = await Convert.convertVideo(inputPath)
 
     inputPath = outputPath
-    outputPath = await Match.getPath(inputPath)
+    outputPath = await Match.getMatchedPath(inputPath)
   
     await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
-  
-    // Log.debug(`FileSystem.rename('${Path.basename(inputPath)}', '${Path.basename(outputPath)}')`)
     await FileSystem.rename(inputPath, outputPath)
   
     Log.debug(`CREATE '${Path.relative(Configuration.path.processed, outputPath)}'`)
@@ -187,26 +180,24 @@ Process.processVideo = async function (path) {
 Process.processOther = async function (path) {
   // Log.debug(`Process.processOther('${Path.basename(path)}')`)
 
-  let inputPath = path
-  let outputPath = null
-
-  let { parentPath, extension, name } = Match.fromPath(inputPath)
+  let [ parentPath, name, extension ] = Match.fromPath(path)
 
   parentPath = Path.join(Configuration.path.processed, 'Other')
-  outputPath = Match.toPath({ parentPath, extension, name })
+
+  let outputPath = Match.toPath([ parentPath, name, extension ])
 
   await FileSystem.mkdir(Path.dirname(outputPath), { 'recursive': true })
 
-  Log.trace(`START FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true })`)
+  Log.debug(`START FileSystem.copy('${Path.basename(path)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true })`)
   let start = Process.hrtime()
 
   try {
-    await FileSystem.copy(inputPath, outputPath, { 'stopOnErr' : true })
+    await FileSystem.copy(path, outputPath, { 'stopOnErr' : true })
   }
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP FileSystem.copy('${Path.basename(inputPath)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.debug(`STOP FileSystem.copy('${Path.basename(path)}', '${Path.basename(outputPath)}', { 'stopOnErr' : true }) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 

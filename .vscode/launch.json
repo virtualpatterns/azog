@@ -48,7 +48,7 @@
       "preLaunchTask": "Build",
       "args": [
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "0", "0", "${workspaceFolder}/resource/deluge/downloaded"
+        "0", "0", "0"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     },

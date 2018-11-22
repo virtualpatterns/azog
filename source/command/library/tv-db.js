@@ -10,23 +10,23 @@ import MatchError from './error/match-error'
 
 const TvDB = Object.create({})
 
-TvDB.getTVShow = async function (name, yearReleased, season, episodeNumber, dateAired) {
+TvDB.getTVShow = async function (title, yearReleased, seasonNumber, episodeNumber, dateAired) {
 
   const tvDB = new _TvDB(Configuration.key.tvDB)
 
   let data = null
   let options = {}
   
-  Log.trace(`START _TvDB.getSeriesByName('${yearReleased ? `${name} ${yearReleased}` : name}', options)`)
+  Log.trace(`START _TvDB.getSeriesByName('${yearReleased ? `${title} ${yearReleased}` : title}', options)`)
   let start = Process.hrtime()
 
   try {
-    data = await tvDB.getSeriesByName(yearReleased ? `${name} ${yearReleased}` : name, options)
+    data = await tvDB.getSeriesByName(yearReleased ? `${title} ${yearReleased}` : title, options)
   }
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${yearReleased ? `${name} ${yearReleased}` : name}', options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getSeriesByName('${yearReleased ? `${title} ${yearReleased}` : title}', options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -37,37 +37,53 @@ TvDB.getTVShow = async function (name, yearReleased, season, episodeNumber, date
 
         return {
           'id': tvShow.id,
-          'name': tvShow.seriesName,
+          'title': tvShow.seriesName,
           'yearReleased': DateTime.fromISO(tvShow.firstAired).year
         }
 
       })
       .shift()
 
-    let _episode = await TvDB.getEpisode(tvDB, tvShow, season, episodeNumber, dateAired)
+    let episode = await TvDB.getEpisode(tvDB, tvShow, seasonNumber, episodeNumber, dateAired)
 
     tvShow = {
       'id': tvShow.id,
-      'name': tvShow.name,
+      'title': tvShow.title,
       'yearReleased': tvShow.yearReleased,
-      'season': _episode.season,
-      'episodeNumber': _episode.number,
-      'episodeName': _episode.name
+      'seasonNumber': episode.seasonNumber,
+      'episodeNumber': episode.episodeNumber,
+      'episodeTitle': episode.episodeTitle
     }
 
     return tvShow
 
   }
   else {
-    throw new MatchError(`Failed to find a matching tv show for the name '${yearReleased ? `${name} ${yearReleased}` : name}'.`)
+    throw new MatchError(`Failed to find a matching tv show for the title '${yearReleased ? `${title} ${yearReleased}` : title}'.`)
   }
   
 }
 
-TvDB.getEpisode = async function (tvDB, tvShow, season, episodeNumber, dateAired) {
+TvDB.getEpisode = async function (tvDB, tvShow, seasonNumber, episodeNumber, dateAired) {
 
   let data = null
-  let options = {}
+  let options = {
+    'query': {}
+  }
+
+  if (Is.not.null(seasonNumber) &&
+      Is.not.null(episodeNumber)) {
+
+    options.query.airedSeason = seasonNumber
+    options.query.airedEpisode = episodeNumber
+
+  }
+  else if (Is.not.null(dateAired)) {
+    options.query.firstAired = dateAired.toFormat(Configuration.format.date)
+  }
+  else {
+    options = {}
+  }
   
   Log.trace(`START _TvDB.getEpisodesBySeriesId(${tvShow.id}, options)`)
   let start = Process.hrtime()
@@ -78,34 +94,20 @@ TvDB.getEpisode = async function (tvDB, tvShow, season, episodeNumber, dateAired
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `STOP _TvDB.getEpisodesBySeriesId(${tvShow.id}, options) ${Configuration.conversion.toSeconds(seconds, nanoSeconds)}s`)
  
   }
 
   if (data.length > 0) {
 
     let episode = data
-      .filter((episode) => {
-
-        if (Is.not.null(season) &&
-            Is.not.null(episodeNumber)) {
-          return  episode.airedSeason == season &&
-                  episode.airedEpisodeNumber == episodeNumber
-        }
-        else if (Is.not.null(dateAired)) {
-          return  DateTime.fromISO(episode.firstAired).equals(dateAired)
-        }
-
-      })
       .map((episode) => { 
-
-        Log.trace({ episode }, `_TvDB.getEpisodesBySeriesId(${tvShow.id}, options)`)
 
         return {
           'id': episode.id,
-          'season': episode.airedSeason,
-          'number': episode.airedEpisodeNumber,
-          'name': episode.episodeName
+          'seasonNumber': episode.airedSeason,
+          'episodeNumber': episode.airedEpisodeNumber,
+          'episodeTitle': episode.episodeName
         }
 
       })
@@ -115,7 +117,18 @@ TvDB.getEpisode = async function (tvDB, tvShow, season, episodeNumber, dateAired
 
   }
   else {
-    throw new MatchError(`Failed to find a matching episode for the tv show '${tvShow.name}', season ${season}, and episode ${episodeNumber}.`)
+
+    if (Is.not.null(seasonNumber) &&
+        Is.not.null(episodeNumber)) {
+      throw new MatchError(`Failed to find a matching episode for the tv show '${tvShow.title}', season ${seasonNumber}, and episode ${episodeNumber}.`)
+    }
+    else if (Is.not.null(dateAired)) {
+      throw new MatchError(`Failed to find a matching episode for the tv show '${tvShow.title}' and date aired '${dateAired.toFormat(Configuration.format.date)}'.`)
+    }
+    else {
+      throw new MatchError(`Failed to find a matching episode for the tv show '${tvShow.title}'.`)
+    }
+
   }
 
 }

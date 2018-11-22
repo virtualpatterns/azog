@@ -20,6 +20,9 @@ const command = {
     'video': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
     'other': [ '.rar', '.zip' ]      
   },
+  'format': {
+    'date': 'yyyy-LL-dd'
+  },
   'key': {
     'movieDB': '',
     'tvDB': ''
@@ -62,12 +65,12 @@ const command = {
 }
 
 const task = {
-  'logLevel': 'debug',
+  'logLevel': 'trace',
   'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
 }
 
 const test = {
-  'logLevel': 'debug',
+  'logLevel': 'trace',
   'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
   'path': {
     'module': `${__dirname}/command/index.js`

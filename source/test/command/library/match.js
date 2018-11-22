@@ -62,16 +62,16 @@ describe('match', () => {
 
   }
 
-  function shouldGetSeason (tests) {
+  function shouldGetSeasonNumber (tests) {
 
-    describe('getSeason', () => {
+    describe('getSeasonNumber', () => {
 
       for (let test of tests) {
 
         describe(`(when passing '${test.path}')`, () => {
 
           it(`should produce ${test.season}`, () => {
-            Assert.equal(Match.getSeason(test.path), test.season)
+            Assert.equal(Match.getSeasonNumber(test.path), test.seasonNumber)
           })
 
         })
@@ -82,16 +82,16 @@ describe('match', () => {
 
   }
 
-  function shouldGetEpisode (tests) {
+  function shouldGetEpisodeNumber (tests) {
 
-    describe('getEpisode', () => {
+    describe('getEpisodeNumber', () => {
 
       for (let test of tests) {
 
         describe(`(when passing '${test.path}')`, () => {
       
           it(`should produce ${test.episode}`, () => {
-            Assert.equal(Match.getEpisode(test.path), test.episode)
+            Assert.equal(Match.getEpisodeNumber(test.path), test.episodeNumber)
           })
 
         })
@@ -102,16 +102,16 @@ describe('match', () => {
 
   }
 
-  function shouldGetName (tests) {
+  function shouldGetTitle (tests) {
 
-    describe('getName', () => {
+    describe('getTitle', () => {
 
       for (let test of tests) {
 
         describe(`(when passing '${test.path}')`, () => {
       
           it(`should produce '${test.name}'`, () => {
-            Assert.equal(Match.getName(test.path), test.name)
+            Assert.equal(Match.getTitle(test.path), test.title)
           })
 
         })
@@ -122,16 +122,16 @@ describe('match', () => {
 
   }
 
-  function shouldGetPath (tests) {
+  function shouldGetMatchedPath (tests) {
 
-    describe('getPath', () => {
+    describe('getMatchedPath', () => {
 
       for (let test of tests) {
 
         describe(`(when passing '${test.inputPath}')`, () => {
       
           it(`should produce '${test.outputPath}'`, async () => {
-            Assert.equal(await Match.getPath(test.inputPath), test.outputPath)
+            Assert.equal(await Match.getMatchedPath(test.inputPath), test.outputPath)
           })
 
         })
@@ -180,92 +180,92 @@ describe('match', () => {
     }
   ])
 
-  shouldGetSeason([
+  shouldGetSeasonNumber([
     {
       'path': 'abc.1970.S98E99-def',
-      'season': 98
+      'seasonNumber': 98
     },
     {
       'path': 'the.abc.S01E01',
-      'season': 1
+      'seasonNumber': 1
     },
     {
       'path': 'abc - 98x99 - def',
-      'season': 98
+      'seasonNumber': 98
     },
     {
       'path': 'abc.series.98.97.of.99-def',
-      'season': 98
+      'seasonNumber': 98
     },
     {
       'path': 'abc.97.of.99-def',
-      'season': null
+      'seasonNumber': null
     },
     {
       'path': 'abc.1970.01.01-def',
-      'season': null
+      'seasonNumber': null
     }
   ])
 
-  shouldGetEpisode([
+  shouldGetEpisodeNumber([
     {
       'path': 'abc.1970.S98E99-def',
-      'episode': 99
+      'episodeNumber': 99
     },
     {
       'path': 'the.abc.S01E01',
-      'episode': 1
+      'episodeNumber': 1
     },
     {
       'path': 'abc - 98x99 - def',
-      'episode': 99
+      'episodeNumber': 99
     },
     {
       'path': 'abc.series.98.97of99-def',
-      'episode': 97
+      'episodeNumber': 97
     },
     {
       'path': 'abc.part.97-def',
-      'episode': 97
+      'episodeNumber': 97
     },
     {
       'path': 'abc.series.98-def',
-      'episode': null
+      'episodeNumber': null
     },
     {
       'path': 'abc.1970.01.01-def',
-      'episode': null
+      'episodeNumber': null
     }
   ])
 
-  shouldGetName([
+  shouldGetTitle([
     {
       'path': 'abc.1970.S98E99-def',
-      'name': 'abc'
+      'title': 'abc'
     },
     {
       'path': 'The.Flash.S01E01',
-      'name': 'The Flash'
+      'title': 'The Flash'
     },
     {
       'path': 'abc.(1970).S98E99-def',
-      'name': 'abc'
+      'title': 'abc'
     },
     {
       'path': 'abc - 98x99 - def',
-      'name': 'abc'
+      'title': 'abc'
     },
     {
       'path': 'ch4-abc.series.98.97of99-def',
-      'name': 'abc'
+      'title': 'abc'
     },
     {
       'path': 'itv-abc.part.97.of.99-def',
-      'name': 'abc'
+      'title': 'abc'
     }
   ])
 
-  shouldGetPath([
+  shouldGetMatchedPath([
     {
       'inputPath': Path.join(Configuration.path.processing, 'The.Equalizer.2.2018.720p.BluRay.x264.MkvCage.ws.mkv'),
       'outputPath': Path.join(Configuration.path.processed, 'Movies', 'The Equalizer 2 (2018).mkv')
@@ -300,7 +300,7 @@ describe('match', () => {
     },
     {
       'inputPath': Path.join(Configuration.path.processing, 'jimmy.kimmel.2018.11.19.bono.web.x264-tbs[eztv].mkv'),
-      'outputPath': Path.join(Configuration.path.processed, 'TV Shows', 'Jimmy Kimmel Live', 'Season 16', 'Jimmy Kimmel Live - 16x159 - Bono, Chris Rock, Will Ferrell, Kristen Bell, Channing Tatum, Snoop Dogg, Mila Kunis, Pharrell.mkv')
+      'outputPath': Path.join(Configuration.path.processed, 'TV Shows', 'Jimmy Kimmel Live', 'Season 16', 'Jimmy Kimmel Live - 16x159 - Bono, Chris Rock, Will Ferrell, Kristen Bell, Channing Tatum, Snoop Dogg, Mila Kunis, Pharrell, Brad Paisley, Zoe Saldana.mkv')
     } 
   ])
 

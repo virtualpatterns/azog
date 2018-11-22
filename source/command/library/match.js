@@ -13,44 +13,44 @@ const NOW_YEAR = DateTime.local().year
 
 const Match = Object.create({})
 
-Match.getPath = async function (path) {
+Match.getMatchedPath = async function (path) {
 
-  let { parentPath, extension, name } = Match.fromPath(path)
+  let [ parentPath, name, extension ] = Match.fromPath(path)
 
-  let _name = Match.getName(name)
+  let title = Match.getTitle(name)
   let yearReleased = Match.getYearReleased(name)
-  let season = Match.getSeason(name)
-  let episode = Match.getEpisode(name)
+  let seasonNumber = Match.getSeasonNumber(name)
+  let episodeNumber = Match.getEpisodeNumber(name)
   let dateAired = Match.getDateAired(name)
 
-  if (Is.not.null(_name) &&
-      Is.null(season) &&
-      Is.null(episode) &&
+  if (Is.not.null(title) &&
+      Is.null(seasonNumber) &&
+      Is.null(episodeNumber) &&
       Is.null(dateAired)) {
 
-    let movie = await MovieDB.getMovie(_name, yearReleased)
+    let movie = await MovieDB.getMovie(title, yearReleased)
 
     parentPath = Path.join(Configuration.path.processed, 'Movies')
-    name = `${Sanitize(movie.name)} (${movie.yearReleased})`
+    name = `${Sanitize(movie.title)} (${movie.yearReleased})`
 
   }
-  else if ( Is.not.null(_name) &&
-            ( Is.not.null(episode) ||
+  else if ( Is.not.null(title) &&
+            ( Is.not.null(episodeNumber) ||
               Is.not.null(dateAired))) {
 
-    season = Is.not.null(season) ? season : (Is.not.null(episode) ? 1 : null)
+    seasonNumber = Is.not.null(seasonNumber) ? seasonNumber : (Is.not.null(episodeNumber) ? 1 : null)
 
-    let tvShow = await TvDB.getTVShow(_name, yearReleased, season, episode, dateAired)
+    let tvShow = await TvDB.getTVShow(title, yearReleased, seasonNumber, episodeNumber, dateAired)
 
-    parentPath = Path.join(Configuration.path.processed, 'TV Shows', Sanitize(tvShow.name), `Season ${tvShow.season.toString()}`)
-    name = `${Sanitize(tvShow.name)} - ${tvShow.season.toString()}x${tvShow.episodeNumber.toString().padStart(2, '0')} - ${Sanitize(tvShow.episodeName)}`
+    parentPath = Path.join(Configuration.path.processed, 'TV Shows', Sanitize(tvShow.title), `Season ${tvShow.seasonNumber.toString()}`)
+    name = `${Sanitize(tvShow.title)} - ${tvShow.seasonNumber.toString()}x${tvShow.episodeNumber.toString().padStart(2, '0')} - ${Sanitize(tvShow.episodeTitle)}`
 
   }
   else {
     throw new MatchError(`Failed to find a match for the path '${path}'.`)
   }
 
-  return Match.toPath({ parentPath, extension, name })
+  return Match.toPath([ parentPath, name, extension ])
 
 }
 
@@ -60,11 +60,11 @@ Match.fromPath = function (path) {
   let extension = Path.extname(path)
   let name = Path.basename(path, extension)
 
-  return { parentPath, extension, name }
+  return [ parentPath, name, extension ]
 
 }
 
-Match.toPath = function ({ parentPath, extension, name }) {
+Match.toPath = function ([ parentPath, name, extension ]) {
   return Path.join(parentPath, `${name}${extension}`)
 }
 
@@ -117,65 +117,58 @@ Match.getDateAired = function (name) {
 
 }
 
-Match.getSeason = function (name) {
+Match.getSeasonNumber = function (name) {
 
   let pattern = /s(\d+)e\d+|(\d+)x\d+|series.(\d+)/i
   let match = null
 
-  let season = null
+  let seasonNumber = null
 
   if (Is.not.null(match = pattern.exec(name))) {
 
     let [ , ...seasonsAsString ] = match
-    let seasonAsNumber = seasonsAsString
+    seasonNumber = seasonsAsString
       .map((value) => Is.undefined(value) ? 0 : parseInt(value))
       .reduce((accumulator, value) => Math.max(accumulator, value), 0)
 
-    season = seasonAsNumber
-
   }
 
-  return season
+  return seasonNumber
 
 }
 
-Match.getEpisode = function (name) {
+Match.getEpisodeNumber = function (name) {
 
   let pattern = /s\d+e(\d+)|\d+x(\d+)|(\d+)of\d+|part.(\d+)/i
   let match = null
 
-  let episode = null
+  let episodeNumber = null
 
   if (Is.not.null(match = pattern.exec(name))) {
 
     let [ , ...episodesAsString ] = match
-    let episodeAsNumber = episodesAsString
+    episodeNumber = episodesAsString
       .map((value) => Is.undefined(value) ? 0 : parseInt(value))
       .reduce((accumulator, value) => Math.max(accumulator, value), 0)
 
-    episode = episodeAsNumber
-
   }
 
-  return episode
+  return episodeNumber
 
 }
 
-Match.getName = function (name) {
+Match.getTitle = function (name) {
 
   let pattern = /^(.+?)(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})/i
   let match = null
 
-  let _name = null
+  let title = null
 
   if (Is.not.null(match = pattern.exec(name))) {
-
-    [ , _name ] = match
-    _name = Match.transform(_name)
-
+    [ , title ] = match
   }
 
-  return _name
+  return Match.transform(title)
 
 }
 
@@ -186,13 +179,13 @@ Match.transform = function (name) {
 
   do {
 
-    Configuration.transform.replace.forEach((replace) => {
+    for (let replace of Configuration.transform.replace) {
       outputName = outputName.replace(replace.pattern, replace.with)
-    })
-  
-    Configuration.transform.remove.forEach((pattern) => {
+    }
+
+    for (let pattern of Configuration.transform.remove) {
       outputName = outputName.replace(pattern, '')
-    })
+    }
   
   } while ([
     Configuration.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(outputName), false),
