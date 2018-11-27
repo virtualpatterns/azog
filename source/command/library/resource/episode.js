@@ -49,7 +49,7 @@ episodePrototype.getEpisode = async function () {
 
   let data = null
   
-  Log.trace({ options }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
   let start = Process.hrtime()
 
   try {

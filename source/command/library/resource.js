@@ -22,15 +22,7 @@ resourcePrototype.getToPath = function () {
 
 }
 
-resourcePrototype.copy = function () {
-  return this.to(FileSystem.copy.bind(FileSystem), 'FileSystem.copy')
-}
-
-resourcePrototype.move = function () {
-  return this.to(FileSystem.rename.bind(FileSystem), 'FileSystem.rename')
-}
-
-resourcePrototype.to = async function (fn, fnName) {
+resourcePrototype.copy = async function () {
 
   let fromPath = this.path
   let toPath = await this.getToPath()
@@ -40,8 +32,8 @@ resourcePrototype.to = async function (fn, fnName) {
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
 
-  Log.trace(`${fnName}(fromPath, '${Path.basename(toPath)}')`)
-  await fn(fromPath, toPath)
+  Log.trace(`FileSystem.copy(fromPath, '${Path.basename(toPath)}')`)
+  await FileSystem.copy(fromPath, toPath)
 
   return this.path = toPath
 

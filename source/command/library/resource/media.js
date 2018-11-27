@@ -40,23 +40,20 @@ mediaPrototype.convert = function (fn) {
       }
       
       let start = null
-      let command = null
   
       converter
-        .on('start', (_command) => {
+        .on('start', (command) => {
   
           Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ...`)
-          Log.trace(_command)
+          Log.trace(command)
   
           start = Process.hrtime()
-          command = _command
   
         })
         .on('error', (error, stdout, stderr) => {
   
-          Log.error(`Media.convert(fromPath, '${Path.basename(toPath)}', fn)`)
-          Log.error(command)
-          Log.error(`\n\n${stderr}`)
+          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn)`)
+          Log.trace(`\n\n${stderr}`)
   
           try {
             FileSystem.unlinkSync(toPath)
@@ -100,8 +97,8 @@ mediaPrototype.probe = function () {
 
         if (error) {
 
-          Log.error(`Media.probe('${Path.basename(this.path)}')`)
-          Log.error(`\n\n${error}`)
+          Log.trace(`Media.probe('${Path.basename(this.path)}')`)
+          Log.trace(`\n\n${error}`)
 
           reject(new MediaProbeError(this.path))
 

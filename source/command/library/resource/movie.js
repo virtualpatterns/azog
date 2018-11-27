@@ -37,7 +37,7 @@ moviePrototype.getMovie = async function () {
 
   let data = null
 
-  Log.trace({ options }, 'MovieDB.searchMovie(options) ...')
+  Log.trace('MovieDB.searchMovie(options) ...')
   let start = Process.hrtime()
 
   try {

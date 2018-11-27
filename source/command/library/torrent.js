@@ -16,7 +16,6 @@ const torrentPrototype = Object.create({})
 
 torrentPrototype.process = async function () {
 
-  Log.trace('Torrent.process() ...')
   let start = Process.hrtime()
 
   try {
@@ -36,7 +35,7 @@ torrentPrototype.process = async function () {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace(`Torrent.process() ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.debug(`Processed '${Path.basename(this.path)}' in ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -81,8 +80,6 @@ torrentPrototype.dequeueFile = async function (path) {
 
     toPath = await resource.process()
 
-    Log.debug(`Created '${Path.relative(Command.path.processed, toPath)}'`)
-
   }
   catch (error) {
 
@@ -95,8 +92,11 @@ torrentPrototype.dequeueFile = async function (path) {
       Log.error(error)
 
       toPath = Path.join(Command.path.failed, Path.basename(fromPath))
-  
+    
+      Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
       await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+
+      Log.trace(`FileSystem.copy(fromPath, '${Path.basename(toPath)}')`)
       await FileSystem.copy(fromPath, toPath)
   
     }
