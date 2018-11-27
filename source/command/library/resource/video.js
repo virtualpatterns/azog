@@ -19,10 +19,10 @@ videoPrototype.process = async function () {
   let [ minimumDurationInMinutes ] = Command.range.videoDurationInMinutes
 
   if (durationInMinutes >= minimumDurationInMinutes) {
-    await mediaPrototype.process.call(this)
+    return await mediaPrototype.process.call(this)
   }
   else {
-    throw new VideoDurationError(this.fromPath, durationInMinutes, minimumDurationInMinutes)
+    throw new VideoDurationError(this.path, durationInMinutes, minimumDurationInMinutes)
   }
 
 }
@@ -47,23 +47,23 @@ videoPrototype.convert = function () {
 }
 
 videoPrototype.getTitle = function () {
-  return Video.getTitle(this.fromPath)
+  return Video.getTitle(this.path)
 }
 
 videoPrototype.getYearReleased = function () {
-  return Video.getYearReleased(this.fromPath)
+  return Video.getYearReleased(this.path)
 }
 
 videoPrototype.getDateAired = function () {
-  return Video.getDateAired(this.fromPath)
+  return Video.getDateAired(this.path)
 }
 
 videoPrototype.getSeasonNumber = function () {
-  return Video.getSeasonNumber(this.fromPath)
+  return Video.getSeasonNumber(this.path)
 }
 
 videoPrototype.getEpisodeNumber = function () {
-  return Video.getEpisodeNumber(this.fromPath)
+  return Video.getEpisodeNumber(this.path)
 }
 
 // videoPrototype.getVideoCodecData = async function () {
@@ -104,8 +104,8 @@ videoPrototype.getEpisodeNumber = function () {
 
 const Video = Object.create(Media)
 
-Video.createResource = function (fromPath, prototype = videoPrototype) {
-  return Media.createResource.call(this, fromPath, prototype)
+Video.createResource = function (path, prototype = videoPrototype) {
+  return Media.createResource.call(this, path, prototype)
 }
 
 Video.getResourcePrototype = function () {

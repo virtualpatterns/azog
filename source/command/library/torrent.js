@@ -10,11 +10,13 @@ import Movie from './resource/movie'
 import Episode from './resource/episode'
 import Other from './resource/other'
 
+import { ResourceClassNotFoundError } from './error/resource-error'
+
 const torrentPrototype = Object.create({})
 
 torrentPrototype.process = async function () {
 
-  Log.debug('Torrent.process() ...')
+  Log.trace('Torrent.process() ...')
   let start = Process.hrtime()
 
   try {
@@ -34,7 +36,7 @@ torrentPrototype.process = async function () {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`Torrent.process() ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace(`Torrent.process() ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
 
@@ -63,30 +65,41 @@ torrentPrototype.enqueueFile = function (path) {
 }
 
 torrentPrototype.dequeueFiles = async function () {
-
   await this.queue.start()
   await this.queue.onIdle()
-
 }
 
 torrentPrototype.dequeueFile = async function (path) {
   
+  let fromPath = path
+  let toPath = null
+
   try {
-    await Resource.selectResource(path).process()
+
+    let resource = null
+    resource = Resource.selectResource(fromPath)
+
+    toPath = await resource.process()
+
+    Log.debug(`Created '${Path.relative(Command.path.processed, toPath)}'`)
+
   }
   catch (error) {
 
-    Log.error(`Torrent.dequeueFile('${Path.basename(path)}')`)
-    Log.error(error)
+    if (error instanceof ResourceClassNotFoundError) {
+      Log.debug(`Skipped '${Path.basename(fromPath)}'`)
+    }
+    else {
 
-    let fromPath = path
-    let toPath = Path.join(Command.path.failed, Path.basename(path))
+      Log.error(`Failed on '${Path.basename(fromPath)}'`)
+      Log.error(error)
 
-    Log.debug(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
-    await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+      toPath = Path.join(Command.path.failed, Path.basename(fromPath))
   
-    Log.debug(`FileSystem.copy('${Path.basename(fromPath)}', '${Path.basename(toPath)}')`)
-    await FileSystem.copy(fromPath, toPath)
+      await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+      await FileSystem.copy(fromPath, toPath)
+  
+    }
   
   }
 

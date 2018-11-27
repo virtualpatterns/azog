@@ -37,7 +37,7 @@ moviePrototype.getMovie = async function () {
 
   let data = null
 
-  Log.debug({ options }, 'MovieDB.searchMovie(options) ...')
+  Log.trace({ options }, 'MovieDB.searchMovie(options) ...')
   let start = Process.hrtime()
 
   try {
@@ -46,7 +46,7 @@ moviePrototype.getMovie = async function () {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug({ options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
   
   }
   
@@ -77,7 +77,7 @@ moviePrototype.getMovie = async function () {
 
 const Movie = Object.create(Video)
 
-Movie.createResource = function (fromPath, prototype = moviePrototype) {
+Movie.createResource = function (path, prototype = moviePrototype) {
 
   if (Is.undefined(this.movieDB)) {
 
@@ -86,7 +86,7 @@ Movie.createResource = function (fromPath, prototype = moviePrototype) {
   
   }
 
-  return Video.createResource.call(this, fromPath, prototype)
+  return Video.createResource.call(this, path, prototype)
 
 }
 
@@ -123,55 +123,5 @@ Movie.isResourceClass = function (path) {
   }
   
 }
-
-// Movie.getMovie = async function (title, yearReleased) {
-
-//   let options = {}
-//   options.query = title
-//   options.include_adult = true
-
-//   if (Is.not.null(yearReleased)) {
-//     options.year = yearReleased
-//   }
-
-//   let data = null
-
-//   Log.debug({ options }, 'MovieDB.searchMovie(options) ...')
-//   let start = Process.hrtime()
-
-//   try {
-//     data = await Movie.movieDB.searchMovie(options)
-//   }
-//   finally {
-
-//     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-//     Log.debug({ options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
-  
-//   }
-  
-//   if (data.total_results > 0) {
-
-//     let movie = data.results
-//       .map((movie) => { 
-
-//         return {
-//           'title': movie.title,
-//           'yearReleased': DateTime.fromISO(movie.release_date).year,
-//           'score': movie.vote_count
-//         }
-
-//       })
-//       .reduce((accumulator, movie) => {
-//         return Is.null(accumulator) ? movie : (accumulator.score > movie.score ? accumulator : movie)
-//       }, null)
-
-//     return movie
-
-//   }
-//   else {
-//     throw new MovieNotFoundError(title, yearReleased)
-//   }
-
-// }
 
 export default Movie

@@ -8,6 +8,24 @@ describe('torrent', () => {
 
   describe('process()', () => {
 
+    describe('(when passing text)', () => {
+
+      let torrentName = null
+      let torrentPath = null
+
+      before(() => {
+
+        torrentName = 'no resource'
+        torrentPath = Path.join(Command.path.downloaded, torrentName)
+
+      })
+
+      it('should not throw an error', async () => {
+        await Torrent.createTorrent(torrentPath).process()
+      })
+    
+    })
+
     describe('(when passing a book)', () => {
 
       let torrentName = null

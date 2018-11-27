@@ -86,7 +86,7 @@ Program
 
     } catch (error) {
 
-      console.log(error.stack) // eslint-disable-line no-console
+      console.log(error.stack)
 
       Process.exit(3)
 

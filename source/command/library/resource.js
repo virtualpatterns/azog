@@ -13,8 +13,8 @@ resourcePrototype.process = function () {
 
 resourcePrototype.getToPath = function () {
 
-  let extension = Path.extname(this.fromPath)
-  let name = Path.basename(this.fromPath, extension)
+  let extension = Path.extname(this.path)
+  let name = Path.basename(this.path, extension)
 
   name = Resource.transform(name)
 
@@ -32,15 +32,18 @@ resourcePrototype.move = function () {
 
 resourcePrototype.to = async function (fn, fnName) {
 
+  let fromPath = this.path
   let toPath = await this.getToPath()
 
-  Log.debug(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
+  Log.debug(`Creating '${Path.relative(Command.path.processed, toPath)}' ...`)
+
+  Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
 
-  Log.debug(`${fnName}('${Path.basename(this.fromPath)}', '${Path.basename(toPath)}')`)
-  await fn(this.fromPath, toPath)
+  Log.trace(`${fnName}(fromPath, '${Path.basename(toPath)}')`)
+  await fn(fromPath, toPath)
 
-  this.fromPath = toPath
+  return this.path = toPath
 
 }
 
@@ -48,11 +51,11 @@ const Resource = Object.create({})
 
 Resource.resourceClasses = []
 
-Resource.createResource = function (fromPath, prototype = resourcePrototype) {
+Resource.createResource = function (path, prototype = resourcePrototype) {
 
   let resource = Object.create(prototype)
 
-  resource.fromPath = fromPath
+  resource.path = path
 
   return resource
 

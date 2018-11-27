@@ -9,8 +9,8 @@ const otherPrototype = Object.create(resourcePrototype)
 
 const Other = Object.create(Resource)
 
-Other.createResource = function (fromPath, prototype = otherPrototype) {
-  return Resource.createResource.call(this, fromPath, prototype)
+Other.createResource = function (path, prototype = otherPrototype) {
+  return Resource.createResource.call(this, path, prototype)
 }
 
 Other.getResourcePrototype = function () {

@@ -10,8 +10,8 @@ const musicPrototype = Object.create(mediaPrototype)
 
 musicPrototype.getToPath = async function () {
 
-  let tag = await ID3.parseFile(this.fromPath, { 'skipCovers': true })
-  Log.debug({ tag }, `ID3.parseFile('${Path.basename(this.fromPath)}', { 'skipCovers': true }`)
+  let tag = await ID3.parseFile(this.path, { 'skipCovers': true })
+  Log.trace({ tag }, `ID3.parseFile('${Path.basename(this.path)}', { 'skipCovers': true }`)
 
   let artist = Music.sanitize(tag.common.albumartist || tag.common.artist || 'Unknown Artist')
   let album = Music.sanitize(tag.common.album || 'Unknown Album')
@@ -23,8 +23,8 @@ musicPrototype.getToPath = async function () {
 
 const Music = Object.create(Media)
 
-Music.createResource = function (fromPath, prototype = musicPrototype) {
-  return Media.createResource.call(this, fromPath, prototype)
+Music.createResource = function (path, prototype = musicPrototype) {
+  return Media.createResource.call(this, path, prototype)
 }
 
 Music.getResourcePrototype = function () {
