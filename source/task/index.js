@@ -1,6 +1,6 @@
 import '@babel/polyfill'
 import Jake from 'jake'
-import { Log, Path } from '@virtualpatterns/mablung'
+import { Log } from '@virtualpatterns/mablung'
 
 import { Task, Test } from '../configuration'
 
@@ -9,7 +9,6 @@ Jake.addListener('start', () => {
   Jake.rmRf(Task.logPath, { 'silent': true })
   Jake.rmRf(Test.logPath, { 'silent': true })
 
-  console.log(`\nLogging '${Task.logLevel}' to '${Path.trim(Task.logPath)}' ...\n`) // eslint-disable-line no-console
   Log.createFormattedLog({ 'level': Task.logLevel }, Task.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
   

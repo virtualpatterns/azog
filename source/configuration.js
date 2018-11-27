@@ -12,6 +12,7 @@ const command = {
   'conversion': {
     'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
     'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
+    'toMinutes': (minutes) => minutes.toFixed(2),
     'toSeconds': (seconds, nanoseconds) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
   },
   'extension': {
@@ -65,12 +66,12 @@ const command = {
 }
 
 const task = {
-  'logLevel': 'trace',
+  'logLevel': 'debug',
   'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
 }
 
 const test = {
-  'logLevel': 'trace',
+  'logLevel': 'debug',
   'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
   'path': {
     'module': `${__dirname}/command/index.js`

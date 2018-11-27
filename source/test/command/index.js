@@ -6,6 +6,8 @@ import { Command, Test } from '../../configuration'
 
 describe('command', () => {
 
+  require('./library/index')
+
   describe('index', () => {
 
     describe('(when launched with an invalid torrent)', () => {
@@ -15,6 +17,7 @@ describe('command', () => {
       before(() => {
         childProcess = ChildProcess.fork(Test.path.module, [
           '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
+          '--logLevel', Test.logLevel, '--logPath', Test.logPath,
           '0', '0', `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })
       })
     
@@ -36,13 +39,14 @@ describe('command', () => {
 
       before(async () => {
 
-        torrentId = '6fe895e52e803f58e640e3d8311e1e8e1231e599'
-        torrentName = 'Sleeping Beauties by Stephen King'
+        torrentId = '0001'
+        torrentName = 'book'
     
         await FileSystem.remove(Command.path.processed)
 
         childProcess = ChildProcess.fork(Test.path.module, [ 
           '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
+          '--logLevel', Test.logLevel, '--logPath', Test.logPath,
           torrentId, torrentName, `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })
 
       })
@@ -61,7 +65,5 @@ describe('command', () => {
     })
 
   })
-
-  require('./library/index')
 
 })

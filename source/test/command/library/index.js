@@ -1,7 +1,6 @@
 describe('library', () => {
 
-  require('./convert')
-  require('./match')
-  require('./process')
+  require('./resource/index')
+  require('./torrent')
 
 })

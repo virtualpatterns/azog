@@ -7,6 +7,14 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Sandbox Classes",
+      "program": "${workspaceFolder}/distributable/sandbox/classes.js",
+      "preLaunchTask": "Build",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Sandbox Convert w/ Short Video",
       "program": "${workspaceFolder}/distributable/sandbox/convert.js",
       "preLaunchTask": "Build",
@@ -55,12 +63,25 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch w/ Book",
+      "program": "${workspaceFolder}/distributable/command/index.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
+        "0001", "Sleeping Beauties by Stephen King", "${workspaceFolder}/resource/deluge/downloaded"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch w/ Album",
       "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "--logLevel", "trace", "--logPath", "console",
+        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
         "0001", "Jimi Hendrix - Axis Bold as Love (320)", "${workspaceFolder}/resource/deluge/downloaded"
       ],
       "internalConsoleOptions": "openOnSessionStart"
@@ -73,6 +94,7 @@
       "preLaunchTask": "Build",
       "args": [
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
         "0001", "Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT", "${workspaceFolder}/resource/deluge/downloaded"
       ],
       "internalConsoleOptions": "openOnSessionStart"

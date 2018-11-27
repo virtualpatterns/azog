@@ -1,47 +1,50 @@
 import '@babel/polyfill'
-import Command from 'commander'
-import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
+import { FileSystem, Log, Path, Process } from '@virtualpatterns/mablung'
+import Program from 'commander'
 import Source from 'source-map-support'
 
-import { Command as Configuration } from '../configuration'
+import { Command } from '../configuration'
 import Package from '../../package.json'
-import Process from './library/process'
+import Torrent from './library/torrent'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
-Command
+Program
   .arguments('<torrentId> <torrentName> <torrentPath>')
   .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
-  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
-  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
+  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Command.logLevel}'`)
+  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Command.logPath}'`)
   .action(async (torrentId, torrentName, torrentPath, options) => {
 
     try {
 
       if (options.configurationPath) {
-        Configuration.merge(options.configurationPath.split(','))
+        Command.merge(options.configurationPath.split(','))
       }
 
-      Configuration.logLevel = options.logLevel || Configuration.logLevel
-      Configuration.logPath = options.logPath || Configuration.logPath
+      Command.logLevel = options.logLevel || Command.logLevel
+      Command.logPath = options.logPath || Command.logPath
   
-      if (Configuration.logPath == 'console') {
-        Log.createFormattedLog({ 'level': Configuration.logLevel })
+      if (Command.logPath == 'console') {
+        Log.createFormattedLog({ 'level': Command.logLevel })
       }
       else {
 
-        await FileSystem.mkdir(Path.dirname(Configuration.logPath), { 'recursive': true })
+        await FileSystem.mkdir(Path.dirname(Command.logPath), { 'recursive': true })
 
-        console.log(`\nLogging '${Configuration.logLevel}' to '${Path.trim(Configuration.logPath)}' ...\n`) // eslint-disable-line no-console
-        Log.createFormattedLog({ 'level': Configuration.logLevel }, Configuration.logPath)
+        console.log(Command.line)
+        console.log(`Logging to '${Path.trim(Command.logPath)}' (${Command.logLevel}) ...`)
+        console.log(Command.line)
+
+        Log.createFormattedLog({ 'level': Command.logLevel }, Command.logPath)
 
       }
 
-      Log.debug(Configuration.line)
-      Log.debug(`${torrentId} '${torrentName}' '${Path.normalize(torrentPath)}'`)
-      Log.debug(Configuration.line)
-
       try {
+
+        Log.debug(Command.line)
+        Log.debug(Path.trim(Path.join(torrentPath, torrentName)))
+        Log.debug(Command.line) 
 
         Process.once('SIGINT', () => {
           Log.debug('Process.once(\'SIGINT\', () => { ... })')
@@ -70,7 +73,7 @@ Command
           Log.error(error)
         })
 
-        await Process.processTorrent(Path.join(torrentPath, torrentName))
+        await Torrent.createTorrent(Path.join(torrentPath, torrentName)).process()
 
       } catch (error) {
 

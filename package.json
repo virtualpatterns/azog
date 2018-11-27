@@ -21,10 +21,9 @@
     "buildJake": "npm run buildConfiguration && babel --config-file ./distributable/babel.configuration source/Jakefile.js --out-file Jakefile.js --source-maps && babel --config-file ./distributable/babel.configuration source/task --copy-files --out-dir distributable/task --source-maps 1>/dev/null",
     "jake": "npm run buildJake && jake",
     "buildAll": "npm run jake build",
-    "runCompleted": "npm run buildAll && node distributable/command/index.js --logLevel debug --logPath \"/Users/fficnar/Library/Logs/azog/azog.log\" --downloadedPath \"resource/deluge/downloaded\" --processingPath \"resource/deluge/processing\" --processedPath \"resource/deluge/processed\" --failedPath \"resource/deluge/failed\" completed 0001 ",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.11",
+  "version": "0.0.12-163",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",

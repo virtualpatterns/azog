@@ -1,6 +1,6 @@
 import '@babel/polyfill'
 import { assert as Assert } from 'chai'
-import { Log, Path } from '@virtualpatterns/mablung'
+import { Log } from '@virtualpatterns/mablung'
 import Source from 'source-map-support'
 
 import { Command, Test } from '../configuration'
@@ -8,13 +8,11 @@ import { Command, Test } from '../configuration'
 Source.install({ 'handleUncaughtExceptions': false })
 
 Command.merge(`${__dirname}/../../resource/deluge/configuration.json`)
-
-console.log(`\nLogging '${Test.logLevel}' to '${Path.trim(Test.logPath)}' ...\n`) // eslint-disable-line no-console
 Log.createFormattedLog({ 'level': Test.logLevel }, Test.logPath)
 
 describe('configuration', () => {
 
-  describe('merge', () => {
+  describe('merge(path)', () => {
 
     describe('(before called)', () => {
 
