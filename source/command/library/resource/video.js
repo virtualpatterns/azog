@@ -66,41 +66,41 @@ videoPrototype.getEpisodeNumber = function () {
   return Video.getEpisodeNumber(this.path)
 }
 
-// videoPrototype.getVideoCodecData = async function () {
+videoPrototype.getVideoCodecData = async function () {
 
-//   return (await this.getCodecData())
-//     .filter((codec) => codec.type == 'video')
-//     .map((codec) => {
-//       delete codec.type
-//       return codec
-//     })
+  return (await this.getCodecData())
+    .filter((codec) => codec.type == 'video')
+    .map((codec) => {
+      delete codec.type
+      return codec
+    })
 
-// }
+}
 
-// videoPrototype.getAudioCodecData = async function () {
+videoPrototype.getAudioCodecData = async function () {
 
-//   return (await this.getCodecData())
-//     .filter((codec) => codec.type == 'audio')
-//     .map((codec) => {
-//       delete codec.type
-//       return codec
-//     })
+  return (await this.getCodecData())
+    .filter((codec) => codec.type == 'audio')
+    .map((codec) => {
+      delete codec.type
+      return codec
+    })
 
-// }
+}
 
-// videoPrototype.getCodecData = async function () {
+videoPrototype.getCodecData = async function () {
 
-//   return (await this.probe())
-//     .streams
-//     .map((stream) => {
-//       return {
-//         'name': stream.codec_name,
-//         'description': stream.codec_long_name,
-//         'type': stream.codec_type
-//       }
-//     })
+  return (await this.probe())
+    .streams
+    .map((stream) => {
+      return {
+        'name': stream.codec_name,
+        'description': stream.codec_long_name,
+        'type': stream.codec_type
+      }
+    })
 
-// }
+}
 
 const Video = Object.create(Media)
 

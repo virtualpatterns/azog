@@ -1,3 +1,4 @@
+import { Duration } from 'luxon'
 import Is from '@pwn/is'
 import Merge from 'deepmerge'
 import OS from 'os'
@@ -10,8 +11,10 @@ const NANOSECONDS_PER_SECOND = 1000000000
 
 const command = {
   'conversion': {
-    'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
     'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
+    'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
+    'toDuration': (seconds, nanoseconds) => Duration.fromMillis((seconds + nanoseconds / NANOSECONDS_PER_SECOND) * MILLISECONDS_PER_SECOND), 
+    'toPercent': (progress) => progress.percent.toFixed(2),
     'toMinutes': (minutes) => minutes.toFixed(2),
     'toSeconds': (seconds, nanoseconds) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
   },
@@ -22,7 +25,9 @@ const command = {
     'other': [ '.rar', '.zip' ]      
   },
   'format': {
-    'date': 'yyyy-LL-dd'
+    'date': 'yyyy-LL-dd',
+    'longDuration': 'hh\'h\' mm\'m\' ss.SSSS\'s\'',
+    'shortDuration': 'ss.SSSS\'s\''
   },
   'key': {
     'movieDB': '',
@@ -86,14 +91,8 @@ Command.merge = function (path) {
 
   for (let _path of paths) {
 
-    _path = Path.normalize(_path)
-
-    let configuration = null
-    let transform = null
-
-    configuration = require(_path)
-
-    transform = {}
+    let configuration = Is.string(_path) ? require(Path.normalize(_path)) : _path
+    let transform = {}
 
     transform.remove = Property
       .get(configuration, 'transform.remove', [])

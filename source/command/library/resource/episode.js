@@ -58,7 +58,7 @@ episodePrototype.getEpisode = async function () {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.shortDuration)}`)
  
   }
 
@@ -109,7 +109,7 @@ episodePrototype.getSeries = async function () {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.shortDuration)}`)
 
   }
 

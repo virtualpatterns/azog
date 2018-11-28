@@ -17,7 +17,13 @@ describe('configuration', () => {
     describe('(before called)', () => {
 
       before(() => {
-        Command.merge(`${__dirname}/before.json`)
+        Command.merge({
+          'test': {
+            'array': [
+              'abc'
+            ]
+          }
+        })
       })
 
       it('should include \'abc\'', () => {
@@ -33,7 +39,13 @@ describe('configuration', () => {
     describe('(after called)', () => {
 
       before(() => {
-        Command.merge(`${__dirname}/after.json`)
+        Command.merge({
+          'test': {
+            'array': [
+              'def'
+            ]
+          }
+        })
       })
 
       it('should include \'abc\'', () => {

@@ -35,7 +35,7 @@ torrentPrototype.process = async function () {
   finally {
 
     let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.debug(`Processed '${Path.basename(this.path)}' in ${Command.conversion.toSeconds(seconds, nanoSeconds)}s`)
+    Log.debug(`Processed '${Path.basename(this.path)}' in ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.longDuration)}`)
   
   }
 
