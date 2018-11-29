@@ -13,10 +13,10 @@ const command = {
   'conversion': {
     'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
     'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
-    'toDuration': (seconds, nanoseconds) => Duration.fromMillis((seconds + nanoseconds / NANOSECONDS_PER_SECOND) * MILLISECONDS_PER_SECOND), 
+    'toDuration': ([ seconds, nanoseconds ]) => Duration.fromMillis((seconds + nanoseconds / NANOSECONDS_PER_SECOND) * MILLISECONDS_PER_SECOND), 
     'toPercent': (progress) => progress.percent.toFixed(2),
     'toMinutes': (minutes) => minutes.toFixed(2),
-    'toSeconds': (seconds, nanoseconds) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
+    'toSeconds': ([ seconds, nanoseconds ]) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
   },
   'extension': {
     'book': [ '.epub', '.mobi', '.pdf' ],
@@ -48,7 +48,8 @@ const command = {
     'concurrency': OS.cpus().length
   },
   'range': {
-    'videoDurationInMinutes':  [ 15, Infinity ]
+    'progressInSeconds':  [ 60.0, Infinity ],
+    'videoDurationInMinutes':  [ 15.0, Infinity ]
   },
   'transform': {
     'remove': [ 

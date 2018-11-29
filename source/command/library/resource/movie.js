@@ -44,10 +44,7 @@ moviePrototype.getMovie = async function () {
     data = await Movie.movieDB.searchMovie(options)
   }
   finally {
-
-    let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.shortDuration)}`)
-  
+    Log.trace({ options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
   
   if (data.total_results > 0) {

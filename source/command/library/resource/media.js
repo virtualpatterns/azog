@@ -43,66 +43,78 @@ Media.isResource = function (media) {
 
 Media.convert = function (fromPath, toPath, fn) {
 
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
-    Log.debug(`Creating '${Path.basename(toPath)}' ...`)
+    try {
 
-    Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
-    FileSystem.mkdirSync(Path.dirname(toPath), { 'recursive': true })
+      Log.debug(`Creating '${Path.basename(toPath)}' ...`)
 
-    let converter = new FFMPEG({ 'stdoutLines': 0 })
+      Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
+      FileSystem.mkdirSync(Path.dirname(toPath), { 'recursive': true })
+  
+      let converter = new FFMPEG({ 'stdoutLines': 0 })
+  
+      converter
+        .setFfmpegPath(Command.path.ffmpeg)
+        .input(fromPath)
+        .output(toPath)
+  
+      if (fn) {
+        fn(converter)
+      }
+      
+      let start = null
+      let progress = 0
+  
+      converter
+        .on('start', (command) => {
+  
+          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ...`)
+          Log.trace(command)
+  
+          start = Process.hrtime()
+          progress = Process.hrtime()
+  
+        })
+        .on('progress', (_progress) => {
 
-    converter
-      .setFfmpegPath(Command.path.ffmpeg)
-      .input(fromPath)
-      .output(toPath)
+          let progressInSeconds = Command.conversion.toSeconds(Process.hrtime(progress))
+          let [ minimumProgressInSeconds ] = Command.range.progressInSeconds
 
-    if (fn) {
-      fn(converter)
+          if (progressInSeconds >= minimumProgressInSeconds) {
+            Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ${Command.conversion.toPercent(_progress)}%`)
+            progress = Process.hrtime()
+          }
+
+        })
+        .on('error', (error, stdout, stderr) => {
+  
+          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn)`)
+          Log.trace(`\n\n${stderr}`)
+  
+          try {
+            FileSystem.unlinkSync(toPath)
+          }
+          catch (error) {
+            // Do nothing
+          }
+  
+          reject(new MediaConversionError(fromPath))
+  
+        })
+        .on('end', () => {
+
+          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+  
+          resolve(this.path = toPath)
+  
+        })
+        .run()
+
     }
-    
-    let start = null
-    let percent = 0.00
-
-    converter
-      .on('start', (command) => {
-
-        Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ...`)
-        Log.trace(command)
-
-        start = Process.hrtime()
-
-      })
-      .on('progress', (progress) => {
-        if (progress.percent - percent >= 10.00) {
-          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ${Command.conversion.toPercent(progress)}%`)
-          percent = progress.percent
-        }
-      })
-      .on('error', (error, stdout, stderr) => {
-
-        Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn)`)
-        Log.trace(`\n\n${stderr}`)
-
-        try {
-          FileSystem.unlinkSync(toPath)
-        }
-        catch (error) {
-          // Do nothing
-        }
-
-        reject(new MediaConversionError(fromPath))
-
-      })
-      .on('end', () => {
-
-        let [ seconds, nanoSeconds ] = Process.hrtime(start)
-        Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.longDuration)}`)
-
-        resolve(this.path = toPath)
-
-      })
-      .run()
+    catch (error) {
+      reject(error)
+    }
 
   })
 
@@ -112,30 +124,51 @@ Media.probe = function (path) {
 
   return new Promise((resolve, reject) => {
 
-    let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
+    try {
 
-    ffmpeg
-      .setFfprobePath(Command.path.ffprobe)
-      .input(path)
-      .ffprobe((error, data) => {
+      let ffmpeg = new FFMPEG({ 'stdoutLines': 0 })
 
-        if (error) {
-
-          Log.trace(`Media.probe('${Path.basename(path)}')`)
-          Log.trace(`\n\n${error}`)
-
-          reject(new MediaProbeError(path))
-
-        }
-        else {
-
-          Log.trace({ data }, `Media.probe('${Path.basename(path)}')`)
-
-          resolve(data)
-
-        }
-
-      })
+      ffmpeg
+        .setFfprobePath(Command.path.ffprobe)
+        .input(path)
+        .ffprobe((error, data) => {
+  
+          if (error) {
+  
+            Log.trace(`Media.probe('${Path.basename(path)}')`)
+            Log.trace(`\n\n${error}`)
+  
+            reject(new MediaProbeError(path))
+  
+          }
+          else {
+  
+            Log.trace({
+              'streams': data.streams.map((stream) => {
+                return {
+                  'codecType': stream.codec_type,
+                  'codecName': stream.codec_name,
+                  'codecDescription': stream.codec_long_name,
+                  'codedWidth': stream.coded_width,
+                  'codedHeight': stream.coded_height,
+                  'bitRate': stream.bit_rate
+                }
+              }),
+              'formatName': data.format.format_name,
+              'formatDescription': data.format.format_long_name,
+              'durationInSeconds': data.format.duration
+            }, `Media.probe('${Path.basename(path)}')`)
+    
+            resolve(data)
+  
+          }
+  
+        })
+  
+    }
+    catch (error) {
+      reject(error)
+    }
 
   })
 

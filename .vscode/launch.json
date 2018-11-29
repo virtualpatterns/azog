@@ -15,20 +15,18 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Sandbox Convert w/ Short Video",
+      "name": "Launch Sandbox Convert w/ South Park",
       "program": "${workspaceFolder}/distributable/sandbox/convert.js",
       "preLaunchTask": "Build",
       "args": [
-        "--configurationPath", "${workspaceFolder}/distributable/sandbox/convert-configuration.json",
-        "${workspaceFolder}/resource/deluge/downloaded/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4"
+        "/Volumes/BABBLING/Users/fficnar/Downloads/South.Park.S22E05/South.Park.S22E05.720p.HDTV.x264-AVS.mkv"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Sandbox Probe w/ Short Video",
-      "program": "${workspaceFolder}/distributable/sandbox/probe.js",
+      "name": "Launch Sandbox Probe w/ South Parkrogram": "${workspaceFolder}/distributable/sandbox/probe.js",
       "preLaunchTask": "Build",
       "args": [
         "${workspaceFolder}/resource/deluge/downloaded/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4"
@@ -89,8 +87,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch w/ Short Video",
-      "program": "${workspaceFolder}/distributable/command/index.js",
+      "name": "Launch w/ South Parkrogram": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",

@@ -56,10 +56,7 @@ episodePrototype.getEpisode = async function () {
     data = await Episode.tvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-
-    let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.shortDuration)}`)
- 
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -107,10 +104,7 @@ episodePrototype.getSeries = async function () {
     data = await Episode.tvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
   }
   finally {
-
-    let [ seconds, nanoSeconds ] = Process.hrtime(start)
-    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toDuration(seconds, nanoSeconds).toFormat(Command.format.shortDuration)}`)
-
+    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
