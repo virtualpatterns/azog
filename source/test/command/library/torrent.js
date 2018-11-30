@@ -231,21 +231,31 @@ describe('torrent', () => {
   
     })
 
-    describe('(when passing an episode)', () => {
+    describe('(when passing 2 episodes)', () => {
 
       let torrentName = null
       let torrentPath = null
-      let processedSeriesPath = null
-      let processedSeasonPath = null
-      let processedEpisodePath = null
+
+      let processedSeriesPath1 = null
+      let processedSeasonPath1 = null
+      let processedEpisodePath1 = null
+
+      let processedSeriesPath2 = null
+      let processedSeasonPath2 = null
+      let processedEpisodePath2 = null
 
       before(async () => {
 
         torrentName = 'episode'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        processedSeriesPath = Path.join(Command.path.processed, 'South Park')
-        processedSeasonPath = Path.join(processedSeriesPath, 'Season 22')
-        processedEpisodePath = Path.join(processedSeasonPath, 'South Park - 22x05 - The Scoots.mp4')
+
+        processedSeriesPath1 = Path.join(Command.path.processed, 'South Park')
+        processedSeasonPath1 = Path.join(processedSeriesPath1, 'Season 22')
+        processedEpisodePath1 = Path.join(processedSeasonPath1, 'South Park - 22x05 - The Scoots.mp4')
+
+        processedSeriesPath2 = Path.join(Command.path.processed, 'Will & Grace')
+        processedSeasonPath2 = Path.join(processedSeriesPath2, 'Season 10')
+        processedEpisodePath2 = Path.join(processedSeasonPath2, 'Will & Grace - 10x07 - So Long, Division.mp4')
 
         await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
@@ -253,7 +263,11 @@ describe('torrent', () => {
       })
 
       it('should produce the correct file', async () => {
-        await FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        await FileSystem.access(processedEpisodePath1, FileSystem.F_OK)
+      })
+    
+      it('should produce the correct file', async () => {
+        await FileSystem.access(processedEpisodePath2, FileSystem.F_OK)
       })
     
       after(async () => {

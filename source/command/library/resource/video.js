@@ -13,10 +13,10 @@ const videoPrototype = Object.create(mediaPrototype)
 
 videoPrototype.process = async function () {
 
-  let videoInformation = null
-  ;[ videoInformation ] = await this.getVideoInformation()
+  let formatInformation = null
+  formatInformation = await this.getFormatInformation()
 
-  let durationInMinutes = videoInformation.duration.as('minutes')
+  let durationInMinutes = formatInformation.duration.as('minutes')
   let [ minimumDurationInMinutes ] = Command.range.videoDurationInMinutes
 
   if (durationInMinutes >= minimumDurationInMinutes) {
@@ -24,9 +24,10 @@ videoPrototype.process = async function () {
     let path = null
     path = await mediaPrototype.process.call(this)
 
+    let videoInformation = null
     ;[ videoInformation ] = await this.getVideoInformation()
 
-    Log.debug(`Video: ${videoInformation.codecName} (${videoInformation.codecDescription}) ${videoInformation.codedWidth}x${videoInformation.codedHeight} ${videoInformation.duration.toFormat(Command.format.longDuration)}`)    
+    Log.debug(`'${Path.basename(path)}' ${videoInformation.codecName} (${videoInformation.codecDescription}) ${videoInformation.codedWidth}x${videoInformation.codedHeight}`)    
 
     return path
 
@@ -47,10 +48,22 @@ videoPrototype.getVideoInformation = async function () {
         'width': stream.width,
         'height': stream.height,
         'codedWidth': stream.coded_width,
-        'codedHeight': stream.coded_height,
-        'duration': Duration.fromMillis(Command.conversion.secondsToMilliseconds(stream.duration))
+        'codedHeight': stream.coded_height
       }
     })
+}
+
+videoPrototype.getFormatInformation = async function () {
+
+  let format = null
+  format = await mediaPrototype.getFormatInformation.call(this)
+
+  return {
+    'name': format.format_name,
+    'description': format.format_long_name,
+    'duration': Duration.fromMillis(Command.conversion.secondsToMilliseconds(format.duration))
+  }
+
 }
 
 videoPrototype.convert = function () {

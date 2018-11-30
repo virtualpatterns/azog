@@ -18,6 +18,10 @@ mediaPrototype.getStreamInformation = async function () {
   return (await this.probe()).streams
 }
 
+mediaPrototype.getFormatInformation = async function () {
+  return (await this.probe()).format
+}
+
 mediaPrototype.convert = async function (fn) {
 
   let fromPath = this.path
