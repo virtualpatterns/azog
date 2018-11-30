@@ -23,7 +23,7 @@
     "buildAll": "npm run jake build",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.15-45",
+  "version": "0.0.15-58",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",

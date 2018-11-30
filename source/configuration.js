@@ -8,11 +8,13 @@ import Property from 'object-path'
 const MILLISECONDS_PER_MINUTE = 1000 * 60
 const MILLISECONDS_PER_SECOND = 1000
 const NANOSECONDS_PER_SECOND = 1000000000
+const SECONDS_PER_MINUTE = 60
 
 const command = {
   'conversion': {
     'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
     'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
+    'secondsToMinutes': (seconds) => seconds / SECONDS_PER_MINUTE,
     'toDuration': ([ seconds, nanoseconds ]) => Duration.fromMillis((seconds + nanoseconds / NANOSECONDS_PER_SECOND) * MILLISECONDS_PER_SECOND), 
     'toPercent': (progress) => progress.percent.toFixed(2),
     'toMinutes': (minutes) => minutes.toFixed(2),

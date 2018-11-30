@@ -14,6 +14,10 @@ mediaPrototype.process = function () {
   return this.convert()
 }
 
+mediaPrototype.getStreamInformation = async function () {
+  return (await this.probe()).streams
+}
+
 mediaPrototype.convert = async function (fn) {
 
   let fromPath = this.path
@@ -142,25 +146,7 @@ Media.probe = function (path) {
   
           }
           else {
-  
-            Log.trace({
-              'streams': data.streams.map((stream) => {
-                return {
-                  'codecType': stream.codec_type,
-                  'codecName': stream.codec_name,
-                  'codecDescription': stream.codec_long_name,
-                  'codedWidth': stream.coded_width,
-                  'codedHeight': stream.coded_height,
-                  'bitRate': stream.bit_rate
-                }
-              }),
-              'formatName': data.format.format_name,
-              'formatDescription': data.format.format_long_name,
-              'durationInSeconds': data.format.duration
-            }, `Media.probe('${Path.basename(path)}')`)
-    
             resolve(data)
-  
           }
   
         })

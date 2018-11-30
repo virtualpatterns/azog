@@ -43,7 +43,7 @@ Program
       try {
 
         Log.debug(Command.line)
-        Log.debug(Path.trim(Path.join(torrentPath, torrentName)))
+        Log.debug(torrentName)
         Log.debug(Command.line) 
 
         Process.once('SIGINT', () => {

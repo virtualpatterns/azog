@@ -1,6 +1,6 @@
 import { DateTime, Duration } from 'luxon'
 import Is from '@pwn/is'
-import { Path } from '@virtualpatterns/mablung'
+import { Log, Path } from '@virtualpatterns/mablung'
 
 import { Command } from '../../../configuration'
 
@@ -13,13 +13,23 @@ const videoPrototype = Object.create(mediaPrototype)
 
 videoPrototype.process = async function () {
 
-  let duration = await this.getDuration()
-  let durationInMinutes = duration.as('minutes')
-  
+  let videoInformation = null
+  ;[ videoInformation ] = await this.getVideoInformation()
+
+  let durationInMinutes = videoInformation.duration.as('minutes')
   let [ minimumDurationInMinutes ] = Command.range.videoDurationInMinutes
 
   if (durationInMinutes >= minimumDurationInMinutes) {
-    return await mediaPrototype.process.call(this)
+
+    let path = null
+    path = await mediaPrototype.process.call(this)
+
+    ;[ videoInformation ] = await this.getVideoInformation()
+
+    Log.debug(`Video: ${videoInformation.codecName} (${videoInformation.codecDescription}) ${videoInformation.codedWidth}x${videoInformation.codedHeight} ${videoInformation.duration.toFormat(Command.format.longDuration)}`)    
+
+    return path
+
   }
   else {
     throw new VideoDurationError(this.path, durationInMinutes, minimumDurationInMinutes)
@@ -27,16 +37,20 @@ videoPrototype.process = async function () {
 
 }
 
-videoPrototype.getDuration = async function () {
-
-  let data = await this.probe()
-  let format = data.format
-
-  let durationInSeconds = format.duration
-  let durationInMilliseconds = Command.conversion.secondsToMilliseconds(durationInSeconds)
-
-  return Duration.fromMillis(durationInMilliseconds)
-
+videoPrototype.getVideoInformation = async function () {
+  return (await this.getStreamInformation())
+    .filter((stream) => stream.codec_type == 'video')
+    .map((stream) => {
+      return {
+        'codecName': stream.codec_name.toUpperCase(),
+        'codecDescription': stream.codec_long_name,
+        'width': stream.width,
+        'height': stream.height,
+        'codedWidth': stream.coded_width,
+        'codedHeight': stream.coded_height,
+        'duration': Duration.fromMillis(Command.conversion.secondsToMilliseconds(stream.duration))
+      }
+    })
 }
 
 videoPrototype.convert = function () {
@@ -64,42 +78,6 @@ videoPrototype.getSeasonNumber = function () {
 
 videoPrototype.getEpisodeNumber = function () {
   return Video.getEpisodeNumber(this.path)
-}
-
-videoPrototype.getVideoCodecData = async function () {
-
-  return (await this.getCodecData())
-    .filter((codec) => codec.type == 'video')
-    .map((codec) => {
-      delete codec.type
-      return codec
-    })
-
-}
-
-videoPrototype.getAudioCodecData = async function () {
-
-  return (await this.getCodecData())
-    .filter((codec) => codec.type == 'audio')
-    .map((codec) => {
-      delete codec.type
-      return codec
-    })
-
-}
-
-videoPrototype.getCodecData = async function () {
-
-  return (await this.probe())
-    .streams
-    .map((stream) => {
-      return {
-        'name': stream.codec_name,
-        'description': stream.codec_long_name,
-        'type': stream.codec_type
-      }
-    })
-
 }
 
 const Video = Object.create(Media)
