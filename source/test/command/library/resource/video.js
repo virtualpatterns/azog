@@ -37,7 +37,7 @@ describe('video', () => {
 
       describe(`(when passing '${test.path}')`, () => {
     
-        it(`should return '${test.name}'`, () => {
+        it(`should return '${test.title}'`, () => {
           Assert.equal(Video.getTitle(test.path), test.title)
         })
 
@@ -158,7 +158,7 @@ describe('video', () => {
 
       describe(`(when passing '${test.path}')`, () => {
 
-        it(`should return ${test.season}`, () => {
+        it(`should return ${test.seasonNumber}`, () => {
           Assert.equal(Video.getSeasonNumber(test.path), test.seasonNumber)
         })
 
@@ -203,8 +203,37 @@ describe('video', () => {
 
       describe(`(when passing '${test.path}')`, () => {
     
-        it(`should return ${test.episode}`, () => {
+        it(`should return ${test.episodeNumber}`, () => {
           Assert.equal(Video.getEpisodeNumber(test.path), test.episodeNumber)
+        })
+
+      })
+
+    })
+
+  })
+
+  describe('getEpisodeTitle(path)', () => {
+
+    [
+      {
+        'path': 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv].mp4',
+        'episodeTitle': 'The Jehovahs Witnesses WEB h264 TBS'
+      },
+      {
+        'path': 'South.Park.S321E123.720p.HDTV.x264-AVS.mkv',
+        'episodeTitle': '720p HDTV x264 AVS'
+      },
+      {
+        'path': 'South.Park.S321E12.mkv',
+        'episodeTitle': null
+      }
+    ].forEach((test) => {
+
+      describe(`(when passing '${test.path}')`, () => {
+    
+        it(`should return '${test.episodeTitle}'`, () => {
+          Assert.equal(Video.getEpisodeTitle(test.path), test.episodeTitle)
         })
 
       })

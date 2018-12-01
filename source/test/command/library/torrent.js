@@ -177,7 +177,7 @@ describe('torrent', () => {
   
     })
 
-    describe('(when passing a invalid movie)', () => {
+    describe('(when passing an invalid movie)', () => {
 
       let torrentName = null
       let torrentPath = null
@@ -231,7 +231,7 @@ describe('torrent', () => {
   
     })
 
-    describe('(when passing 2 episodes)', () => {
+    describe('(when passing 3 episodes)', () => {
 
       let torrentName = null
       let torrentPath = null
@@ -243,6 +243,10 @@ describe('torrent', () => {
       let processedSeriesPath2 = null
       let processedSeasonPath2 = null
       let processedEpisodePath2 = null
+
+      let processedSeriesPath3 = null
+      let processedSeasonPath3 = null
+      let processedEpisodePath3 = null
 
       before(async () => {
 
@@ -257,6 +261,10 @@ describe('torrent', () => {
         processedSeasonPath2 = Path.join(processedSeriesPath2, 'Season 10')
         processedEpisodePath2 = Path.join(processedSeasonPath2, 'Will & Grace - 10x07 - So Long, Division.mp4')
 
+        processedSeriesPath3 = Path.join(Command.path.processed, 'Leah Remini Scientology and the Aftermath')
+        processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
+        processedEpisodePath3 = Path.join(processedSeasonPath3, 'Leah Remini Scientology and the Aftermath - 0x12 - The Jehovah\'s Witnesses.mp4')
+
         await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
@@ -268,6 +276,10 @@ describe('torrent', () => {
     
       it('should produce the correct file', async () => {
         await FileSystem.access(processedEpisodePath2, FileSystem.F_OK)
+      })
+    
+      it('should produce the correct file', async () => {
+        await FileSystem.access(processedEpisodePath3, FileSystem.F_OK)
       })
     
       after(async () => {
@@ -313,7 +325,7 @@ describe('torrent', () => {
 
         torrentName = 'unrecognized episode'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        failedEpisodePath = Path.join(Command.path.failed, 'South.Park.S321E123.720p.HDTV.x264-AVS.mkv')
+        failedEpisodePath = Path.join(Command.path.failed, 'South.Park.S321E123.mkv')
 
         await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()

@@ -63,6 +63,7 @@ moviePrototype.getMovie = async function () {
         return Is.null(accumulator) ? movie : (accumulator.score > movie.score ? accumulator : movie)
       }, null)
 
+    delete movie.score
     return movie
 
   }

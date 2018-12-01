@@ -30,21 +30,12 @@ SeriesNotFoundError.prototype = Object.create(EpisodeError.prototype)
 SeriesNotFoundError.prototype.constructor = SeriesNotFoundError
 SeriesNotFoundError.prototype.name = SeriesNotFoundError.name
 
-function EpisodeNotFoundError (series, seasonNumber, episodeNumber, dateAired) {
+function EpisodeNotFoundError (series) {
 
   Error.call(this)
   Error.captureStackTrace(this, EpisodeNotFoundError)
 
-  if (Is.not.null(seasonNumber) &&
-      Is.not.null(episodeNumber)) {
-    this.message = `Unable to find an episode for the series '${series.title}', season ${seasonNumber}, and episode ${episodeNumber}.`
-  }
-  else if (Is.not.null(dateAired)) {
-    this.message = `Unable to find an episode for the series '${series.title}' aired on '${dateAired.toFormat(Command.format.date)}'.`
-  }
-  else {
-    this.message = `Unable to find an episode for the series '${series.title}'.`
-  }
+  this.message = `Unable to find an episode for the series '${series.title}'.`
 
 }
 
@@ -52,4 +43,50 @@ EpisodeNotFoundError.prototype = Object.create(EpisodeError.prototype)
 EpisodeNotFoundError.prototype.constructor = EpisodeNotFoundError
 EpisodeNotFoundError.prototype.name = EpisodeNotFoundError.name
 
-export { EpisodeError, SeriesNotFoundError, EpisodeNotFoundError }
+function EpisodeByDateAiredNotFoundError (series, dateAired) {
+
+  Error.call(this)
+  Error.captureStackTrace(this, EpisodeByDateAiredNotFoundError)
+
+  this.message = `Unable to find an episode for the series '${series.title}' aired on '${dateAired.toFormat(Command.format.date)}'.`
+
+}
+
+EpisodeByDateAiredNotFoundError.prototype = Object.create(EpisodeNotFoundError.prototype)
+EpisodeByDateAiredNotFoundError.prototype.constructor = EpisodeByDateAiredNotFoundError
+EpisodeByDateAiredNotFoundError.prototype.name = EpisodeByDateAiredNotFoundError.name
+
+function EpisodeByNumberNotFoundError (series, seasonNumber, episodeNumber) {
+
+  Error.call(this)
+  Error.captureStackTrace(this, EpisodeByNumberNotFoundError)
+
+  this.message = `Unable to find an episode for the series '${series.title}', season ${seasonNumber}, and episode ${episodeNumber}.`
+
+}
+
+EpisodeByNumberNotFoundError.prototype = Object.create(EpisodeNotFoundError.prototype)
+EpisodeByNumberNotFoundError.prototype.constructor = EpisodeByNumberNotFoundError
+EpisodeByNumberNotFoundError.prototype.name = EpisodeByNumberNotFoundError.name
+
+function EpisodeByTitleNotFoundError (series, episodeTitle) {
+
+  Error.call(this)
+  Error.captureStackTrace(this, EpisodeByTitleNotFoundError)
+
+  this.message = `Unable to find an episode for the series '${series.title}' titled '${episodeTitle}'.`
+
+}
+
+EpisodeByTitleNotFoundError.prototype = Object.create(EpisodeNotFoundError.prototype)
+EpisodeByTitleNotFoundError.prototype.constructor = EpisodeByTitleNotFoundError
+EpisodeByTitleNotFoundError.prototype.name = EpisodeByTitleNotFoundError.name
+
+export {
+  EpisodeError, 
+  SeriesNotFoundError, 
+  EpisodeNotFoundError,
+  EpisodeByDateAiredNotFoundError,
+  EpisodeByNumberNotFoundError,
+  EpisodeByTitleNotFoundError 
+}

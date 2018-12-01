@@ -33,7 +33,7 @@ torrentPrototype.process = async function () {
 
   }
   finally {
-    Log.debug(`Processed in ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+    Log.debug(`Completed in ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
   }
 
 }

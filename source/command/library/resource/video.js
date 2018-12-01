@@ -93,6 +93,10 @@ videoPrototype.getEpisodeNumber = function () {
   return Video.getEpisodeNumber(this.path)
 }
 
+videoPrototype.getEpisodeTitle = function () {
+  return Video.getEpisodeTitle(this.path)
+}
+
 const Video = Object.create(Media)
 
 Video.createResource = function (path, prototype = videoPrototype) {
@@ -212,6 +216,27 @@ Video.getEpisodeNumber = function (path) {
   }
 
   return episodeNumber
+
+}
+
+Video.getEpisodeTitle = function (path) {
+
+  let pattern = /(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})(.*?)$/i
+  let match = null
+
+  let extension = Path.extname(path)
+  let name = Path.basename(path, extension)
+
+  let episodeTitle = null
+
+  if (Is.not.null(match = pattern.exec(name))) {
+
+    [ , episodeTitle ] = match
+    episodeTitle = Is.emptyString(episodeTitle) ? null : episodeTitle
+    
+  }
+
+  return Is.not.null(episodeTitle) ? Video.transform(episodeTitle) : episodeTitle
 
 }
 
