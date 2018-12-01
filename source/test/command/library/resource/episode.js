@@ -28,6 +28,14 @@ describe('episode', () => {
       {
         'fromPath': 'jimmy.kimmel.2018.11.19.bono.web.x264-tbs[eztv].mkv',
         'toPath': Path.join(Command.path.processed, 'Jimmy Kimmel Live', 'Season 16', 'Jimmy Kimmel Live - 16x159 - Bono, Chris Rock, Will Ferrell, Kristen Bell, Channing Tatum, Snoop Dogg, Mila Kunis, Pharrell, Brad Paisley, Zoe Saldana.mp4')
+      },
+      {
+        'fromPath': 'The.Simpsons.S30E08.1080p.WEB.x264-TBS[rartv].mkv',
+        'toPath': Path.join(Command.path.processed, 'The Simpsons', 'Season 30', 'The Simpsons - 30x08 - Krusty the Clown.mp4')
+      },
+      {
+        'fromPath': 'The.Simpsons.S00E00.Krusty.the.Clown.1080p.WEB.x264-TBS[rartv].mkv',
+        'toPath': Path.join(Command.path.processed, 'The Simpsons', 'Season 30', 'The Simpsons - 30x08 - Krusty the Clown.mp4')
       } 
     ].forEach((test) => {
 
