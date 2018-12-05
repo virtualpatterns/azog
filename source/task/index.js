@@ -2,10 +2,11 @@ import '@babel/polyfill'
 import Jake from 'jake'
 import { Log } from '@virtualpatterns/mablung'
 
-import { Task, Test } from '../configuration'
+import { Command, Task, Test } from '../configuration'
 
 Jake.addListener('start', () => {
 
+  Jake.rmRf(Command.logPath, { 'silent': true })
   Jake.rmRf(Task.logPath, { 'silent': true })
   Jake.rmRf(Test.logPath, { 'silent': true })
 

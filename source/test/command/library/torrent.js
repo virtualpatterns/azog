@@ -150,6 +150,33 @@ describe('torrent', () => {
   
     })
 
+    describe('(when passing a movie with the wrong year released)', () => {
+
+      let torrentName = null
+      let torrentPath = null
+      let processedMoviePath = null
+
+      before(async () => {
+
+        torrentName = 'wrong year released movie'
+        torrentPath = Path.join(Command.path.downloaded, torrentName)
+        processedMoviePath = Path.join(Command.path.processed, 'Under the Silver Lake (2019).mp4')
+
+        await FileSystem.remove(Command.path.processed)
+        await Torrent.createTorrent(torrentPath).process()
+
+      })
+
+      it('should produce the correct file', async () => {
+        await FileSystem.access(processedMoviePath, FileSystem.F_OK)
+      })
+    
+      after(async () => {
+        await FileSystem.remove(Command.path.processed)
+      })
+  
+    })
+
     describe('(when passing a short movie)', () => {
 
       let torrentName = null

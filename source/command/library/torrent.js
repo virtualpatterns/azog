@@ -10,6 +10,8 @@ import Movie from './resource/movie'
 import Episode from './resource/episode'
 import Other from './resource/other'
 
+import Media from './directory/media'
+
 import { ResourceClassNotFoundError } from './error/resource-error'
 
 const torrentPrototype = Object.create({})
@@ -26,10 +28,10 @@ torrentPrototype.process = async function () {
       await this.processDirectory(this.path)
     }
     else if (file.isFile()) {
-      this.enqueueFile(this.path)
+      this.enqueuePath(this.path)
     }
   
-    await this.dequeueFiles()
+    await this.dequeuePaths()
 
   }
   finally {
@@ -50,22 +52,22 @@ torrentPrototype.processDirectory = async function (path) {
       await this.processDirectory(Path.join(path, file.name))
     }
     else if (file.isFile()) {
-      this.enqueueFile(Path.join(path, file.name))
+      this.enqueuePath(Path.join(path, file.name))
     }
   }
 
 }
 
-torrentPrototype.enqueueFile = function (path) {
-  this.queue.add(torrentPrototype.dequeueFile.bind(torrentPrototype, path))
+torrentPrototype.enqueuePath = function (path) {
+  this.queue.add(torrentPrototype.dequeuePath.bind(torrentPrototype, path))
 }
 
-torrentPrototype.dequeueFiles = async function () {
+torrentPrototype.dequeuePaths = async function () {
   await this.queue.start()
   await this.queue.onIdle()
 }
 
-torrentPrototype.dequeueFile = async function (path) {
+torrentPrototype.dequeuePath = async function (path) {
   
   let fromPath = path
   let toPath = null
@@ -117,6 +119,37 @@ Torrent.createTorrent = function (path, prototype = torrentPrototype) {
 
 Torrent.getTorrentPrototype = function () {
   return torrentPrototype
+}
+
+Torrent.isTorrent = function (torrent) {
+  return torrentPrototype.isPrototypeOf(torrent)
+}
+
+Torrent.transfer = async function () {
+
+  let start = Process.hrtime()
+
+  try {
+    
+    let queue = null
+    queue = new Queue(Command.queue)
+        
+    queue.addDirectory = function (directory) {
+      this.add(directory.transfer.bind(directory))
+    }
+
+    for (let fromPath of Command.path.local.media) {
+      queue.addDirectory(Media.createDirectory(fromPath))
+    }
+
+    await queue.start()
+    await queue.onIdle()
+    
+  }
+  finally {
+    Log.debug(`Completed in ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+  }
+
 }
 
 Book.registerResourceClass()

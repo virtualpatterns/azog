@@ -43,7 +43,21 @@ const command = {
     'processed': `${Process.env.HOME}/Deluge/Processed`,
     'failed': `${Process.env.HOME}/Deluge/Failed`,
     'ffmpeg': '/usr/local/bin/ffmpeg',
-    'ffprobe': '/usr/local/bin/ffprobe'
+    'ffprobe': '/usr/local/bin/ffprobe',
+    'rsync': '/usr/local/bin/rsync', // '/usr/bin/rsync',
+    'local': {
+      'media': [
+        // `${Process.env.HOME}/Deluge/Processed/Movies`,
+        // `${Process.env.HOME}/Deluge/Processed/Movies (Documentaries)`,
+        // `${Process.env.HOME}/Deluge/Processed/Movies (Miscellaneous)`,
+        // `${Process.env.HOME}/Deluge/Processed/Music`,
+        // `${Process.env.HOME}/Deluge/Processed/TV Shows`,
+        `${Process.env.HOME}/Deluge/Processed/TV Shows (Documentaries)`
+      ]
+    },
+    'remote': {
+      'media': '/Volumes/BUCKBEAK2/Media'
+    }
   },
   'queue': {
     'autoStart': false,
@@ -53,6 +67,7 @@ const command = {
     'progressInSeconds':  [ 60.0, Infinity ],
     'videoDurationInMinutes':  [ 15.0, Infinity ]
   },
+  'remoteServer': 'BUCKBEAK.local',
   'transform': {
     'remove': [ 
       /[()]/g,

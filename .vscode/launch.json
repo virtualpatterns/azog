@@ -26,11 +26,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Sandbox Probe w/ South Parkrogram": "${workspaceFolder}/distributable/sandbox/probe.js",
+      "name": "Launch Sandbox Transfer",
+      "program": "${workspaceFolder}/distributable/sandbox/transfer.js",
       "preLaunchTask": "Build",
-      "args": [
-        "${workspaceFolder}/resource/deluge/downloaded/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT/Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4"
-      ],
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
@@ -49,11 +47,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch w/ Invalid",
+      "name": "Launch Process w/ Invalid",
       "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
+        "process",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
         "0", "0", "0"
       ],
       "internalConsoleOptions": "openOnSessionStart"
@@ -61,10 +61,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch w/ Book",
+      "name": "Launch Process w/ Book",
       "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
+        "process",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
         "0001", "Sleeping Beauties by Stephen King", "${workspaceFolder}/resource/deluge/downloaded"
@@ -74,10 +75,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch w/ Album",
+      "name": "Launch Process w/ Album",
       "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
+        "process",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
         "0001", "Jimi Hendrix - Axis Bold as Love (320)", "${workspaceFolder}/resource/deluge/downloaded"
@@ -87,12 +89,27 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch w/ South Parkrogram": "${workspaceFolder}/distributable/command/index.js",
+      "name": "Launch Process w/ South Park",
+      "program": "${workspaceFolder}/distributable/command/index.js",
       "preLaunchTask": "Build",
       "args": [
+        "process",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
         "0001", "Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT", "${workspaceFolder}/resource/deluge/downloaded"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Transfer",
+      "program": "${workspaceFolder}/distributable/command/index.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "transfer",
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "trace", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     }

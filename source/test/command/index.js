@@ -16,6 +16,7 @@ describe('command', () => {
 
       before(() => {
         childProcess = ChildProcess.fork(Test.path.module, [
+          'process',
           '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
           '--logLevel', Test.logLevel, '--logPath', Test.logPath,
           '0', '0', `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })
@@ -45,6 +46,7 @@ describe('command', () => {
         await FileSystem.remove(Command.path.processed)
 
         childProcess = ChildProcess.fork(Test.path.module, [ 
+          'process',
           '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
           '--logLevel', Test.logLevel, '--logPath', Test.logPath,
           torrentId, torrentName, `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })

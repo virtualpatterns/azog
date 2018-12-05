@@ -27,26 +27,41 @@ moviePrototype.getMovie = async function () {
   let title = this.getTitle()
   let yearReleased = this.getYearReleased()
 
-  let options = {}
-  options.query = title
-  options.include_adult = true
+  let options = []
 
   if (Is.not.null(yearReleased)) {
-    options.year = yearReleased
+    options.push({
+      'query': title,
+      'year': yearReleased,
+      'include_adult': true
+    })
   }
+
+  options.push({
+    'query': title,
+    'include_adult': true
+  })
 
   let data = null
 
-  Log.trace('MovieDB.searchMovie(options) ...')
-  let start = Process.hrtime()
+  for (let _options of options) {
 
-  try {
-    data = await Movie.movieDB.searchMovie(options)
-  }
-  finally {
-    Log.trace({ options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
-  }
+    Log.trace('Movie.searchMovie(options) ...')
+    let start = Process.hrtime()
   
+    try {
+      data = await Movie.searchMovie(_options)
+    }
+    finally {
+      Log.trace({ _options, data }, `Movie.searchMovie(options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    }
+      
+    if (data.total_results > 0) {
+      break
+    }
+
+  }
+
   if (data.total_results > 0) {
 
     let movie = data.results
@@ -77,11 +92,8 @@ const Movie = Object.create(Video)
 
 Movie.createResource = function (path, prototype = moviePrototype) {
 
-  if (Is.undefined(this.movieDB)) {
-
-    this.movieDB = MovieDB(Command.key.movieDB)
-    this.movieDB.searchMovie = Utilities.promisify(this.movieDB.searchMovie)
-  
+  if (Is.undefined(Movie.searchMovie)) {
+    Movie.searchMovie = Utilities.promisify(MovieDB(Command.key.movieDB).searchMovie)
   }
 
   return Video.createResource.call(this, path, prototype)
@@ -100,15 +112,15 @@ Movie.isResourceClass = function (path) {
 
   if (Video.isResourceClass(path)) {
 
-    let titleFromPath = Video.getTitle(path)
-    let seasonNumberFromPath = Video.getSeasonNumber(path)
-    let episodeNumberFromPath = Video.getEpisodeNumber(path)
-    let dateAiredFromPath = Video.getDateAired(path)
+    let title = Video.getTitle(path)
+    let seasonNumber = Video.getSeasonNumber(path)
+    let episodeNumber = Video.getEpisodeNumber(path)
+    let dateAired = Video.getDateAired(path)
   
-    if (Is.not.null(titleFromPath) &&
-        Is.null(seasonNumberFromPath) &&
-        Is.null(episodeNumberFromPath) &&
-        Is.null(dateAiredFromPath)) {
+    if (Is.not.null(title) &&
+        Is.null(seasonNumber) &&
+        Is.null(episodeNumber) &&
+        Is.null(dateAired)) {
       return true
     }
     else {
