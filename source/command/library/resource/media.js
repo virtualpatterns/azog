@@ -90,7 +90,7 @@ Media.convert = function (fromPath, toPath, fn) {
           let [ minimumProgressInSeconds ] = Command.range.progressInSeconds
 
           if (progressInSeconds >= minimumProgressInSeconds) {
-            Log.trace(`FFMPEG.on('progress', (_progress) => { ... }) toPath = '${Path.basename(toPath)}' ${Command.conversion.toPercent(_progress)}%`)
+            Log.debug(`FFMPEG.on('progress', (_progress) => { ... }) toPath = '${Path.basename(toPath)}' ${Command.conversion.toPercent(_progress)}%`)
             progress = Process.hrtime()
           }
 

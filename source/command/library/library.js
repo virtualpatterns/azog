@@ -68,7 +68,7 @@ libraryPrototype.transfer = function () {
           let [ minimumProgressInSeconds ] = Command.range.progressInSeconds
 
           if (progressInSeconds >= minimumProgressInSeconds) {
-            Log.trace(`ChildProcess.spawn(command, parameters, options) this.fromPath = '${Path.basename(this.fromPath)}' ${Command.conversion.toPercent({ 'percent': percentAsNumber })}%`)
+            Log.debug(`ChildProcess.on('data'), (data) => { ... }) this.fromPath = '${Path.basename(this.fromPath)}' ${Command.conversion.toPercent({ 'percent': percentAsNumber })}%`)
             progress = Process.hrtime()
           }
 
