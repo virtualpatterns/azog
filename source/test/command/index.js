@@ -10,7 +10,7 @@ describe('command', () => {
 
   describe('index', () => {
 
-    describe('(when launched with an invalid torrent)', () => {
+    describe('(when processing an invalid torrent)', () => {
 
       let childProcess = null
 
@@ -31,7 +31,7 @@ describe('command', () => {
 
     })
 
-    describe('(when launched with a valid torrent)', () => {
+    describe('(when processing a valid torrent)', () => {
 
       let torrentId = null
       let torrentName = null
@@ -40,8 +40,8 @@ describe('command', () => {
 
       before(async () => {
 
-        torrentId = '0001'
-        torrentName = 'book'
+        torrentId = '0'
+        torrentName = 'Book'
     
         await FileSystem.remove(Command.path.processed)
 
@@ -51,6 +51,30 @@ describe('command', () => {
           '--logLevel', Test.logLevel, '--logPath', Test.logPath,
           torrentId, torrentName, `${__dirname}/../../../resource/deluge/downloaded` ], { 'stdio': 'inherit' })
 
+      })
+    
+      it('should exit with the correct code', (complete) => {
+        childProcess.on('exit', (code) => {
+          Assert.equal(code, 0)
+          complete()
+        })
+      })
+    
+      after(async () => {
+        await FileSystem.remove(Command.path.processed)
+      })
+
+    })
+
+    describe('(when transferring)', () => {
+
+      let childProcess = null
+
+      before(() => {
+        childProcess = ChildProcess.fork(Test.path.module, [
+          'transfer',
+          '--configurationPath', `${__dirname}/../../../resource/deluge/configuration.json`,
+          '--logLevel', Test.logLevel, '--logPath', Test.logPath ], { 'stdio': 'inherit' })
       })
     
       it('should exit with the correct code', (complete) => {

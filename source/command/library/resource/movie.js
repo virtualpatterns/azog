@@ -46,14 +46,14 @@ moviePrototype.getMovie = async function () {
 
   for (let _options of options) {
 
-    Log.trace('Movie.searchMovie(options) ...')
+    Log.trace('MovieDB.searchMovie(options) ...')
     let start = Process.hrtime()
   
     try {
-      data = await Movie.searchMovie(_options)
+      data = await Movie.MovieDB.searchMovie(_options)
     }
     finally {
-      Log.trace({ _options, data }, `Movie.searchMovie(options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+      Log.trace({ _options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
     }
       
     if (data.total_results > 0) {
@@ -92,8 +92,11 @@ const Movie = Object.create(Video)
 
 Movie.createResource = function (path, prototype = moviePrototype) {
 
-  if (Is.undefined(Movie.searchMovie)) {
-    Movie.searchMovie = Utilities.promisify(MovieDB(Command.key.movieDB).searchMovie)
+  if (Is.undefined(Movie.MovieDB)) {
+
+    Movie.MovieDB = MovieDB(Command.key.movieDB)
+    Movie.MovieDB.searchMovie = Utilities.promisify(Movie.MovieDB.searchMovie)
+
   }
 
   return Video.createResource.call(this, path, prototype)

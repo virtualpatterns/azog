@@ -10,10 +10,6 @@ describe('episode', () => {
 
     [
       {
-        'fromPath': 'Charmed.2018.S01E05.WEB.h264-TBS[eztv].mkv',
-        'toPath': Path.join(Command.path.processed, 'Charmed (2018)', 'Season 1', 'Charmed (2018) - 1x05 - Other Woman.mp4')
-      },
-      {
         'fromPath': 'ITV.Joanna.Lumleys.Silk.Road.Adventure.1of4.720p.HDTV.x264.AAC.MVGroup.org.mkv.mkv',
         'toPath': Path.join(Command.path.processed, 'Joanna Lumley\'s Silk Road Adventure', 'Season 1', 'Joanna Lumley\'s Silk Road Adventure - 1x01 - Venice, Albania and Turkey.mp4')
       },
@@ -28,15 +24,7 @@ describe('episode', () => {
       {
         'fromPath': 'jimmy.kimmel.2018.11.19.bono.web.x264-tbs[eztv].mkv',
         'toPath': Path.join(Command.path.processed, 'Jimmy Kimmel Live', 'Season 16', 'Jimmy Kimmel Live - 16x159 - Bono, Chris Rock, Will Ferrell, Kristen Bell, Channing Tatum, Snoop Dogg, Mila Kunis, Pharrell, Brad Paisley, Zoe Saldana.mp4')
-      },
-      {
-        'fromPath': 'The.Simpsons.S30E08.1080p.WEB.x264-TBS[rartv].mkv',
-        'toPath': Path.join(Command.path.processed, 'The Simpsons', 'Season 30', 'The Simpsons - 30x08 - Krusty the Clown.mp4')
-      },
-      {
-        'fromPath': 'The.Simpsons.S00E00.Krusty.the.Clown.1080p.WEB.x264-TBS[rartv].mkv',
-        'toPath': Path.join(Command.path.processed, 'The Simpsons', 'Season 30', 'The Simpsons - 30x08 - Krusty the Clown.mp4')
-      } 
+      }
     ].forEach((test) => {
 
       describe(`(when passing '${test.fromPath}')`, () => {

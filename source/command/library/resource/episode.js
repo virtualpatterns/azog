@@ -89,14 +89,14 @@ episodePrototype.getEpisodeByDateAired = async function (series, dateAired) {
 
   let data = null
   
-  Log.trace(`Episode.getEpisodesBySeriesId(${series.id}, options) ...`)
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
   let start = Process.hrtime()
 
   try {
-    data = await Episode.getEpisodesBySeriesId(series.id, options)
+    data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-    Log.trace({ options, data }, `Episode.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -131,14 +131,14 @@ episodePrototype.getEpisodeByNumber = async function (series, seasonNumber, epis
 
   let data = null
   
-  Log.trace(`Episode.getEpisodesBySeriesId(${series.id}, options) ...`)
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
   let start = Process.hrtime()
 
   try {
-    data = await Episode.getEpisodesBySeriesId(series.id, options)
+    data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-    Log.trace({ options, data }, `Episode.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -167,14 +167,14 @@ episodePrototype.getEpisodeByTitle = async function (series, episodeTitle) {
   let options = {}
   let data = null
   
-  Log.trace(`Episode.getEpisodesBySeriesId(${series.id}, options) ...`)
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
   let start = Process.hrtime()
 
   try {
-    data = await Episode.getEpisodesBySeriesId(series.id, options)
+    data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-    Log.trace(`Episode.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -212,14 +212,14 @@ episodePrototype.getSeries = async function () {
   let options = {}
   let data = null
   
-  Log.trace(`Episode.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ...`)
+  Log.trace(`TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ...`)
   let start = Process.hrtime()
 
   try {
-    data = await Episode.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
+    data = await Episode.TvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
   }
   finally {
-    Log.trace({ options, data }, `Episode.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -248,15 +248,8 @@ const Episode = Object.create(Video)
 
 Episode.createResource = function (path, prototype = episodePrototype) {
 
-  if (Is.undefined(Episode.getSeriesByName) &&
-      Is.undefined(Episode.getEpisodesBySeriesId)) {
-
-    let tvDB = null
-    tvDB = new TvDB(Command.key.tvDB)
-
-    Episode.getSeriesByName = tvDB.getSeriesByName
-    Episode.getEpisodesBySeriesId = tvDB.getEpisodesBySeriesId
-
+  if (Is.undefined(Episode.TvDB)) {
+    Episode.TvDB = new TvDB(Command.key.tvDB)
   }
 
   return Video.createResource.call(this, path, prototype)

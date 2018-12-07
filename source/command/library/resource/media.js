@@ -51,14 +51,14 @@ Media.isResource = function (media) {
 
 Media.convert = function (fromPath, toPath, fn) {
 
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     try {
 
       Log.debug(`Creating '${Path.basename(toPath)}' ...`)
 
       Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
-      FileSystem.mkdirSync(Path.dirname(toPath), { 'recursive': true })
+      await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
   
       let converter = new FFMPEG({ 'stdoutLines': 0 })
   
@@ -77,7 +77,7 @@ Media.convert = function (fromPath, toPath, fn) {
       converter
         .on('start', (command) => {
   
-          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ...`)
+          Log.trace(`FFMPEG.on('start', (command) => { ... }) toPath = '${Path.basename(toPath)}'`)
           Log.trace(command)
   
           start = Process.hrtime()
@@ -90,14 +90,14 @@ Media.convert = function (fromPath, toPath, fn) {
           let [ minimumProgressInSeconds ] = Command.range.progressInSeconds
 
           if (progressInSeconds >= minimumProgressInSeconds) {
-            Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ${Command.conversion.toPercent(_progress)}%`)
+            Log.trace(`FFMPEG.on('progress', (_progress) => { ... }) toPath = '${Path.basename(toPath)}' ${Command.conversion.toPercent(_progress)}%`)
             progress = Process.hrtime()
           }
 
         })
         .on('error', (error, stdout, stderr) => {
   
-          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn)`)
+          Log.trace(`FFMPEG.on('error', (error, stdout, stderr) => { ... }) toPath = '${Path.basename(toPath)}'`)
           Log.trace(`\n\n${stderr}`)
   
           try {
@@ -112,7 +112,7 @@ Media.convert = function (fromPath, toPath, fn) {
         })
         .on('end', () => {
 
-          Log.trace(`Media.convert(fromPath, '${Path.basename(toPath)}', fn) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+          Log.trace(`FFMPEG.on('end', () => { ... }) toPath = '${Path.basename(toPath)}' ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
   
           resolve(this.path = toPath)
   
@@ -143,7 +143,7 @@ Media.probe = function (path) {
   
           if (error) {
   
-            Log.trace(`Media.probe('${Path.basename(path)}')`)
+            Log.trace(`FFMPEG.ffprobe((error, data) => { ... }) path = '${Path.basename(path)}'`)
             Log.trace(`\n\n${error}`)
   
             reject(new MediaProbeError(path))

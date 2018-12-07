@@ -10,7 +10,7 @@ import Movie from './resource/movie'
 import Episode from './resource/episode'
 import Other from './resource/other'
 
-import Media from './directory/media'
+import Library from './library'
 
 import { ResourceClassNotFoundError } from './error/resource-error'
 
@@ -134,16 +134,32 @@ Torrent.transfer = async function () {
     let queue = null
     queue = new Queue(Command.queue)
         
-    queue.addDirectory = function (directory) {
-      this.add(directory.transfer.bind(directory))
+    const enqueueLibrary = function (library) {
+      queue.add(dequeueLibrary.bind(dequeueLibrary, library))
     }
 
-    for (let fromPath of Command.path.local.media) {
-      queue.addDirectory(Media.createDirectory(fromPath))
+    const dequeueLibraries = async function () {
+      await queue.start()
+      await queue.onIdle()
     }
 
-    await queue.start()
-    await queue.onIdle()
+    const dequeueLibrary = async function (library) {
+
+      try {
+        await library.transfer()
+      }
+      catch (error) {
+        Log.error(`Failed on '${Path.basename(library.fromPath)}'`)
+        Log.error(error)      
+      }
+
+    }
+
+    for (let fromPath of Object.values(Command.path.library.from)) {
+      enqueueLibrary(Library.createLibrary(fromPath, Command.path.library.to))
+    }
+
+    await dequeueLibraries()
     
   }
   finally {

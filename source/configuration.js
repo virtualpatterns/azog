@@ -45,18 +45,16 @@ const command = {
     'ffmpeg': '/usr/local/bin/ffmpeg',
     'ffprobe': '/usr/local/bin/ffprobe',
     'rsync': '/usr/local/bin/rsync', // '/usr/bin/rsync',
-    'local': {
-      'media': [
-        // `${Process.env.HOME}/Deluge/Processed/Movies`,
-        // `${Process.env.HOME}/Deluge/Processed/Movies (Documentaries)`,
-        // `${Process.env.HOME}/Deluge/Processed/Movies (Miscellaneous)`,
-        // `${Process.env.HOME}/Deluge/Processed/Music`,
-        // `${Process.env.HOME}/Deluge/Processed/TV Shows`,
-        `${Process.env.HOME}/Deluge/Processed/TV Shows (Documentaries)`
-      ]
-    },
-    'remote': {
-      'media': '/Volumes/BUCKBEAK2/Media'
+    'library': {
+      'from': {
+        'movies': `${Process.env.HOME}/Deluge/Processed/Movies`,
+        'moviesDocumentaries': `${Process.env.HOME}/Deluge/Processed/Movies (Documentaries)`,
+        'moviesMiscellaneous': `${Process.env.HOME}/Deluge/Processed/Movies (Miscellaneous)`,
+        'music': `${Process.env.HOME}/Deluge/Processed/Music`,
+        'series': `${Process.env.HOME}/Deluge/Processed/TV Shows`,
+        'seriesDocumentaries': `${Process.env.HOME}/Deluge/Processed/TV Shows (Documentaries)`
+      },
+      'to': 'BUCKBEAK.local:/Volumes/BUCKBEAK2/Media'
     }
   },
   'queue': {
@@ -64,10 +62,9 @@ const command = {
     'concurrency': OS.cpus().length
   },
   'range': {
-    'progressInSeconds':  [ 60.0, Infinity ],
+    'progressInSeconds':  [ 15.0, Infinity ],
     'videoDurationInMinutes':  [ 15.0, Infinity ]
   },
-  'remoteServer': 'BUCKBEAK.local',
   'transform': {
     'remove': [ 
       /[()]/g,

@@ -1,5 +1,4 @@
-import { assert as Assert } from 'chai'
-import { FileSystem, Path } from '@virtualpatterns/mablung'
+import { FileSystem, Path, Process } from '@virtualpatterns/mablung'
 
 import { Command } from '../../../configuration'
 import Torrent from '../../../command/library/torrent'
@@ -15,7 +14,7 @@ describe('torrent', () => {
 
       before(() => {
 
-        torrentName = 'no resource'
+        torrentName = 'Text'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
 
       })
@@ -34,16 +33,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'book'
+        torrentName = 'Book'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        processedBookPath = Path.join(Command.path.processed, `${torrentName}.epub`)
+        processedBookPath = Path.join(Command.path.processed, 'Sleeping Beauties by Stephen King.epub')
 
-        await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedBookPath, FileSystem.F_OK)
       })
     
@@ -53,7 +51,7 @@ describe('torrent', () => {
   
     })
 
-    describe('(when passing an album)', () => {
+    describe('(when passing music)', () => {
 
       let torrentName = null
       let torrentPath = null
@@ -63,30 +61,17 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'album'
+        torrentName = 'Music'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
         processedArtistPath = Path.join(Command.path.processed, 'The Jimi Hendrix Experience')
         processedAlbumPath = Path.join(processedArtistPath, 'Axis Bold as Love')
         processedSongPath = Path.join(processedAlbumPath, '26 Bold as Love.mp3')
 
-        await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct directory ', async () => {
-        await FileSystem.access(processedArtistPath, FileSystem.F_OK)
-      })
-    
-      it('should produce the correct directory ', async () => {
-        await FileSystem.access(processedAlbumPath, FileSystem.F_OK)
-      })
-    
-      it('should produce the correct number of files', async () => {
-        Assert.equal((await FileSystem.readdir(processedAlbumPath)).length, 26)
-      })
-    
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedSongPath, FileSystem.F_OK)
       })
     
@@ -96,7 +81,7 @@ describe('torrent', () => {
   
     })
 
-    describe('(when passing an invalid song)', () => {
+    describe('(when passing invalid music)', () => {
 
       let torrentName = null
       let torrentPath = null
@@ -104,16 +89,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'invalid song'
+        torrentName = 'Music (invalid music)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        failedSongPath = Path.join(Command.path.failed, 'invalid song.flac')
+        failedSongPath = Path.join(Command.path.failed, '01 Song.flac')
 
-        await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(failedSongPath, FileSystem.F_OK)
       })
     
@@ -131,16 +115,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'movie'
+        torrentName = 'Movie'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
         processedMoviePath = Path.join(Command.path.processed, 'The Equalizer 2 (2018).mp4')
 
-        await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedMoviePath, FileSystem.F_OK)
       })
     
@@ -150,7 +133,7 @@ describe('torrent', () => {
   
     })
 
-    describe('(when passing a movie with the wrong year released)', () => {
+    describe('(when passing a movie with no year released)', () => {
 
       let torrentName = null
       let torrentPath = null
@@ -158,16 +141,41 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'wrong year released movie'
+        torrentName = 'Movie (no year released)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        processedMoviePath = Path.join(Command.path.processed, 'Under the Silver Lake (2019).mp4')
+        processedMoviePath = Path.join(Command.path.processed, 'They Shall Not Grow Old (2018).mp4')
 
-        await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
+        await FileSystem.access(processedMoviePath, FileSystem.F_OK)
+      })
+    
+      after(async () => {
+        await FileSystem.remove(Command.path.processed)
+      })
+  
+    })
+
+    describe('(when passing a movie with the incorrect year released)', () => {
+
+      let torrentName = null
+      let torrentPath = null
+      let processedMoviePath = null
+
+      before(async () => {
+
+        torrentName = 'Movie (incorrect year released)'
+        torrentPath = Path.join(Command.path.downloaded, torrentName)
+        processedMoviePath = Path.join(Command.path.processed, 'Under the Silver Lake (2018).mp4')
+
+        await Torrent.createTorrent(torrentPath).process()
+
+      })
+
+      it('should create the correct file', async () => {
         await FileSystem.access(processedMoviePath, FileSystem.F_OK)
       })
     
@@ -185,16 +193,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'short movie'
+        torrentName = 'Movie (short)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
         failedMoviePath = Path.join(Command.path.failed, 'Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4')
 
-        await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(failedMoviePath, FileSystem.F_OK)
       })
     
@@ -212,16 +219,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'invalid movie'
+        torrentName = 'Movie (invalid)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
         failedMoviePath = Path.join(Command.path.failed, 'The.Equalizer.2.2018.720p.WEBRip.x264-[YTS.AM].mkv')
 
-        await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(failedMoviePath, FileSystem.F_OK)
       })
     
@@ -239,16 +245,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'unrecognized movie'
+        torrentName = 'Movie (unrecognized)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
         failedMoviePath = Path.join(Command.path.failed, 'Fart Farter 1970.mp4')
 
-        await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(failedMoviePath, FileSystem.F_OK)
       })
     
@@ -277,7 +282,7 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'episode'
+        torrentName = 'Episodes'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
 
         processedSeriesPath1 = Path.join(Command.path.processed, 'South Park')
@@ -292,20 +297,19 @@ describe('torrent', () => {
         processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
         processedEpisodePath3 = Path.join(processedSeasonPath3, 'Leah Remini Scientology and the Aftermath - 0x12 - The Jehovah\'s Witnesses.mp4')
 
-        await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedEpisodePath1, FileSystem.F_OK)
       })
     
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedEpisodePath2, FileSystem.F_OK)
       })
     
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedEpisodePath3, FileSystem.F_OK)
       })
     
@@ -323,16 +327,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'unrecognized series'
+        torrentName = 'Series (unrecognized)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        failedSeriesPath = Path.join(Command.path.failed, 'Fart.Farter.S22E05.720p.HDTV.x264-AVS.mkv')
+        failedSeriesPath = Path.join(Command.path.failed, 'Fart.Farter.S22E05.720p.HDTV.x264-AVS.mp4')
 
-        await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(failedSeriesPath, FileSystem.F_OK)
       })
     
@@ -350,16 +353,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'unrecognized episode'
+        torrentName = 'Episode (unrecognized)'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        failedEpisodePath = Path.join(Command.path.failed, 'South.Park.S321E123.mkv')
+        failedEpisodePath = Path.join(Command.path.failed, 'South.Park.S321E123.mp4')
 
-        await FileSystem.remove(Command.path.failed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(failedEpisodePath, FileSystem.F_OK)
       })
     
@@ -377,16 +379,15 @@ describe('torrent', () => {
 
       before(async () => {
 
-        torrentName = 'other'
+        torrentName = 'Archive'
         torrentPath = Path.join(Command.path.downloaded, torrentName)
-        processedArchivePath = Path.join(Command.path.processed, `${torrentName}.zip`)
+        processedArchivePath = Path.join(Command.path.processed, 'Sleeping Beauties by Stephen King.zip')
 
-        await FileSystem.remove(Command.path.processed)
         await Torrent.createTorrent(torrentPath).process()
 
       })
 
-      it('should produce the correct file', async () => {
+      it('should create the correct file', async () => {
         await FileSystem.access(processedArchivePath, FileSystem.F_OK)
       })
     
@@ -395,6 +396,67 @@ describe('torrent', () => {
       })
   
     })
+
+  })
+
+  describe('transfer()', () => {
+
+    describe('(when called)', () => {
+
+      before(async () => {
+
+        await FileSystem.mkdir(Command.path.library.to, { 'recursive': true })
+
+        await Torrent.transfer()
+
+      })
+
+      for (let fromPath of Object.values(Command.path.library.from)) {
+
+        it(`should create '${Path.trim(fromPath)}'`, async () => {
+          await FileSystem.access(fromPath, FileSystem.F_OK)
+        })
+
+      }
+
+      after(async () => {
+        await FileSystem.remove(Command.path.processed)
+      })
+
+    })
+
+    for (let fromPath of Object.values(Command.path.library.from)) {
+
+      describe(`(when called with content in '${Path.basename(fromPath)}')`, () => {
+
+        let contentFromPath = null
+        let contentToPath = null
+
+        before(async () => {
+
+          contentFromPath = Path.join(fromPath, `${Process.pid}.pid`)
+          contentToPath = Path.join(Command.path.library.to, Path.basename(fromPath), `${Process.pid}.pid`)
+  
+          await FileSystem.mkdir(Path.dirname(contentFromPath), { 'recursive': true })
+          await FileSystem.writeFile(contentFromPath, Process.pid, { 'encoding': 'utf-8' })
+
+          await FileSystem.mkdir(Command.path.library.to, { 'recursive': true })
+
+          await Torrent.transfer()
+  
+        })
+  
+        it('should create the correct file', async () => {
+          await FileSystem.access(contentToPath, FileSystem.F_OK)
+        })
+
+        after(async () => {
+          await FileSystem.remove(Command.path.processed)
+        })
+
+      })
+
+    }
 
   })
 

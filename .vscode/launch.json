@@ -7,33 +7,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Sandbox Classes",
-      "program": "${workspaceFolder}/distributable/sandbox/classes.js",
-      "preLaunchTask": "Build",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Sandbox Convert w/ South Park",
-      "program": "${workspaceFolder}/distributable/sandbox/convert.js",
-      "preLaunchTask": "Build",
-      "args": [
-        "/Volumes/BABBLING/Users/fficnar/Downloads/South.Park.S22E05/South.Park.S22E05.720p.HDTV.x264-AVS.mkv"
-      ],
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Sandbox Transfer",
-      "program": "${workspaceFolder}/distributable/sandbox/transfer.js",
-      "preLaunchTask": "Build",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Launch Test",
       "program": "${workspaceFolder}/node_modules/.bin/_mocha",
       "preLaunchTask": "Build",
@@ -68,38 +41,10 @@
         "process",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
-        "0001", "Sleeping Beauties by Stephen King", "${workspaceFolder}/resource/deluge/downloaded"
+        "0", "Book", "${workspaceFolder}/resource/deluge/downloaded"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Process w/ Album",
-      "program": "${workspaceFolder}/distributable/command/index.js",
-      "preLaunchTask": "Build",
-      "args": [
-        "process",
-        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
-        "0001", "Jimi Hendrix - Axis Bold as Love (320)", "${workspaceFolder}/resource/deluge/downloaded"
-      ],
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Process w/ South Park",
-      "program": "${workspaceFolder}/distributable/command/index.js",
-      "preLaunchTask": "Build",
-      "args": [
-        "process",
-        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
-        "0001", "Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT", "${workspaceFolder}/resource/deluge/downloaded"
-      ],
-      "internalConsoleOptions": "openOnSessionStart"
-    }
     {
       "type": "node",
       "request": "launch",
