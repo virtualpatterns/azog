@@ -3,7 +3,7 @@ import { FileSystem, Log, Path, Process } from '@virtualpatterns/mablung'
 import Is from '@pwn/is'
 import { quote as Quote } from 'shell-quote'
 
-import { Command } from '../../configuration'
+import Configuration from '../configuration'
 
 import { LibraryTransferError } from './error/library-error'
 
@@ -14,8 +14,6 @@ libraryPrototype.transfer = function () {
   return new Promise(async (resolve, reject) => {
 
     try {
-
-      Log.debug(`Transferring '${Path.basename(this.fromPath)}' ...`)
 
       Log.trace(`FileSystem.mkdir('${Path.basename(this.fromPath)}'), { 'recursive': true }`)
       await FileSystem.mkdir(this.fromPath, { 'recursive': true })
@@ -36,9 +34,9 @@ libraryPrototype.transfer = function () {
       
       let options = {}
   
-      Log.trace(`ChildProcess.spawn(command, parameters, options) this.fromPath = '${Path.basename(this.fromPath)}' ...`)
+      Log.trace(`ChildProcess.spawn('${Configuration.path.rsync}', parameters, options) ...`)
       Log.trace(Quote([
-        Command.path.rsync,
+        Configuration.path.rsync,
         ...parameters
       ]))
 
@@ -49,7 +47,7 @@ libraryPrototype.transfer = function () {
       let progress = Process.hrtime()
 
       let process = null
-      process = ChildProcess.spawn(Command.path.rsync, parameters, options)
+      process = ChildProcess.spawn(Configuration.path.rsync, parameters, options)
 
       process.stdout.on('data', (data) => {
 
@@ -64,11 +62,11 @@ libraryPrototype.transfer = function () {
           let [ percentAsString ] = match
           let percentAsNumber = parseFloat(percentAsString)
 
-          let progressInSeconds = Command.conversion.toSeconds(Process.hrtime(progress))
-          let [ minimumProgressInSeconds ] = Command.range.progressInSeconds
+          let progressInSeconds = Configuration.conversion.toSeconds(Process.hrtime(progress))
+          let [ minimumProgressInSeconds ] = Configuration.range.progressInSeconds
 
           if (progressInSeconds >= minimumProgressInSeconds) {
-            Log.debug(`ChildProcess.on('data'), (data) => { ... }) this.fromPath = '${Path.basename(this.fromPath)}' ${Command.conversion.toPercent({ 'percent': percentAsNumber })}%`)
+            Log.debug(`'${Path.basename(this.fromPath)}' ${Configuration.conversion.toPercent({ 'percent': percentAsNumber })}% ...`)
             progress = Process.hrtime()
           }
 
@@ -90,7 +88,7 @@ libraryPrototype.transfer = function () {
 
       process.on('error', (error) => {
 
-        Log.trace(error, `ChildProcess.on('error'), (error) => { ... }) this.fromPath = '${Path.basename(this.fromPath)}'`)
+        Log.trace(error, `ChildProcess.on('error', (error) => { ... }) this.fromPath='${Path.basename(this.fromPath)}'`)
 
         reject(new LibraryTransferError(this.fromPath))
 
@@ -98,7 +96,7 @@ libraryPrototype.transfer = function () {
       
       process.on('exit', (code, signal) => {
 
-        Log.trace(`ChildProcess.on('exit'), (${code}, ${Is.not.null(signal) ? `'${signal}'` : signal}) => { ... }) this.fromPath = '${Path.basename(this.fromPath)}' ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+        Log.trace(`ChildProcess.on('exit'), (${code}, ${Is.not.null(signal) ? '${signal}' : signal}) => { ... }) this.fromPath='${Path.basename(this.fromPath)}' ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.longDuration)}`)
 
         if (Is.not.emptyString(stderr)) {
 

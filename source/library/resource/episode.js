@@ -3,7 +3,7 @@ import { Log, Path, Process } from '@virtualpatterns/mablung'
 import Score from 'string-similarity'
 import TvDB from 'node-tvdb'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import { SeriesNotFoundError, EpisodeNotFoundError, EpisodeByDateAiredNotFoundError, EpisodeByNumberNotFoundError, EpisodeByTitleNotFoundError } from '../error/episode-error'
 
@@ -20,7 +20,7 @@ episodePrototype.getToPath = async function () {
   let season = `Season ${episode.seasonNumber.toString()}`
   let _episode = `${Episode.sanitize(episode.seriesTitle)} - ${episode.seasonNumber.toString()}x${episode.episodeNumber.toString().padStart(2, '0')} - ${Episode.sanitize(episode.episodeTitle)}`
 
-  return Path.join(Command.path.processed, series, season, `${_episode}.mp4`)
+  return Path.join(Configuration.path.library.from.series, series, season, `${_episode}.mp4`)
 
 }
 
@@ -83,7 +83,7 @@ episodePrototype.getEpisodeByDateAired = async function (series, dateAired) {
 
   let options = {
     'query': {
-      'firstAired': dateAired.toFormat(Command.format.date)
+      'firstAired': dateAired.toFormat(Configuration.format.date)
     }
   }
 
@@ -96,7 +96,7 @@ episodePrototype.getEpisodeByDateAired = async function (series, dateAired) {
     data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -138,7 +138,7 @@ episodePrototype.getEpisodeByNumber = async function (series, seasonNumber, epis
     data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -174,7 +174,7 @@ episodePrototype.getEpisodeByTitle = async function (series, episodeTitle) {
     data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
   }
   finally {
-    Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -219,7 +219,7 @@ episodePrototype.getSeries = async function () {
     data = await Episode.TvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
   }
   finally {
-    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
   }
 
   if (data.length > 0) {
@@ -249,7 +249,7 @@ const Episode = Object.create(Video)
 Episode.createResource = function (path, prototype = episodePrototype) {
 
   if (Is.undefined(Episode.TvDB)) {
-    Episode.TvDB = new TvDB(Command.key.tvDB)
+    Episode.TvDB = new TvDB(Configuration.key.tvDB)
   }
 
   return Video.createResource.call(this, path, prototype)

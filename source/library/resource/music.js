@@ -1,7 +1,7 @@
 import * as ID3 from 'music-metadata'
 import { Log, Path } from '@virtualpatterns/mablung'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import Media from './media'
 
@@ -17,7 +17,7 @@ musicPrototype.getToPath = async function () {
   let album = Music.sanitize(tag.common.album || 'Unknown Album')
   let song = `${tag.common.track.no && tag.common.track.no.toString().padStart(2, '0') || '00'} ${Music.sanitize(tag.common.title || 'Unknown Title')}`
 
-  return Path.join(Command.path.processed, artist, album, `${song}.mp3`)
+  return Path.join(Configuration.path.library.from.music, artist, album, `${song}.mp3`)
 
 }
 
@@ -36,7 +36,7 @@ Music.isResource = function (music) {
 }
 
 Music.isResourceClass = function (path) {
-  return Command.extension.music.includes(Path.extname(path))
+  return Configuration.extension.music.includes(Path.extname(path))
 }
 
 export default Music

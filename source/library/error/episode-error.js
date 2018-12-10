@@ -1,6 +1,6 @@
 import Is from '@pwn/is'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import { VideoError } from './video-error'
 
@@ -48,7 +48,7 @@ function EpisodeByDateAiredNotFoundError (series, dateAired) {
   Error.call(this)
   Error.captureStackTrace(this, EpisodeByDateAiredNotFoundError)
 
-  this.message = `Unable to find an episode for the series '${series.title}' aired on '${dateAired.toFormat(Command.format.date)}'.`
+  this.message = `Unable to find an episode for the series '${series.title}' aired on '${dateAired.toFormat(Configuration.format.date)}'.`
 
 }
 

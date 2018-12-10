@@ -1,7 +1,7 @@
 import { FileSystem, Log, Path, Process } from '@virtualpatterns/mablung'
 import Queue from 'p-queue'
 
-import { Command } from '../../configuration'
+import Configuration from '../configuration'
 
 import Resource from './resource'
 import Book from './resource/book'
@@ -35,7 +35,7 @@ torrentPrototype.process = async function () {
 
   }
   finally {
-    Log.debug(`Completed in ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+    Log.debug(`Completed in ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.longDuration)}`)
   }
 
 }
@@ -90,7 +90,7 @@ torrentPrototype.dequeuePath = async function (path) {
       Log.error(`Failed on '${Path.basename(fromPath)}'`)
       Log.error(error)
 
-      toPath = Path.join(Command.path.failed, Path.basename(fromPath))
+      toPath = Path.join(Configuration.path.failed, Path.basename(fromPath))
     
       Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
       await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
@@ -111,7 +111,7 @@ Torrent.createTorrent = function (path, prototype = torrentPrototype) {
   let torrent = Object.create(prototype)
 
   torrent.path = path
-  torrent.queue = new Queue(Command.queue)
+  torrent.queue = new Queue(Configuration.queue)
 
   return torrent
 
@@ -132,7 +132,7 @@ Torrent.transfer = async function () {
   try {
     
     let queue = null
-    queue = new Queue(Command.queue)
+    queue = new Queue(Configuration.queue)
         
     const enqueueLibrary = function (library) {
       queue.add(dequeueLibrary.bind(dequeueLibrary, library))
@@ -155,15 +155,15 @@ Torrent.transfer = async function () {
 
     }
 
-    for (let fromPath of Object.values(Command.path.library.from)) {
-      enqueueLibrary(Library.createLibrary(fromPath, Command.path.library.to))
+    for (let fromPath of Object.values(Configuration.path.library.from)) {
+      enqueueLibrary(Library.createLibrary(fromPath, Configuration.path.library.to))
     }
 
     await dequeueLibraries()
     
   }
   finally {
-    Log.debug(`Completed in ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.longDuration)}`)
+    Log.debug(`Completed in ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.longDuration)}`)
   }
 
 }

@@ -2,7 +2,7 @@ import { assert as Assert } from 'chai'
 import { DateTime } from 'luxon'
 import Is from '@pwn/is'
 
-import Video from '../../../../command/library/resource/video'
+import Video from '../../../library/resource/video'
 
 describe('video', () => {
 

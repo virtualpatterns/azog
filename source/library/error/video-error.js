@@ -1,6 +1,6 @@
 import { Path } from '@virtualpatterns/mablung'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import { MediaError } from './media-error'
 
@@ -22,7 +22,7 @@ function VideoDurationError (path, durationInMinutes, minimumDurationInMinutes) 
   Error.call(this)
   Error.captureStackTrace(this, VideoDurationError)
 
-  this.message = `Unable to process the file '${Path.basename(path)}'. Its duration (${Command.conversion.toMinutes(durationInMinutes)}m) is less than the minimum (${Command.conversion.toMinutes(minimumDurationInMinutes)}m).`
+  this.message = `Unable to process the file '${Path.basename(path)}'. Its duration (${Configuration.conversion.toMinutes(durationInMinutes)}m) is less than the minimum (${Configuration.conversion.toMinutes(minimumDurationInMinutes)}m).`
 
 }
 

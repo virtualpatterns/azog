@@ -1,7 +1,7 @@
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 import Sanitize from 'sanitize-filename'
 
-import { Command } from '../../configuration'
+import Configuration from '../configuration'
 
 import { ResourceClassNotFoundError } from './error/resource-error'
 
@@ -18,7 +18,7 @@ resourcePrototype.getToPath = function () {
 
   name = Resource.transform(name)
 
-  return Path.join(Command.path.processed, `${name}${extension}`)
+  return Path.join(Configuration.path.processed, `${name}${extension}`)
 
 }
 
@@ -27,7 +27,7 @@ resourcePrototype.copy = async function () {
   let fromPath = this.path
   let toPath = await this.getToPath()
 
-  Log.debug(`Creating '${Path.relative(Command.path.processed, toPath)}' ...`)
+  Log.debug(`Creating '${Path.relative(Configuration.path.processed, toPath)}' ...`)
 
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
@@ -69,17 +69,17 @@ Resource.transform = function (value) {
 
   do {
 
-    for (let replace of Command.transform.replace) {
+    for (let replace of Configuration.transform.replace) {
       value = value.replace(replace.pattern, replace.with)
     }
 
-    for (let pattern of Command.transform.remove) {
+    for (let pattern of Configuration.transform.remove) {
       value = value.replace(pattern, '')
     }
   
   } while ([
-    Command.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(value), false),
-    Command.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(value), false)
+    Configuration.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(value), false),
+    Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(value), false)
   ].reduce((accumulator, test) => accumulator || test, false))
 
   return value

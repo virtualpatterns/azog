@@ -2,23 +2,23 @@ import '@babel/polyfill'
 import Jake from 'jake'
 import { Log } from '@virtualpatterns/mablung'
 
-import { Command, Task, Test } from '../configuration'
+import Configuration from '../configuration'
 
 Jake.addListener('start', () => {
 
-  Jake.rmRf(Command.logPath, { 'silent': true })
-  Jake.rmRf(Task.logPath, { 'silent': true })
-  Jake.rmRf(Test.logPath, { 'silent': true })
+  Jake.rmRf(Configuration.task.logPath, { 'silent': true })
+  Jake.rmRf(Configuration.test.logPath, { 'silent': true })
 
-  Log.createFormattedLog({ 'level': Task.logLevel }, Task.logPath)
+  Log.createFormattedLog({ 'level': Configuration.task.logLevel }, Configuration.task.logPath)
   Log.debug('Jake.addListener(\'start\', () => { ... })')
   
 })
 
 desc('Remove built folders and files')
 task('clean', [], { 'async': false }, () => {
+  Jake.rmRf('distributable/index.js', { 'silent': true })
+  Jake.rmRf('distributable/library', { 'silent': true })
   Jake.rmRf('distributable/sandbox', { 'silent': true })
-  Jake.rmRf('distributable/command', { 'silent': true })
 })
 
 desc('Count the number of dirty files')
@@ -34,7 +34,8 @@ task('lint', [], { 'async': true }, () => {
 desc('Build files')
 task('build', [ 'clean', 'count', 'lint' ], { 'async': true }, () => {
   Jake.exec([
-    ...[ 'command', 'sandbox', 'test' ].map((folderName) => `babel --config-file ./distributable/babel.configuration source/${folderName} --copy-files --out-dir distributable/${folderName} --source-maps`),
+    ...[ 'index.js' ].map((fileName) => `babel --config-file ./distributable/babel.configuration source/${fileName} --out-file distributable/${fileName} --source-maps`),
+    ...[ 'library', 'sandbox', 'test' ].map((folderName) => `babel --config-file ./distributable/babel.configuration source/${folderName} --copy-files --out-dir distributable/${folderName} --source-maps`),
     'npm --no-git-tag-version version prerelease'
   ], { 'printStderr': true, 'printStdout': false }, () => complete())
 })

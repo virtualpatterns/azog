@@ -1,6 +1,6 @@
 import { Path } from '@virtualpatterns/mablung'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import Resource from '../resource'
 
@@ -22,7 +22,7 @@ Book.isResource = function (book) {
 }
 
 Book.isResourceClass = function (path) {
-  return Command.extension.book.includes(Path.extname(path))
+  return Configuration.extension.book.includes(Path.extname(path))
 }
 
 export default Book

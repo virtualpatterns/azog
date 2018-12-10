@@ -4,7 +4,7 @@ import { Log, Path, Process } from '@virtualpatterns/mablung'
 import MovieDB from 'moviedb'
 import Utilities from 'util'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import { MovieNotFoundError } from '../error/movie-error'
 
@@ -18,7 +18,7 @@ moviePrototype.getToPath = async function () {
   let movie = await this.getMovie()
   let name = `${Movie.sanitize(movie.title)} (${movie.yearReleased})`
 
-  return Path.join(Command.path.processed, `${name}.mp4`)
+  return Path.join(Configuration.path.library.from.movies, `${name}.mp4`)
 
 }
 
@@ -53,7 +53,7 @@ moviePrototype.getMovie = async function () {
       data = await Movie.MovieDB.searchMovie(_options)
     }
     finally {
-      Log.trace({ _options, data }, `MovieDB.searchMovie(options) ${Command.conversion.toDuration(Process.hrtime(start)).toFormat(Command.format.shortDuration)}`)
+      Log.trace({ _options, data }, `MovieDB.searchMovie(options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
     }
       
     if (data.total_results > 0) {
@@ -94,7 +94,7 @@ Movie.createResource = function (path, prototype = moviePrototype) {
 
   if (Is.undefined(Movie.MovieDB)) {
 
-    Movie.MovieDB = MovieDB(Command.key.movieDB)
+    Movie.MovieDB = MovieDB(Configuration.key.movieDB)
     Movie.MovieDB.searchMovie = Utilities.promisify(Movie.MovieDB.searchMovie)
 
   }

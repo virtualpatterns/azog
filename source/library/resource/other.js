@@ -1,6 +1,6 @@
 import { Path } from '@virtualpatterns/mablung'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import Resource from '../resource'
 
@@ -22,7 +22,7 @@ Other.isResource = function (other) {
 }
 
 Other.isResourceClass = function (path) {
-  return Command.extension.other.includes(Path.extname(path))
+  return Configuration.extension.other.includes(Path.extname(path))
 }
 
 export default Other

@@ -10,7 +10,7 @@ const MILLISECONDS_PER_SECOND = 1000
 const NANOSECONDS_PER_SECOND = 1000000000
 const SECONDS_PER_MINUTE = 60
 
-const command = {
+const Configuration = Object.create({
   'conversion': {
     'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
     'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
@@ -39,7 +39,6 @@ const command = {
   'logLevel': 'debug',
   'logPath': `${Process.env.HOME}/Deluge/Log/azog.log`,
   'path': {
-    'processing': `${Process.env.HOME}/Deluge/Processing`,
     'processed': `${Process.env.HOME}/Deluge/Processed`,
     'failed': `${Process.env.HOME}/Deluge/Failed`,
     'ffmpeg': '/usr/local/bin/ffmpeg',
@@ -65,6 +64,7 @@ const command = {
     'progressInSeconds':  [ 15.0, Infinity ],
     'videoDurationInMinutes':  [ 15.0, Infinity ]
   },
+  'serversUrl': 'https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations&filters={"country_id":38,"servers_groups":[15]}',
   'transform': {
     'remove': [ 
       /[()]/g,
@@ -83,25 +83,21 @@ const command = {
         'with': ' ' 
       } 
     ]
+  },
+  'task': {
+    'logLevel': 'debug',
+    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
+  },
+  'test': {
+    'logLevel': 'debug',
+    'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
+    'path': {
+      'module': `${__dirname}/index.js`
+    }
   }
-}
+})
 
-const task = {
-  'logLevel': 'debug',
-  'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
-}
-
-const test = {
-  'logLevel': 'debug',
-  'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
-  'path': {
-    'module': `${__dirname}/command/index.js`
-  }
-}
-
-const Command = Object.create(command)
-
-Command.merge = function (path) {
+Configuration.merge = function (path) {
 
   let paths = Is.array(path) ? path : [ path ]
 
@@ -127,17 +123,10 @@ Command.merge = function (path) {
 
     configuration.transform = transform
   
-    let prototype = null
-
-    prototype = Object.getPrototypeOf(Command)
-    prototype = Merge(prototype, configuration)
-    Object.setPrototypeOf(Command, prototype)
+    Object.setPrototypeOf(Configuration, Merge(Object.getPrototypeOf(Configuration), configuration))
 
   }
 
 }
 
-const Test = Object.create(test)
-const Task = Object.create(task)
-
-export { Command, Test, Task }
+export default Configuration

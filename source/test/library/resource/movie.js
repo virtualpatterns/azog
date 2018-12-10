@@ -1,6 +1,6 @@
 import { assert as Assert } from 'chai'
 
-import Movie from '../../../../command/library/resource/movie'
+import Movie from '../../../library/resource/movie'
 
 describe('movie', () => {
 

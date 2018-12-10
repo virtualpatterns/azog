@@ -21,7 +21,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Process w/ Invalid",
-      "program": "${workspaceFolder}/distributable/command/index.js",
+      "program": "${workspaceFolder}/distributable/index.js",
       "preLaunchTask": "Build",
       "args": [
         "process",
@@ -34,14 +34,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Process w/ Book",
-      "program": "${workspaceFolder}/distributable/command/index.js",
+      "name": "Launch Process w/ ...",
+      "program": "${workspaceFolder}/distributable/index.js",
       "preLaunchTask": "Build",
       "args": [
         "process",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
-        "0", "Book", "${workspaceFolder}/resource/deluge/downloaded"
+        "0", "Star.Trek.Discovery.S02E00.Short.Treks.Calypso.iNTERNAL.1080p.WEB.x264-W4F[rarbg]", "${workspaceFolder}/resource/deluge/downloaded"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     },
@@ -49,10 +49,23 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Transfer",
-      "program": "${workspaceFolder}/distributable/command/index.js",
+      "program": "${workspaceFolder}/distributable/index.js",
       "preLaunchTask": "Build",
       "args": [
         "transfer",
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "trace", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Select",
+      "program": "${workspaceFolder}/distributable/index.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "select",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "trace", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
       ],

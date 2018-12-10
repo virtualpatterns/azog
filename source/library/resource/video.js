@@ -2,7 +2,7 @@ import { DateTime, Duration } from 'luxon'
 import Is from '@pwn/is'
 import { Log, Path } from '@virtualpatterns/mablung'
 
-import { Command } from '../../../configuration'
+import Configuration from '../../configuration'
 
 import { VideoDurationError } from '../error/video-error'
 
@@ -17,7 +17,7 @@ videoPrototype.process = async function () {
   formatInformation = await this.getFormatInformation()
 
   let durationInMinutes = formatInformation.duration.as('minutes')
-  let [ minimumDurationInMinutes ] = Command.range.videoDurationInMinutes
+  let [ minimumDurationInMinutes ] = Configuration.range.videoDurationInMinutes
 
   if (durationInMinutes >= minimumDurationInMinutes) {
 
@@ -61,7 +61,7 @@ videoPrototype.getFormatInformation = async function () {
   return {
     'name': format.format_name,
     'description': format.format_long_name,
-    'duration': Duration.fromMillis(Command.conversion.secondsToMilliseconds(format.duration))
+    'duration': Duration.fromMillis(Configuration.conversion.secondsToMilliseconds(format.duration))
   }
 
 }
@@ -112,7 +112,7 @@ Video.isResource = function (video) {
 }
 
 Video.isResourceClass = function (path) {
-  return Command.extension.video.includes(Path.extname(path))
+  return Configuration.extension.video.includes(Path.extname(path))
 }
 
 Video.getTitle = function (path) {
