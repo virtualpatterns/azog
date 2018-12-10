@@ -75,7 +75,7 @@ Program
 
       Log.trace({ server })
 
-      console.log(server.hostname)
+      Process.stdout.write(server.hostname)
       
     })
 
