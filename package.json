@@ -3,6 +3,7 @@
   "description": "TBD",
   "files": [
     "distributable/library",
+    "distributable/script",
     "distributable/configuration.js",
     "distributable/configuration.js.map",
     "distributable/index.js",
@@ -25,7 +26,7 @@
     "buildAll": "npm run jake build",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "version": "0.0.21",
+  "version": "0.0.22-5",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
@@ -40,11 +41,9 @@
     "@babel/polyfill": "^7.0.0",
     "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung": "0.0.25",
-    "axios": "^0.18.0",
     "commander": "^2.19.0",
     "deepmerge": "^2.2.1",
     "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^7.0.0",
     "luxon": "^1.4.5",
     "moviedb": "^0.2.10",
     "music-metadata": "^3.1.4",

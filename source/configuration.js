@@ -64,7 +64,6 @@ const Configuration = Object.create({
     'progressInSeconds':  [ 15.0, Infinity ],
     'videoDurationInMinutes':  [ 15.0, Infinity ]
   },
-  'serversUrl': 'https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations&filters={"country_id":38,"servers_groups":[15]}',
   'transform': {
     'remove': [ 
       /[()]/g,
@@ -89,7 +88,7 @@ const Configuration = Object.create({
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
   },
   'test': {
-    'logLevel': 'debug',
+    'logLevel': 'trace',
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
     'path': {
       'module': `${__dirname}/index.js`

@@ -143,38 +143,4 @@ describe('index', () => {
 
   })
 
-  describe('(when selecting a server)', () => {
-
-    let stdout = ''
-    let code = null
-
-    before((complete) => {
-
-      let process = ChildProcess.fork(Configuration.test.path.module, [
-        'select',
-        '--configurationPath', `${__dirname}/../../resource/deluge/configuration.json`,
-        '--logLevel', Configuration.test.logLevel, '--logPath', Configuration.test.logPath 
-      ], { 'stdio': 'pipe' })
-
-      process.stdout.on('data', (data) => {
-        stdout += data.toString()
-      })
-
-      process.on('exit', (_code) => {
-        code = _code
-        complete()
-      })
-
-    })
-  
-    it('should exit with a matching server name', () => {
-      Assert.match(stdout, /ca\d+\.nordvpn\.com/i)
-    })
-
-    it('should exit with the correct code', () => {
-      Assert.equal(code, 0)
-    })
-
-  })
-
 })

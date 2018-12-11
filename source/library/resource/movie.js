@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import Is from '@pwn/is'
 import { Log, Path, Process } from '@virtualpatterns/mablung'
 import MovieDB from 'moviedb'
+import Score from 'string-similarity'
 import Utilities from 'util'
 
 import Configuration from '../../configuration'
@@ -65,17 +66,30 @@ moviePrototype.getMovie = async function () {
   if (data.total_results > 0) {
 
     let movie = data.results
-      .map((movie) => { 
+      .map((_movie) => { 
+
+        let _title = _movie.title
+        let _yearReleased = DateTime.fromISO(_movie.release_date).year
+
+        let score = null
+
+        if (Is.not.null(yearReleased)) {
+          score = Score.compareTwoStrings(`${_title} (${_yearReleased})`.toLowerCase(), `${title} (${yearReleased})`.toLowerCase())
+        }
+        else {
+          score = Score.compareTwoStrings(_title.toLowerCase(), title.toLowerCase())
+        }
 
         return {
-          'title': movie.title,
-          'yearReleased': DateTime.fromISO(movie.release_date).year,
-          'score': movie.vote_count
+          'title': _title,
+          'yearReleased': _yearReleased,
+          // 'score': movie.vote_count
+          'score': score
         }
 
       })
-      .reduce((accumulator, movie) => {
-        return Is.null(accumulator) ? movie : (accumulator.score > movie.score ? accumulator : movie)
+      .reduce((accumulator, _movie) => {
+        return Is.null(accumulator) ? _movie : (accumulator.score > _movie.score ? accumulator : _movie)
       }, null)
 
     delete movie.score

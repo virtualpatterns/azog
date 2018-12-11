@@ -1,7 +1,5 @@
 import '@babel/polyfill'
 import { Log, Path, Process } from '@virtualpatterns/mablung'
-import Is from '@pwn/is'
-import Request from 'axios'
 import Source from 'source-map-support'
 
 import Configuration from './configuration'
@@ -45,38 +43,6 @@ Program
 
       await Torrent.transfer()
 
-    })
-
-  })
-
-Program
-  .command('select')
-  .description('...')
-  .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
-  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
-  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
-  .action((options) => {
-
-    Program.onAction(options, async () => {
-
-      Log.debug(Configuration.line)
-
-      let response = await Request.get(Configuration.serversUrl)
-      let servers = response.data
-
-      let server = servers
-        .reduce((accumulator, server) => {
-          return Is.null(accumulator) ? 
-            server : 
-            ( server.load < accumulator.load ?
-              server :
-              accumulator )
-        }, null)
-
-      Log.trace({ server })
-
-      Process.stdout.write(server.hostname)
-      
     })
 
   })
