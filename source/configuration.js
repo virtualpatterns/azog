@@ -39,11 +39,12 @@ const Configuration = Object.create({
   'logLevel': 'debug',
   'logPath': `${Process.env.HOME}/Deluge/Log/azog.log`,
   'path': {
+    'processing': `${Process.env.HOME}/Deluge/Processing`,
     'processed': `${Process.env.HOME}/Deluge/Processed`,
     'failed': `${Process.env.HOME}/Deluge/Failed`,
     'ffmpeg': '/usr/local/bin/ffmpeg',
     'ffprobe': '/usr/local/bin/ffprobe',
-    'rsync': '/usr/local/bin/rsync', // '/usr/bin/rsync',
+    'rsync': '/usr/local/bin/rsync',
     'library': {
       'from': {
         'movies': `${Process.env.HOME}/Deluge/Processed/Movies`,

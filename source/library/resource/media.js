@@ -27,7 +27,21 @@ mediaPrototype.convert = async function (fn) {
   let fromPath = this.path
   let toPath = await this.getToPath()
 
-  return Media.convert(fromPath, toPath, fn)
+  let fromExtension = Path.extname(fromPath)
+  let toExtension = Path.extname(toPath)
+
+  let fromName = Path.basename(fromPath, fromExtension)
+  let convertPath = Path.join(Configuration.path.processing, `${fromName}${toExtension}`)
+
+  await Media.convert(fromPath, convertPath, fn)
+
+  Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
+  await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+
+  Log.trace(`FileSystem.move(convertPath, '${Path.basename(toPath)}')`)
+  await FileSystem.move(convertPath, toPath)
+
+  return toPath   
 
 }
 
@@ -109,7 +123,7 @@ Media.convert = function (fromPath, toPath, fn) {
   
         })
         .on('end', () => {
-
+        
           Log.trace(`FFMPEG.on('end', () => { ... }) toPath='${Path.basename(toPath)}' ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.longDuration)}`)
   
           resolve(this.path = toPath)
