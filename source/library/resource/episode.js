@@ -20,7 +20,7 @@ episodePrototype.getToPath = async function () {
   let season = `Season ${episode.seasonNumber.toString()}`
   let _episode = `${Episode.sanitize(episode.seriesTitle)} - ${episode.seasonNumber.toString()}x${episode.episodeNumber.toString().padStart(2, '0')} - ${Episode.sanitize(episode.episodeTitle)}`
 
-  return Path.join(Configuration.path.library.from.series, series, season, `${_episode}.mp4`)
+  return Path.join(Configuration.path.processed.episode, series, season, `${_episode}.mp4`)
 
 }
 

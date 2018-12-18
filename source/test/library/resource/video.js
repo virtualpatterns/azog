@@ -32,6 +32,14 @@ describe('video', () => {
       {
         'path': 'itv-abc.part.97.of.99-def',
         'title': 'abc'
+      },
+      {
+        'path': 'abc.32456.1970-def',
+        'title': 'abc 32456'
+      },
+      {
+        'path': 'They.Shall.Not.Grow.Old.1080p.x264.AAC.MVGroup.Forum.mp4',
+        'title': 'They Shall Not Grow Old'
       }
     ].forEach((test) => {
 
@@ -64,6 +72,14 @@ describe('video', () => {
       },
       {
         'path': 'abc.S98E99-def',
+        'yearReleased': null
+      },
+      {
+        'path': 'abc.32456.1970-def',
+        'yearReleased': 1970
+      },
+      {
+        'path': 'They.Shall.Not.Grow.Old.1080p.x264.AAC.MVGroup.Forum.mp4',
         'yearReleased': null
       }
     ].forEach((test) => {

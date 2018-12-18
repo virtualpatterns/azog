@@ -1,7 +1,5 @@
 describe('resource', () => {
-
-  require('./video')
-  require('./movie')
   require('./episode')
- 
+  require('./movie')
+  require('./video')
 })

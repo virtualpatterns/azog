@@ -3,6 +3,7 @@
   "description": "TBD",
   "files": [
     "distributable/library",
+    "distributable/migration",
     "distributable/script",
     "distributable/configuration.js",
     "distributable/configuration.js.map",
@@ -16,17 +17,20 @@
     "url": "https://github.com/virtualpatterns/azog"
   },
   "scripts": {
+    "upgrade": "npm-check-updates --upgrade",
     "refresh": "rm -Rf node_modules distributable/* && npm install",
     "clean": "rm -Rf distributable/configuration.js distributable/configuration.js.map distributable/task",
     "lint": "npm run clean && eslint --ignore-path .gitignore source/configuration.js source/task",
-    "buildBabelConfiguration": "npm run lint && babel --presets \"@babel/env\" source/babel.configuration.js --out-file distributable/babel.configuration.js --source-maps 1>/dev/null",
-    "buildConfiguration": "npm run buildBabelConfiguration && babel --config-file ./distributable/babel.configuration source/configuration.js --out-file distributable/configuration.js --source-maps 1>/dev/null",
+    "buildBabel": "npm run lint && babel --presets \"@babel/env\" source/babel.configuration.js --out-file distributable/babel.configuration.js --source-maps 1>/dev/null",
+    "buildConfiguration": "npm run buildBabel && babel --config-file ./distributable/babel.configuration source/configuration.js --out-file distributable/configuration.js --source-maps 1>/dev/null",
     "buildJake": "npm run buildConfiguration && babel --config-file ./distributable/babel.configuration source/Jakefile.js --out-file Jakefile.js --source-maps && babel --config-file ./distributable/babel.configuration source/task --copy-files --out-dir distributable/task --source-maps 1>/dev/null",
     "jake": "npm run buildJake && jake",
-    "buildAll": "npm run jake build",
-    "upgrade": "npm-check-updates --upgrade"
+    "buildAll": "npm run buildJake && jake build",
+    "create": "node distributable/index.js --logLevel debug --logPath console create",
+    "install": "node distributable/index.js --logLevel debug --logPath console install",
+    "uninstall": "node distributable/index.js --logLevel debug --logPath console uninstall"
   },
-  "version": "0.0.23",
+  "version": "0.0.24-280",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
@@ -50,8 +54,8 @@
     "node-tvdb": "^4.1.0",
     "object-path": "^0.11.4",
     "p-queue": "^3.0.0",
+    "pg": "^7.7.1",
     "sanitize-filename": "^1.6.1",
-    "shell-quote": "^1.6.1",
     "source-map-support": "^0.5.9",
     "string-similarity": "^3.0.0"
   }

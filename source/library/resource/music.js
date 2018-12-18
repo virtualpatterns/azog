@@ -17,7 +17,7 @@ musicPrototype.getToPath = async function () {
   let album = Music.sanitize(tag.common.album || 'Unknown Album')
   let song = `${tag.common.track.no && tag.common.track.no.toString().padStart(2, '0') || '00'} ${Music.sanitize(tag.common.title || 'Unknown Title')}`
 
-  return Path.join(Configuration.path.library.from.music, artist, album, `${song}.mp3`)
+  return Path.join(Configuration.path.processed.music, artist, album, `${song}.mp3`)
 
 }
 

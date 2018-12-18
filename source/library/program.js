@@ -5,6 +5,35 @@ import Configuration from '../configuration'
 
 const Program = Object.create(_Program)
 
+// .command()
+// .description()
+// .option()
+// .option()
+// .option()
+// .action()
+
+// Object.setPrototypeOf(Configuration, Merge(Object.getPrototypeOf(Configuration), configuration))
+
+// Program.command = function (...parameters) {
+//   Object.setPrototypeOf(Program, _Program.command.apply(Program, parameters))
+//   return Program
+// }
+
+// Program.description = function (...parameters) {
+//   Object.setPrototypeOf(Program, _Program.description.apply(Program, parameters))
+//   return Program
+// }
+
+// Program.option = function (...parameters) {
+//   Object.setPrototypeOf(Program, _Program.option.apply(Program, parameters))
+//   return Program
+// }
+
+// Program.action = function (...parameters) {
+//   Object.setPrototypeOf(Program, _Program.action.apply(Program, parameters))
+//   return Program
+// }
+
 Program.onAction = async function (options, fn) {
 
   try {
@@ -57,6 +86,8 @@ Program.onAction = async function (options, fn) {
   
     }
     catch (error) {
+
+      delete error.name
 
       Log.error('catch (error) { ... }')
       Log.error(error)

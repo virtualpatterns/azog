@@ -1,26 +1,30 @@
-import { Duration } from 'luxon'
+import { DateTime, Duration } from 'luxon'
 import Is from '@pwn/is'
 import Merge from 'deepmerge'
 import OS from 'os'
 import { Path, Process } from '@virtualpatterns/mablung'
 import Property from 'object-path'
 
-const MILLISECONDS_PER_MINUTE = 1000 * 60
+// const MILLISECONDS_PER_MINUTE = 1000 * 60
 const MILLISECONDS_PER_SECOND = 1000
 const NANOSECONDS_PER_SECOND = 1000000000
-const SECONDS_PER_MINUTE = 60
+// const SECONDS_PER_MINUTE = 60
 
 const Configuration = Object.create({
+  'connection': {
+    'database': 'azog'
+  },
   'conversion': {
-    'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
+    // 'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
     'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
-    'secondsToMinutes': (seconds) => seconds / SECONDS_PER_MINUTE,
+    // 'secondsToMinutes': (seconds) => seconds / SECONDS_PER_MINUTE,
     'toDuration': ([ seconds, nanoseconds ]) => Duration.fromMillis((seconds + nanoseconds / NANOSECONDS_PER_SECOND) * MILLISECONDS_PER_SECOND), 
     'toPercent': (progress) => progress.percent.toFixed(2),
     'toMinutes': (minutes) => minutes.toFixed(2),
     'toSeconds': ([ seconds, nanoseconds ]) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
   },
   'extension': {
+    'ignore': [ '.map' ],
     'book': [ '.epub', '.mobi', '.pdf' ],
     'music': [ '.flac', '.m4a', '.mp3' ],
     'video': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
@@ -39,31 +43,51 @@ const Configuration = Object.create({
   'logLevel': 'debug',
   'logPath': `${Process.env.HOME}/Deluge/Log/azog.log`,
   'path': {
+    'migration': {
+      'template': `${__dirname}/../source/migration/template.js`,
+      'source': `${__dirname}/../source/migration`,
+      'distributable': `${__dirname}/../distributable/migration`
+    },
     'processing': `${Process.env.HOME}/Deluge/Processing`,
-    'processed': `${Process.env.HOME}/Deluge/Processed`,
+    'processed': {
+      'episode': `${Process.env.HOME}/Deluge/Processed/TV Shows`,
+      'movie': `${Process.env.HOME}/Deluge/Processed/Movies`,
+      'music': `${Process.env.HOME}/Deluge/Processed/Music`,
+      'other': `${Process.env.HOME}/Deluge/Processed/Other`
+    },
     'failed': `${Process.env.HOME}/Deluge/Failed`,
     'ffmpeg': '/usr/local/bin/ffmpeg',
-    'ffprobe': '/usr/local/bin/ffprobe',
-    'rsync': '/usr/local/bin/rsync',
-    'library': {
-      'from': {
-        'movies': `${Process.env.HOME}/Deluge/Processed/Movies`,
-        'moviesDocumentaries': `${Process.env.HOME}/Deluge/Processed/Movies (Documentaries)`,
-        'moviesMiscellaneous': `${Process.env.HOME}/Deluge/Processed/Movies (Miscellaneous)`,
-        'music': `${Process.env.HOME}/Deluge/Processed/Music`,
-        'series': `${Process.env.HOME}/Deluge/Processed/TV Shows`,
-        'seriesDocumentaries': `${Process.env.HOME}/Deluge/Processed/TV Shows (Documentaries)`
-      },
-      'to': 'BUCKBEAK.local:/Volumes/BUCKBEAK2/Media'
-    }
+    'ffprobe': '/usr/local/bin/ffprobe' //,
+    // 'rsync': '/usr/local/bin/rsync',
+    // 'library': {
+    //   'from': {
+    //     'movies': `${Process.env.HOME}/Deluge/Processed/Movies`,
+    //     'moviesDocumentaries': `${Process.env.HOME}/Deluge/Processed/Movies (Documentaries)`,
+    //     'moviesMiscellaneous': `${Process.env.HOME}/Deluge/Processed/Movies (Miscellaneous)`,
+    //     'music': `${Process.env.HOME}/Deluge/Processed/Music`,
+    //     'series': `${Process.env.HOME}/Deluge/Processed/TV Shows`,
+    //     'seriesDocumentaries': `${Process.env.HOME}/Deluge/Processed/TV Shows (Documentaries)`
+    //   },
+    //   'to': 'BUCKBEAK.local:/Volumes/BUCKBEAK2/Media'
+    // }
   },
   'queue': {
     'autoStart': false,
     'concurrency': OS.cpus().length
   },
   'range': {
-    'progressInSeconds':  [ 15.0, Infinity ],
-    'videoDurationInMinutes':  [ 15.0, Infinity ]
+    'progressInSeconds':  {
+      'minimum': 15.0,
+      'maximum': Infinity
+    },
+    'videoDurationInMinutes':  {
+      'minimum': 15.0,
+      'maximum': Infinity
+    },
+    'yearReleased': {
+      'minimum': 1888,
+      'maximum': DateTime.local().year + 1
+    }
   },
   'transform': {
     'remove': [ 
@@ -89,7 +113,7 @@ const Configuration = Object.create({
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
   },
   'test': {
-    'logLevel': 'trace',
+    'logLevel': 'debug',
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
     'path': {
       'module': `${__dirname}/index.js`
@@ -109,20 +133,20 @@ Configuration.merge = function (path) {
     transform.remove = Property
       .get(configuration, 'transform.remove', [])
       .map((value) => {
-        return new RegExp(value, 'gi')
+        return Is.regexp(value) ? value : new RegExp(value, 'gi')
       })
   
     transform.replace = Property
-      .get(configuration, 'transfrom.replace', [])
+      .get(configuration, 'transform.replace', [])
       .map((value) => {
         return {
-          'pattern': new RegExp(value.pattern, 'gi'),
-          'with': new RegExp(value.with)
+          'pattern': Is.regexp(value.pattern) ? value.pattern : new RegExp(value.pattern, 'gi'),
+          'with': value.with // Is.regexp(value.with) ? value.with : new RegExp(value.with)
         }
       })
 
     configuration.transform = transform
-  
+
     Object.setPrototypeOf(Configuration, Merge(Object.getPrototypeOf(Configuration), configuration))
 
   }

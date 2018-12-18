@@ -18,7 +18,10 @@ desc('Remove built folders and files')
 task('clean', [], { 'async': false }, () => {
   Jake.rmRf('distributable/index.js', { 'silent': true })
   Jake.rmRf('distributable/library', { 'silent': true })
+  Jake.rmRf('distributable/migration', { 'silent': true })
   Jake.rmRf('distributable/sandbox', { 'silent': true })
+  Jake.rmRf('distributable/script', { 'silent': true })
+  Jake.rmRf('distributable/test', { 'silent': true })
 })
 
 desc('Count the number of dirty files')
@@ -35,7 +38,7 @@ desc('Build files')
 task('build', [ 'clean', 'count', 'lint' ], { 'async': true }, () => {
   Jake.exec([
     ...[ 'index.js' ].map((fileName) => `babel --config-file ./distributable/babel.configuration source/${fileName} --out-file distributable/${fileName} --source-maps`),
-    ...[ 'library', 'sandbox', 'test' ].map((folderName) => `babel --config-file ./distributable/babel.configuration source/${folderName} --copy-files --out-dir distributable/${folderName} --source-maps`),
+    ...[ 'library', 'migration', 'sandbox', 'script', 'test' ].map((folderName) => `babel --config-file ./distributable/babel.configuration source/${folderName} --copy-files --out-dir distributable/${folderName} --source-maps`),
     'npm --no-git-tag-version version prerelease'
   ], { 'printStderr': true, 'printStdout': false }, () => complete())
 })

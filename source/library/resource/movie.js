@@ -19,7 +19,7 @@ moviePrototype.getToPath = async function () {
   let movie = await this.getMovie()
   let name = `${Movie.sanitize(movie.title)} (${movie.yearReleased})`
 
-  return Path.join(Configuration.path.library.from.movies, `${name}.mp4`)
+  return Path.join(Configuration.path.processed.movie, `${name}.mp4`)
 
 }
 

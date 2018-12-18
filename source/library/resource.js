@@ -1,4 +1,5 @@
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
+import Is from '@pwn/is'
 import Sanitize from 'sanitize-filename'
 
 import Configuration from '../configuration'
@@ -14,11 +15,9 @@ resourcePrototype.process = function () {
 resourcePrototype.getToPath = function () {
 
   let extension = Path.extname(this.path)
-  let name = Path.basename(this.path, extension)
+  let name = Resource.transform(Path.basename(this.path, extension))
 
-  name = Resource.transform(name)
-
-  return Path.join(Configuration.path.processed, `${name}${extension}`)
+  return Path.join(Configuration.path.processed.other, `${name}${extension}`)
 
 }
 
@@ -27,7 +26,7 @@ resourcePrototype.copy = async function () {
   let fromPath = this.path
   let toPath = await this.getToPath()
 
-  Log.debug(`Creating '${Path.relative(Configuration.path.processed, toPath)}' ...`)
+  Log.debug(`Creating '${Path.relative(Configuration.path.processed.other, toPath)}' ...`)
 
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
@@ -67,22 +66,27 @@ Resource.sanitize = function (value) {
 
 Resource.transform = function (value) {
 
+  let fromValue = value
+  let toValue = value
+
   do {
 
     for (let replace of Configuration.transform.replace) {
-      value = value.replace(replace.pattern, replace.with)
+      toValue = toValue.replace(replace.pattern, replace.with)
     }
 
     for (let pattern of Configuration.transform.remove) {
-      value = value.replace(pattern, '')
+      toValue = toValue.replace(pattern, '')
     }
   
   } while ([
-    Configuration.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(value), false),
-    Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(value), false)
+    Configuration.transform.replace.reduce((accumulator, replace) => accumulator || replace.pattern.test(toValue), false),
+    Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(toValue), false)
   ].reduce((accumulator, test) => accumulator || test, false))
 
-  return value
+  Log.trace(`esource.transform ('${fromValue}') { return ${Is.regexp(toValue) ? toValue : `'${toValue}'`} }`)
+
+  return toValue
 
 }
 

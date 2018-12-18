@@ -17,7 +17,7 @@ videoPrototype.process = async function () {
   formatInformation = await this.getFormatInformation()
 
   let durationInMinutes = formatInformation.duration.as('minutes')
-  let [ minimumDurationInMinutes ] = Configuration.range.videoDurationInMinutes
+  let minimumDurationInMinutes = Configuration.range.videoDurationInMinutes.minimum
 
   if (durationInMinutes >= minimumDurationInMinutes) {
 
@@ -117,7 +117,11 @@ Video.isResourceClass = function (path) {
 
 Video.getTitle = function (path) {
 
-  let pattern = /^(.+?)(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})/i
+  let yearReleased = this.getYearReleased(path) || DateTime.local().year
+  let dateAired = this.getDateAired(path) || DateTime.local()
+
+  // let pattern = /^(.+?)(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})/i
+  let pattern = new RegExp(`^(.+?)(?:${yearReleased}|s\\d+e\\d+|\\d+x\\d+|series.\\d+|\\d+of\\d+|part.\\d+|${dateAired.year}.${dateAired.month.toString().padStart(2, '0')}.${dateAired.day.toString().padStart(2, '0')}|\\d+p)`, 'i')
   let match = null
 
   let title = null
@@ -132,18 +136,19 @@ Video.getTitle = function (path) {
 
 Video.getYearReleased = function (path) {
 
-  let pattern = /\d{4}(?!.\d{2}.\d{2})/
+  let pattern = /\d{4}(?!.\d{2}.\d{2})/g
   let match = null
 
   let yearReleased = null
 
-  if (Is.not.null(match = pattern.exec(Path.basename(path)))) {
+  while (Is.not.null(match = pattern.exec(Path.basename(path)))) {
 
     let [ yearReleasedAsString ] = match
     let yearReleasedAsNumber = parseInt(yearReleasedAsString)
 
-    if (yearReleasedAsNumber >= 1888 && yearReleasedAsNumber <= DateTime.local().year + 1) {
+    if (yearReleasedAsNumber >= Configuration.range.yearReleased.minimum && yearReleasedAsNumber <= Configuration.range.yearReleased.maximum) {
       yearReleased = yearReleasedAsNumber
+      break
     }
 
   }
@@ -221,7 +226,11 @@ Video.getEpisodeNumber = function (path) {
 
 Video.getEpisodeTitle = function (path) {
 
-  let pattern = /(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})(.*?)$/i
+  let yearReleased = this.getYearReleased(path) || DateTime.local().year
+  let dateAired = this.getDateAired(path) || DateTime.local()
+
+  // let pattern = /(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})(.*?)$/i
+  let pattern = new RegExp(`(?:${yearReleased}|s\\d+e\\d+|\\d+x\\d+|series.\\d+|\\d+of\\d+|part.\\d+|${dateAired.year}.${dateAired.month.toString().padStart(2, '0')}.${dateAired.day.toString().padStart(2, '0')})(.*?)$`, 'i')
   let match = null
 
   let extension = Path.extname(path)

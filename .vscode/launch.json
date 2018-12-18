@@ -39,20 +39,7 @@
       "preLaunchTask": "Build",
       "args": [
         "process",
-        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log",
-        "0", "Star.Trek.Discovery.S02E00.Short.Treks.Calypso.iNTERNAL.1080p.WEB.x264-W4F[rarbg]", "${workspaceFolder}/resource/deluge/downloaded"
-      ],
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Transfer",
-      "program": "${workspaceFolder}/distributable/index.js",
-      "preLaunchTask": "Build",
-      "args": [
-        "transfer",
+        "0", "Season 7", "${workspaceFolder}/resource/deluge/downloaded",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "trace", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
       ],
@@ -61,13 +48,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Select",
+      "name": "Launch Install",
       "program": "${workspaceFolder}/distributable/index.js",
       "preLaunchTask": "Build",
       "args": [
-        "select",
+        "install",
         "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
-        "--logLevel", "trace", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
+        "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
       ],
       "internalConsoleOptions": "openOnSessionStart"
     }

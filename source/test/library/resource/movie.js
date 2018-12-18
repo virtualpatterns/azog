@@ -11,7 +11,7 @@ describe('movie', () => {
     [
       {
         'fromPath': 'In Extremis.2018.HDRip.XviD.AC3-EVO',
-        'toPath': Path.join(Configuration.path.library.from.movies, 'In Extremis (2017).mp4')
+        'toPath': Path.join(Configuration.path.processed.movie, 'In Extremis (2017).mp4')
       }
     ].forEach((test) => {
 

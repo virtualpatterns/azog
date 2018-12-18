@@ -84,7 +84,7 @@ Media.convert = function (fromPath, toPath, fn) {
       }
       
       let start = null
-      let progress = 0
+      let progress = null
   
       converter
         .on('start', (command) => {
@@ -92,6 +92,8 @@ Media.convert = function (fromPath, toPath, fn) {
           Log.trace(`FFMPEG.on('start', (command) => { ... }) toPath='${Path.basename(toPath)}'`)
           Log.trace(command)
   
+          Log.debug(`'${Path.basename(toPath)}' ...`)
+
           start = Process.hrtime()
           progress = Process.hrtime()
   
@@ -99,7 +101,7 @@ Media.convert = function (fromPath, toPath, fn) {
         .on('progress', (_progress) => {
 
           let progressInSeconds = Configuration.conversion.toSeconds(Process.hrtime(progress))
-          let [ minimumProgressInSeconds ] = Configuration.range.progressInSeconds
+          let minimumProgressInSeconds = Configuration.range.progressInSeconds.minimum
 
           if (progressInSeconds >= minimumProgressInSeconds) {
             Log.debug(`'${Path.basename(toPath)}' ${Configuration.conversion.toPercent(_progress)}% ...`)
