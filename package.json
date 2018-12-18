@@ -26,7 +26,7 @@
     "buildJake": "npm run buildConfiguration && babel --config-file ./distributable/babel.configuration source/Jakefile.js --out-file Jakefile.js --source-maps && babel --config-file ./distributable/babel.configuration source/task --copy-files --out-dir distributable/task --source-maps 1>/dev/null",
     "jake": "npm run buildJake && jake",
     "buildAll": "npm run buildJake && jake build",
-    "create": "node distributable/index.js --logLevel debug --logPath console create",
+    "createMigration": "node distributable/index.js --logLevel debug --logPath console create",
     "install": "node distributable/index.js --logLevel debug --logPath console install",
     "uninstall": "node distributable/index.js --logLevel debug --logPath console uninstall"
   },
