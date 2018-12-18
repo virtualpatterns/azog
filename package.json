@@ -30,7 +30,7 @@
     "installMigrations": "node distributable/index.js --logLevel debug --logPath console install",
     "uninstallMigrations": "node distributable/index.js --logLevel debug --logPath console uninstall"
   },
-  "version": "0.0.25",
+  "version": "0.0.26-6",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",

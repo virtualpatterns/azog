@@ -93,8 +93,8 @@ const Configuration = Object.create({
     'remove': [ 
       /[()]/g,
       /\s{2,}/g,
-      /^\s/,
-      /\s$/,
+      /^[\s-]/,
+      /[-\s]$/,
       /\[.+]$/
     ],
     'replace': [
@@ -103,8 +103,8 @@ const Configuration = Object.create({
         'with': ' ' 
       },
       { 
-        'pattern': /-/g, 
-        'with': ' ' 
+        'pattern': /(\S)-(\S)/g, 
+        'with': '$1 $2' 
       } 
     ]
   },

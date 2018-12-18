@@ -84,7 +84,7 @@ Resource.transform = function (value) {
     Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(toValue), false)
   ].reduce((accumulator, test) => accumulator || test, false))
 
-  Log.trace(`esource.transform ('${fromValue}') { return ${Is.regexp(toValue) ? toValue : `'${toValue}'`} }`)
+  Log.trace(`esource.transform ('${fromValue}') { return '${toValue}' }`)
 
   return toValue
 
