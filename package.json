@@ -27,10 +27,10 @@
     "jake": "npm run buildJake && jake",
     "buildAll": "npm run buildJake && jake build",
     "createMigration": "node distributable/index.js --logLevel debug --logPath console create",
-    "install": "node distributable/index.js --logLevel debug --logPath console install",
-    "uninstall": "node distributable/index.js --logLevel debug --logPath console uninstall"
+    "installMigrations": "node distributable/index.js --logLevel debug --logPath console install",
+    "uninstallMigrations": "node distributable/index.js --logLevel debug --logPath console uninstall"
   },
-  "version": "0.0.24",
+  "version": "0.0.25",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
