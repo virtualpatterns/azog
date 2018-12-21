@@ -6,7 +6,7 @@ import Configuration from '../../configuration'
 import Connection from '../../library/connection'
 import Migration from '../../library/migration'
 
-describe('migration', () => {
+describe.only('migration', () => {
 
   describe('(when using an empty database)', () => {
   
@@ -114,7 +114,7 @@ describe('migration', () => {
         return Migration.installMigrations(userConnection)
       })
   
-      it('should rename the primary key of \'migration\' to \'migrationKey\'', async () => {
+      it('should rename the primary key of \'migration\' from its default to \'migrationKey\'', async () => {
 
         let query = 'select  pg_constraint.conname as "constraintName" \
                      from    pg_constraint \
@@ -127,6 +127,22 @@ describe('migration', () => {
         let constraintName = response.rows[0].constraintName
                                                           
         Assert.equal(constraintName, 'migrationKey')
+
+      })
+
+      it('should rename the primary key of \'resource\' from \'resourcePrimaryKey\' to \'resourceKey\'', async () => {
+
+        let query = 'select  pg_constraint.conname as "constraintName" \
+                     from    pg_constraint \
+                               inner join pg_class on \
+                                 pg_constraint.conrelid = pg_class.oid and \
+                                 pg_class.relname = \'resource\' and \
+                                 pg_constraint.contype = \'p\';'
+
+        let response = await userConnection.query(query)
+        let constraintName = response.rows[0].constraintName
+                                                          
+        Assert.equal(constraintName, 'resourceKey')
 
       })
 

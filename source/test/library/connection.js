@@ -1,11 +1,12 @@
 import { assert as Assert } from 'chai'
 import { Path, Process } from '@virtualpatterns/mablung'
+import Shell from 'shelljs'
 
 import Configuration from '../../configuration'
 import Connection from '../../library/connection'
 import Migration from '../../library/migration'
 
-describe('connection', () => {
+describe.only('connection', () => {
   
   let administratorConnection = null
   let userConnection = null
@@ -14,6 +15,12 @@ describe('connection', () => {
 
     administratorConnection = await Connection.openAdministratorConnection()
     await administratorConnection.createUserDatabase()
+      
+    Shell.config.fatal = true
+
+    Shell
+      .exec('pg_dump --host=RONAN.local --dbname=azog', { 'silent': true })
+      .exec(`psql --dbname=${Configuration.connection.user.database}`, { 'silent': true })
 
     userConnection = await Connection.openUserConnection()
     await Migration.installMigrations(userConnection)
