@@ -12,11 +12,14 @@ import Torrent from './library/torrent'
 Source.install({ 'handleUncaughtExceptions': false })
 
 Program
-  .command('process <torrentId> <torrentName> <torrentPath>')
-  .description('Process the indicated torrent (i.e. identify, convert, match, rename, etc.)')
+  .version(Package.version)
   .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
   .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
   .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
+
+Program
+  .command('process <torrentId> <torrentName> <torrentPath>')
+  .description('Process the indicated torrent (i.e. identify, convert, match, rename, etc.)')
   .action((torrentId, torrentName, torrentPath, options) => {
 
     return Program.onAction(options, async () => {
@@ -26,7 +29,7 @@ Program
       Log.debug(Configuration.line) 
 
       let connection = null
-      connection = await Connection.openConnection()
+      connection = await Connection.openUserConnection()
 
       try {
 
@@ -44,30 +47,42 @@ Program
 
   })
 
-// Program
-//   .command('transfer')
-//   .description('Transfer the contents of videos and music folders')
-//   .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
-//   .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
-//   .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
-//   .action((options) => {
+Program
+  .command('initialize')
+  .description('Create the user database and install migrations')
+  .action((migrationName, options) => {
 
-//     return Program.onAction(options, () => {
+    return Program.onAction(options, async () => {
 
-//       Log.debug(Configuration.line)
+      let administratorConnection = null
+      administratorConnection = await Connection.openAdministratorConnection()
 
-//       return Torrent.transfer()
+      try {
 
-//     })
+        await administratorConnection.createUserDatabase()
 
-//   })
+        let userConnection = null
+        userConnection = await Connection.openUserConnection()
+  
+        try {
+          await Migration.installMigrations(userConnection)
+        }
+        finally {
+          await userConnection.close()
+        }
+  
+      }
+      finally {
+        await administratorConnection.close()
+      }
+
+    })
+
+  })
 
 Program
   .command('create <migrationName>')
   .description('Create a migration with the indicated name')
-  .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
-  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
-  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
   .action((migrationName, options) => {
 
     return Program.onAction(options, () => {
@@ -79,15 +94,12 @@ Program
 Program
   .command('install')
   .description('Install migrations that have not been installed')
-  .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
-  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
-  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
   .action((options) => {
 
     return Program.onAction(options, async () => {
 
       let connection = null
-      connection = await Connection.openConnection()
+      connection = await Connection.openUserConnection()
 
       try {
         await Migration.installMigrations(connection)
@@ -103,15 +115,12 @@ Program
 Program
   .command('uninstall')
   .description('Uninstall migrations that have been installed')
-  .option('--configurationPath <path>', 'Configuration path(s) separated by , if multiple')
-  .option('--logLevel <path>', `Log level, one of 'fatal', 'error', 'warn', 'info', 'debug', or 'trace', defaults to '${Configuration.logLevel}'`)
-  .option('--logPath <path>', `Log file path, 'console' ouputs to the console, defaults to '${Configuration.logPath}'`)
   .action((options) => {
 
     return Program.onAction(options, async () => {
 
       let connection = null
-      connection = await Connection.openConnection()
+      connection = await Connection.openUserConnection()
 
       try {
         await Migration.uninstallMigrations(connection)
@@ -125,5 +134,37 @@ Program
   })
 
 Program
-  .version(Package.version)
+  .command('uninitialize')
+  .description('Uninstall migrations and drop the user database')
+  .action((migrationName, options) => {
+
+    return Program.onAction(options, async () => {
+
+      let administratorConnection = null
+      administratorConnection = await Connection.openAdministratorConnection()
+
+      try {
+
+        let userConnection = null
+        userConnection = await Connection.openUserConnection()
+  
+        try {
+          await Migration.uninstallMigrations(userConnection)
+        }
+        finally {
+          await userConnection.close()
+        }
+  
+        await administratorConnection.dropUserDatabase()
+
+      }
+      finally {
+        await administratorConnection.close()
+      }
+
+    })
+
+  })
+
+Program
   .parse(Process.argv)

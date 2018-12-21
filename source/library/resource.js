@@ -1,5 +1,4 @@
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
-import Is from '@pwn/is'
 import Sanitize from 'sanitize-filename'
 
 import Configuration from '../configuration'
@@ -84,7 +83,7 @@ Resource.transform = function (value) {
     Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(toValue), false)
   ].reduce((accumulator, test) => accumulator || test, false))
 
-  Log.trace(`esource.transform ('${fromValue}') { return '${toValue}' }`)
+  Log.trace(`Resource.transform ('${fromValue}') { return '${toValue}' }`)
 
   return toValue
 

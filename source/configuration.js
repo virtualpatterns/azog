@@ -12,7 +12,12 @@ const NANOSECONDS_PER_SECOND = 1000000000
 
 const Configuration = Object.create({
   'connection': {
-    'database': 'azog'
+    'administrator': {
+      'database': 'postgres'
+    },
+    'user': {
+      'database': 'azog'
+    }
   },
   'conversion': {
     // 'minutesToMilliseconds': (minutes) => minutes * MILLISECONDS_PER_MINUTE,
@@ -24,7 +29,7 @@ const Configuration = Object.create({
     'toSeconds': ([ seconds, nanoseconds ]) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
   },
   'extension': {
-    'ignore': [ '.map' ],
+    'ignore': [ '.map', '.txt' ],
     'book': [ '.epub', '.mobi', '.pdf' ],
     'music': [ '.flac', '.m4a', '.mp3' ],
     'video': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],

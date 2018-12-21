@@ -26,223 +26,236 @@ episodePrototype.getToPath = async function () {
 
 episodePrototype.getEpisode = async function () {
 
-  let dateAired = this.getDateAired()
-  let seasonNumber = this.getSeasonNumber()
-  let episodeNumber = this.getEpisodeNumber()
-  let episodeTitle = this.getEpisodeTitle()
-
-  seasonNumber = Is.not.null(seasonNumber) ? seasonNumber : (Is.not.null(episodeNumber) ? 1 : null)
-
-  let series = await this.getSeries()
-  let episode = null
-
-  if (Is.not.null(dateAired)) {
-    episode = await episodePrototype.getEpisodeByDateAired(series, dateAired)
-  }
-  else if (Is.not.null(seasonNumber) &&
-           Is.not.null(episodeNumber)) {
-
-    try {
-      episode = await episodePrototype.getEpisodeByNumber(series, seasonNumber, episodeNumber)
-    }
-    catch (error) {
-
-      if (Is.not.null(episodeTitle)) {
-
-        Log.trace(`Episode.getEpisodeByNumber(series, ${seasonNumber}, ${episodeNumber})`)
-        Log.trace(error)
-  
-        episode = await episodePrototype.getEpisodeByTitle(series, episodeTitle)
-  
-      }
-      else {
-        throw error
-      }
-
-    }
-
-  }
-
-  if (Is.not.null(episode)) {
-
-    return {
-      'seriesTitle': series.title,
-      'seasonNumber': episode.seasonNumber,
-      'episodeNumber': episode.episodeNumber,
-      'episodeTitle': episode.episodeTitle
-    }
-
-  }
-  else {
-    throw new EpisodeNotFoundError(series)
-  }
-
-}
-
-episodePrototype.getEpisodeByDateAired = async function (series, dateAired) {
-
-  let options = {
-    'query': {
-      'firstAired': dateAired.toFormat(Configuration.format.date)
-    }
-  }
-
-  let data = null
-  
-  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
-  let start = Process.hrtime()
-
-  try {
-    data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
-  }
-  finally {
-    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
-  }
-
-  if (data.length > 0) {
-
-    return data
-      .map((episode) => { 
-
-        return {
-          'seasonNumber': episode.airedSeason,
-          'episodeNumber': episode.airedEpisodeNumber,
-          'episodeTitle': episode.episodeName
-        }
-
-      })
-      .shift()
-
-  }
-  else {
-    throw new EpisodeByDateAiredNotFoundError(series, dateAired)
-  }
-
-}
-
-episodePrototype.getEpisodeByNumber = async function (series, seasonNumber, episodeNumber) {
-
-  let options = {
-    'query': {
-      'airedSeason': seasonNumber,
-      'airedEpisode': episodeNumber
-    }
-  }
-
-  let data = null
-  
-  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
-  let start = Process.hrtime()
-
-  try {
-    data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
-  }
-  finally {
-    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
-  }
-
-  if (data.length > 0) {
-
-    return data
-      .map((episode) => { 
-
-        return {
-          'seasonNumber': episode.airedSeason,
-          'episodeNumber': episode.airedEpisodeNumber,
-          'episodeTitle': episode.episodeName
-        }
-
-      })
-      .shift()
-
-  }
-  else {
-    throw new EpisodeByNumberNotFoundError(series, seasonNumber, episodeNumber)
-  }
-
-}
-
-episodePrototype.getEpisodeByTitle = async function (series, episodeTitle) {
-
-  let options = {}
-  let data = null
-  
-  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
-  let start = Process.hrtime()
-
-  try {
-    data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
-  }
-  finally {
-    Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
-  }
-
-  if (data.length > 0) {
-
-    let episode = data
-      .map((episode) => { 
-
-        return {
-          'seasonNumber': episode.airedSeason,
-          'episodeNumber': episode.airedEpisodeNumber,
-          'episodeTitle': episode.episodeName,
-          'score': Score.compareTwoStrings(episode.episodeName.toLowerCase(), episodeTitle.toLowerCase())
-        }
-
-      })
-      .reduce((accumulator, episode) => {
-        return Is.null(accumulator) ? episode : (accumulator.score > episode.score ? accumulator : episode)
-      }, null)
-
-    delete episode.score
-    return episode
-    
-  }
-  else {
-    throw new EpisodeByTitleNotFoundError(series, episodeTitle)
-  }
-
-}
-
-episodePrototype.getSeries = async function () {
-
   let title = this.getTitle()
   let yearReleased = this.getYearReleased()
 
-  let options = {}
-  let data = null
+  let series = await Episode.getSeries(title, yearReleased)
+
+  let dateAired = this.getDateAired()
+  let [ seasonNumber, episodeNumber ] = this.getSeasonEpisodeNumber()
+  let episodeTitle = this.getEpisodeTitle()
+
+  let episode = await Episode.getEpisode(series, dateAired, seasonNumber, episodeNumber, episodeTitle)
+
+  return episode 
+
+  // let dateAired = this.getDateAired()
+  // let seasonNumber = this.getSeasonNumber()
+  // let episodeNumber = this.getEpisodeNumber()
+  // let episodeTitle = this.getEpisodeTitle()
+
+  // seasonNumber = Is.not.null(seasonNumber) ? seasonNumber : (Is.not.null(episodeNumber) ? 1 : null)
+
+  // let series = await this.getSeries()
+  // let episode = null
+
+  // if (Is.not.null(dateAired)) {
+  //   episode = await episodePrototype.getEpisodeByDateAired(series, dateAired)
+  // }
+  // else if (Is.not.null(seasonNumber) &&
+  //          Is.not.null(episodeNumber)) {
+
+  //   try {
+  //     episode = await episodePrototype.getEpisodeByNumber(series, seasonNumber, episodeNumber)
+  //   }
+  //   catch (error) {
+
+  //     if (Is.not.null(episodeTitle)) {
+
+  //       Log.trace(`Episode.getEpisodeByNumber(series, ${seasonNumber}, ${episodeNumber})`)
+  //       Log.trace(error)
   
-  Log.trace(`TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ...`)
-  let start = Process.hrtime()
-
-  try {
-    data = await Episode.TvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
-  }
-  finally {
-    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
-  }
-
-  if (data.length > 0) {
-
-    let series = data
-      .map((series) => { 
-
-        return {
-          'id': series.id,
-          'title': series.seriesName
-        }
-
-      })
-      .shift()
-
-    return series
-
-  }
-  else {
-    throw new SeriesNotFoundError(title, yearReleased)
-  }
+  //       episode = await episodePrototype.getEpisodeByTitle(series, episodeTitle)
   
+  //     }
+  //     else {
+  //       throw error
+  //     }
+
+  //   }
+
+  // }
+
+  // if (Is.not.null(episode)) {
+
+  //   return {
+  //     'seriesTitle': series.title,
+  //     'seasonNumber': episode.seasonNumber,
+  //     'episodeNumber': episode.episodeNumber,
+  //     'episodeTitle': episode.episodeTitle
+  //   }
+
+  // }
+  // else {
+  //   throw new EpisodeNotFoundError(series)
+  // }
+
 }
+
+// episodePrototype.getEpisodeByDateAired = async function (series, dateAired) {
+
+//   let options = {
+//     'query': {
+//       'firstAired': dateAired.toFormat(Configuration.format.date)
+//     }
+//   }
+
+//   let data = null
+  
+//   Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+//   let start = Process.hrtime()
+
+//   try {
+//     data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
+//   }
+//   finally {
+//     Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+//   }
+
+//   if (data.length > 0) {
+
+//     return data
+//       .map((episode) => { 
+
+//         return {
+//           'seasonNumber': episode.airedSeason,
+//           'episodeNumber': episode.airedEpisodeNumber,
+//           'episodeTitle': episode.episodeName
+//         }
+
+//       })
+//       .shift()
+
+//   }
+//   else {
+//     throw new EpisodeByDateAiredNotFoundError(series, dateAired)
+//   }
+
+// }
+
+// episodePrototype.getEpisodeByNumber = async function (series, seasonNumber, episodeNumber) {
+
+//   let options = {
+//     'query': {
+//       'airedSeason': seasonNumber,
+//       'airedEpisode': episodeNumber
+//     }
+//   }
+
+//   let data = null
+  
+//   Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+//   let start = Process.hrtime()
+
+//   try {
+//     data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
+//   }
+//   finally {
+//     Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+//   }
+
+//   if (data.length > 0) {
+
+//     return data
+//       .map((episode) => { 
+
+//         return {
+//           'seasonNumber': episode.airedSeason,
+//           'episodeNumber': episode.airedEpisodeNumber,
+//           'episodeTitle': episode.episodeName
+//         }
+
+//       })
+//       .shift()
+
+//   }
+//   else {
+//     throw new EpisodeByNumberNotFoundError(series, seasonNumber, episodeNumber)
+//   }
+
+// }
+
+// episodePrototype.getEpisodeByTitle = async function (series, episodeTitle) {
+
+//   let options = {}
+//   let data = null
+  
+//   Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+//   let start = Process.hrtime()
+
+//   try {
+//     data = await Episode.TvDB.getEpisodesBySeriesId(series.id, options)
+//   }
+//   finally {
+//     Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+//   }
+
+//   if (data.length > 0) {
+
+//     let episode = data
+//       .map((episode) => { 
+
+//         return {
+//           'seasonNumber': episode.airedSeason,
+//           'episodeNumber': episode.airedEpisodeNumber,
+//           'episodeTitle': episode.episodeName,
+//           'score': Score.compareTwoStrings(episode.episodeName.toLowerCase(), episodeTitle.toLowerCase())
+//         }
+
+//       })
+//       .reduce((accumulator, episode) => {
+//         return Is.null(accumulator) ? episode : (accumulator.score > episode.score ? accumulator : episode)
+//       }, null)
+
+//     delete episode.score
+//     return episode
+    
+//   }
+//   else {
+//     throw new EpisodeByTitleNotFoundError(series, episodeTitle)
+//   }
+
+// }
+
+// episodePrototype.getSeries = function () {
+
+//   let title = this.getTitle()
+//   let yearReleased = this.getYearReleased()
+
+//   let options = {}
+//   let data = null
+  
+//   Log.trace(`TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ...`)
+//   let start = Process.hrtime()
+
+//   try {
+//     data = await Episode.TvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
+//   }
+//   finally {
+//     Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+//   }
+
+//   if (data.length > 0) {
+
+//     let series = data
+//       .map((series) => { 
+
+//         return {
+//           'id': series.id,
+//           'title': series.seriesName
+//         }
+
+//       })
+//       .shift()
+
+//     return series
+
+//   }
+//   else {
+//     throw new SeriesNotFoundError(title, yearReleased)
+//   }
+  
+// }
 
 const Episode = Object.create(Video)
 
@@ -284,6 +297,215 @@ Episode.isResourceClass = function (path) {
   }
   else {
     return false
+  }
+
+}
+
+Episode.getSeries = async function (title, yearReleased) {
+
+  let options = {}
+  let data = null
+  
+  Log.trace(`TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ...`)
+  let start = Process.hrtime()
+
+  try {
+    data = await this.TvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
+  }
+  finally {
+    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+  }
+
+  if (data.length > 0) {
+
+    let series = data
+      .map((series) => { 
+
+        return {
+          'id': series.id,
+          'title': series.seriesName
+        }
+
+      })
+      .shift()
+
+    return series
+
+  }
+  else {
+    throw new SeriesNotFoundError(title, yearReleased)
+  }
+  
+}
+
+Episode.getEpisode = async function (series, dateAired, seasonNumber, episodeNumber, episodeTitle) {
+
+  let episode = null
+
+  if (Is.not.null(dateAired)) {
+    episode = await this.getEpisodeByDateAired(series, dateAired)
+  }
+  else if (Is.not.null(seasonNumber) &&
+           Is.not.null(episodeNumber)) {
+
+    try {
+      episode = await this.getEpisodeByNumber(series, seasonNumber, episodeNumber)
+    }
+    catch (error) {
+
+      if (Is.not.null(episodeTitle)) {
+
+        Log.trace(`Episode.getEpisodeByNumber(series, ${seasonNumber}, ${episodeNumber})`)
+        Log.trace(error)
+  
+        episode = await this.getEpisodeByTitle(series, episodeTitle)
+  
+      }
+      else {
+        throw error
+      }
+
+    }
+
+  }
+
+  if (Is.not.null(episode)) {
+
+    return {
+      'seriesTitle': series.title,
+      'seasonNumber': episode.seasonNumber,
+      'episodeNumber': episode.episodeNumber,
+      'episodeTitle': episode.episodeTitle
+    }
+
+  }
+  else {
+    throw new EpisodeNotFoundError(series)
+  }
+
+}
+
+Episode.getEpisodeByDateAired = async function (series, dateAired) {
+
+  let options = {
+    'query': {
+      'firstAired': dateAired.toFormat(Configuration.format.date)
+    }
+  }
+
+  let data = null
+  
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+  let start = Process.hrtime()
+
+  try {
+    data = await this.TvDB.getEpisodesBySeriesId(series.id, options)
+  }
+  finally {
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+  }
+
+  if (data.length > 0) {
+
+    return data
+      .map((episode) => { 
+
+        return {
+          'seasonNumber': episode.airedSeason,
+          'episodeNumber': episode.airedEpisodeNumber,
+          'episodeTitle': episode.episodeName
+        }
+
+      })
+      .shift()
+
+  }
+  else {
+    throw new EpisodeByDateAiredNotFoundError(series, dateAired)
+  }
+
+}
+
+Episode.getEpisodeByNumber = async function (series, seasonNumber, episodeNumber) {
+
+  let options = {
+    'query': {
+      'airedSeason': seasonNumber,
+      'airedEpisode': episodeNumber
+    }
+  }
+
+  let data = null
+  
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+  let start = Process.hrtime()
+
+  try {
+    data = await this.TvDB.getEpisodesBySeriesId(series.id, options)
+  }
+  finally {
+    Log.trace({ options, data }, `TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+  }
+
+  if (data.length > 0) {
+
+    return data
+      .map((episode) => { 
+
+        return {
+          'seasonNumber': episode.airedSeason,
+          'episodeNumber': episode.airedEpisodeNumber,
+          'episodeTitle': episode.episodeName
+        }
+
+      })
+      .shift()
+
+  }
+  else {
+    throw new EpisodeByNumberNotFoundError(series, seasonNumber, episodeNumber)
+  }
+
+}
+
+Episode.getEpisodeByTitle = async function (series, episodeTitle) {
+
+  let options = {}
+  let data = null
+  
+  Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ...`)
+  let start = Process.hrtime()
+
+  try {
+    data = await this.TvDB.getEpisodesBySeriesId(series.id, options)
+  }
+  finally {
+    Log.trace(`TvDB.getEpisodesBySeriesId(${series.id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+  }
+
+  if (data.length > 0) {
+
+    let episode = data
+      .map((episode) => { 
+
+        return {
+          'seasonNumber': episode.airedSeason,
+          'episodeNumber': episode.airedEpisodeNumber,
+          'episodeTitle': episode.episodeName,
+          'score': Score.compareTwoStrings(episode.episodeName.toLowerCase(), episodeTitle.toLowerCase())
+        }
+
+      })
+      .reduce((accumulator, episode) => {
+        return Is.null(accumulator) ? episode : (accumulator.score > episode.score ? accumulator : episode)
+      }, null)
+
+    delete episode.score
+    return episode
+    
+  }
+  else {
+    throw new EpisodeByTitleNotFoundError(series, episodeTitle)
   }
 
 }

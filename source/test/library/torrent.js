@@ -9,12 +9,18 @@ import Torrent from '../../library/torrent'
 describe('torrent', () => {
 
   describe('process()', () => {
-
-    let connection = null
-
+  
+    let administratorConnection = null
+    let userConnection = null
+  
     before(async () => {
-      connection = await Connection.openConnection({ 'database': 'azog-torrent' })
-      await Migration.installMigrations(connection)
+  
+      administratorConnection = await Connection.openAdministratorConnection()
+      await administratorConnection.createUserDatabase()
+  
+      userConnection = await Connection.openUserConnection()
+      await Migration.installMigrations(userConnection)
+  
     })
   
     describe('(when passing text)', () => {
@@ -28,7 +34,7 @@ describe('torrent', () => {
       })
 
       it('should not throw an error', () => {
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
       })
     
     })
@@ -53,7 +59,7 @@ describe('torrent', () => {
   
         processedBookPath = Path.join(Configuration.path.processed.other, `${resourceToName}.epub`)
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -62,12 +68,12 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName, resourceToName))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
       })
     
       after(() => {
         return Promise.all([
-          connection.deleteResource(resourceFromName, resourceToName),
+          userConnection.deleteResource(resourceFromName, resourceToName),
           FileSystem.remove(Configuration.path.processed.other)
         ])
       })
@@ -98,7 +104,7 @@ describe('torrent', () => {
         processedAlbumPath = Path.join(processedArtistPath, 'Axis Bold as Love')
         processedSongPath = Path.join(processedAlbumPath, `${resourceToName}.mp3`)
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -107,12 +113,12 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName, resourceToName))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
       })
     
       after(() => {
         return Promise.all([
-          connection.deleteResource(resourceFromName, resourceToName),
+          userConnection.deleteResource(resourceFromName, resourceToName),
           FileSystem.remove(Configuration.path.processed.music)
         ])
       })
@@ -131,7 +137,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         failedSongPath = Path.join(Configuration.path.failed, '01 Song.flac')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -165,7 +171,7 @@ describe('torrent', () => {
   
         processedMoviePath = Path.join(Configuration.path.processed.movie, `${resourceToName}.mp4`)
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -174,12 +180,12 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName, resourceToName))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
       })
     
       after(() => {
         return Promise.all([
-          connection.deleteResource(resourceFromName, resourceToName),
+          userConnection.deleteResource(resourceFromName, resourceToName),
           FileSystem.remove(Configuration.path.processed.movie)
         ])
       })
@@ -198,7 +204,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         processedMoviePath = Path.join(Configuration.path.processed.movie, 'They Shall Not Grow Old (2018).mp4')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -232,7 +238,7 @@ describe('torrent', () => {
   
         processedMoviePath = Path.join(Configuration.path.processed.movie, `${resourceToName}.mp4`)
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -241,12 +247,12 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName, resourceToName))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
       })
     
       after(() => {
         return Promise.all([
-          connection.deleteResource(resourceFromName, resourceToName),
+          userConnection.deleteResource(resourceFromName, resourceToName),
           FileSystem.remove(Configuration.path.processed.movie)
         ])
       })
@@ -265,7 +271,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         failedMoviePath = Path.join(Configuration.path.failed, 'Jonathan.2018.1080p.WEB-DL.DD5.1.H264-FGT.mp4')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -291,7 +297,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         failedMoviePath = Path.join(Configuration.path.failed, 'The.Equalizer.2.2018.720p.WEBRip.x264-[YTS.AM].mkv')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -317,7 +323,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         failedMoviePath = Path.join(Configuration.path.failed, 'Fart Farter 1970.mp4')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -383,7 +389,7 @@ describe('torrent', () => {
         processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
         processedEpisodePath3 = Path.join(processedSeasonPath3, `${resourceToName3}.mp4`)
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -392,7 +398,7 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName1, resourceToName1))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName1, resourceToName1))
       })
     
       it('should create the correct file', () => {
@@ -400,7 +406,7 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName2, resourceToName2))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName2, resourceToName2))
       })
     
       it('should create the correct file', () => {
@@ -408,14 +414,14 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName3, resourceToName3))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName3, resourceToName3))
       })
     
       after(() => {
         return Promise.all([
-          connection.deleteResource(resourceFromName1, resourceToName1),
-          connection.deleteResource(resourceFromName2, resourceToName2),
-          connection.deleteResource(resourceFromName3, resourceToName3),
+          userConnection.deleteResource(resourceFromName1, resourceToName1),
+          userConnection.deleteResource(resourceFromName2, resourceToName2),
+          userConnection.deleteResource(resourceFromName3, resourceToName3),
           FileSystem.remove(Configuration.path.processed.episode)
         ])
       })
@@ -434,7 +440,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         failedSeriesPath = Path.join(Configuration.path.failed, 'Fart.Farter.S22E05.720p.HDTV.x264-AVS.mp4')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -460,7 +466,7 @@ describe('torrent', () => {
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         failedEpisodePath = Path.join(Configuration.path.failed, 'South.Park.S321E123.mp4')
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -494,7 +500,7 @@ describe('torrent', () => {
   
         processedArchivePath = Path.join(Configuration.path.processed.other, `${resourceToName}.zip`)
 
-        return Torrent.createTorrent(torrentPath).process(connection)
+        return Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -503,12 +509,12 @@ describe('torrent', () => {
       })
     
       it('should create the correct record', async () => {
-        Assert.isTrue(await connection.existsResource(resourceFromName, resourceToName))
+        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
       })
     
       after(() => {
         return Promise.all([
-          connection.deleteResource(resourceFromName, resourceToName),
+          userConnection.deleteResource(resourceFromName, resourceToName),
           FileSystem.remove(Configuration.path.processed.other)
         ])
       })
@@ -516,71 +522,15 @@ describe('torrent', () => {
     })
 
     after(async () => {
-      await Migration.installMigrations(connection)
-      await connection.close()
+
+      await Migration.uninstallMigrations(userConnection)
+      await userConnection.close()
+    
+      await administratorConnection.dropUserDatabase()
+      await administratorConnection.close()
+  
     })
   
   })
-
-  // describe('transfer()', () => {
-
-  //   describe('(when called)', () => {
-
-  //     before(async () => {
-
-  //       return FileSystem.mkdir(Configuration.path.library.to, { 'recursive': true })
-
-  //       return Torrent.transfer()
-
-  //     })
-
-  //     for (let fromPath of Object.values(Configuration.path.processed)) {
-
-  //       it(`should create '${Path.trim(fromPath)}'`, async () => {
-  //         return FileSystem.access(fromPath, FileSystem.F_OK)
-  //       })
-
-  //     }
-
-  //     after(async () => {
-  //       return FileSystem.remove(Configuration.path.processed)
-  //     })
-
-  //   })
-
-  //   for (let fromPath of Object.values(Configuration.path.processed)) {
-
-  //     describe(`(when called with content in '${Path.basename(fromPath)}')`, () => {
-
-  //       let contentFromPath = null
-  //       let contentToPath = null
-
-  //       before(async () => {
-
-  //         contentFromPath = Path.join(fromPath, `${Process.pid}.pid`)
-  //         contentToPath = Path.join(Configuration.path.library.to, Path.basename(fromPath), `${Process.pid}.pid`)
-  
-  //         return FileSystem.mkdir(Path.dirname(contentFromPath), { 'recursive': true })
-  //         return FileSystem.writeFile(contentFromPath, Process.pid, { 'encoding': 'utf-8' })
-
-  //         return FileSystem.mkdir(Configuration.path.library.to, { 'recursive': true })
-
-  //         return Torrent.transfer()
-  
-  //       })
-  
-  //       it('should create the correct file', async () => {
-  //         return FileSystem.access(contentToPath, FileSystem.F_OK)
-  //       })
-
-  //       after(async () => {
-  //         return FileSystem.remove(Configuration.path.processed)
-  //       })
-
-  //     })
-
-  //   }
-
-  // })
 
 })

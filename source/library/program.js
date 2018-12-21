@@ -38,12 +38,12 @@ Program.onAction = async function (options, fn) {
 
   try {
 
-    if (options.configurationPath) {
-      Configuration.merge(options.configurationPath.split(','))
+    if (this.configurationPath) {
+      Configuration.merge(this.configurationPath.split(','))
     }
 
-    Configuration.logLevel = options.logLevel || Configuration.logLevel
-    Configuration.logPath = options.logPath || Configuration.logPath
+    Configuration.logLevel = this.logLevel || Configuration.logLevel
+    Configuration.logPath = this.logPath || Configuration.logPath
 
     if (Configuration.logPath == 'console') {
       Log.createFormattedLog({ 'level': Configuration.logLevel })
@@ -86,7 +86,7 @@ Program.onAction = async function (options, fn) {
   
     }
     catch (error) {
-
+      
       delete error.name
 
       Log.error('catch (error) { ... }')

@@ -1,11 +1,10 @@
 import '@babel/polyfill'
 import { assert as Assert } from 'chai'
 import ChildProcess from 'child_process'
-import { FileSystem, Log } from '@virtualpatterns/mablung'
+import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 import Source from 'source-map-support'
 
 import Configuration from '../configuration'
-// import Migration from '../library/migration'
 
 Source.install({ 'handleUncaughtExceptions': false })
 
@@ -13,13 +12,17 @@ Configuration.merge(`${__dirname}/../../resource/deluge/configuration.json`)
 Log.createFormattedLog({ 'level': Configuration.test.logLevel }, Configuration.test.logPath)
 
 require('./configuration')
-require('./library/index')
 
 describe('index', () => {
-
+  
   [
     {
-      'parameters': [ 'create', 'azog-test' ],
+      'parameters': [ 'initialize' ],
+      'exitCode': 0,
+      'afterFn': () => {}
+    },
+    {
+      'parameters': [ 'create', 'azog-migration' ],
       'exitCode': 0,
       'afterFn': () => {
         return FileSystem.remove(Configuration.path.migration.source)
@@ -36,7 +39,7 @@ describe('index', () => {
       'afterFn': () => {}
     },
     {
-      'parameters': [ 'process', '0', 'Book', `${__dirname}/../../resource/deluge/downloaded` ],
+      'parameters': [ 'process', '0', 'Book', Path.normalize(`${__dirname}/../../resource/deluge/downloaded`) ],
       'exitCode': 0,
       'afterFn': () => {
         return FileSystem.remove(Configuration.path.processed.other)
@@ -44,6 +47,11 @@ describe('index', () => {
     },
     {
       'parameters': [ 'uninstall' ],
+      'exitCode': 0,
+      'afterFn': () => {}
+    },
+    {
+      'parameters': [ 'uninitialize' ],
       'exitCode': 0,
       'afterFn': () => {}
     }
@@ -76,28 +84,6 @@ describe('index', () => {
      
   })
 
-  // describe.only('(when transferring)', () => {
-
-  //   let process = null
-
-  //   before(() => {
-  //     process = ChildProcess.fork(Configuration.test.path.module, [
-  //       'transfer',
-  //       '--configurationPath', `${__dirname}/../../resource/deluge/configuration.json`,
-  //       '--logLevel', Configuration.test.logLevel, '--logPath', Configuration.test.logPath ], { 'stdio': 'inherit' })
-  //   })
-  
-  //   it('should exit with the correct code', (complete) => {
-  //     process.on('exit', (code) => {
-  //       Assert.equal(code, 0)
-  //       complete()
-  //     })
-  //   })
-  
-  //   // after(async () => {
-  //   //   await FileSystem.remove(Configuration.path.processed)
-  //   // })
-
-  // })
-    
 })
+
+require('./library/index')

@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
 import { FileSystem, Log, Path } from '@virtualpatterns/mablung'
 
-// import Connection from './connection'
 import Configuration from '../configuration'
 
 const migrationPrototype = Object.create({})
@@ -45,22 +44,46 @@ Migration.requireMigration = function (path, connection) {
 
 }
 
-Migration.installMigrations = async function (connection) {
+Migration.getInstalledMigrations = async function (connection, isInstalled = true) {
+  
+  let migrations = await Migration.getMigrations(connection)
 
-  await connection.createMigration()
+  let migrationPromises = migrations
+    .map((migration) => {
+      return migration.isInstalled()
+        .then((isInstalled) => {
+          return {
+            'migration': migration,
+            'isInstalled': isInstalled
+          }
+        })
+    })
+
+  migrations = await Promise.all(migrationPromises)
+
+  return migrations
+    .filter((migration) => {
+      return migration.isInstalled == isInstalled
+    })
+    .map((value) => {
+      return value.migration
+    })
+    .sort((migration1, migration2) => {
+      return  migration1.path < migration2.path ? -1 : ( migration1.path > migration2.path ? 1 : 0 )
+    })
+
+}
+
+Migration.getMigrations = async function (connection) {
 
   let migrationPath = Configuration.path.migration.distributable
-
-  let options = null
-  options = {
+  let options = {
     'encoding': 'utf-8',
     'withFileTypes': true
   }
 
-  let files = null
-  files = await FileSystem.readdir(migrationPath, options)
-
-  files = files
+  let files = await FileSystem.readdir(migrationPath, options)
+  let migrations = files
     .filter((file) => {
       return  file.isFile()
     })
@@ -68,40 +91,41 @@ Migration.installMigrations = async function (connection) {
       return  !Configuration.extension.ignore.includes(Path.extname(file.name))
     })
     .filter((file) => {
-      return  Path.basename(Path.join(migrationPath, file.name)) !=
-              Path.basename(Configuration.path.migration.template)
+      return  file.name != Path.basename(Configuration.path.migration.template)
     })
     .sort((file1, file2) => {
       return  file1.name < file2.name ? -1 : ( file1.name > file2.name ? 1 : 0 )
     })
+    .map((file) => {
+      return Migration.requireMigration(Path.join(migrationPath, file.name), connection)
+    })
 
-  for (let file of files) {
+  return migrations
 
-    let migration = Migration.requireMigration(Path.join(migrationPath, file.name), connection)
+}
 
-    if (!(await migration.isInstalled())) {
-      Log.debug(`Installing '${migration.path}' ...`)
-      await migration.install()
-    }
-    
+Migration.installMigrations = async function (connection) {
+
+  let migrations = null
+  migrations = await this.getInstalledMigrations(connection, false)
+
+  for (let migration of migrations) {
+    Log.debug(`Installing '${migration.path}' ...`)
+    await migration.install()
   }
 
 }
 
 Migration.uninstallMigrations = async function (connection) {
 
-  let migrationPath = Configuration.path.migration.distributable
+  let migrations = null
+  migrations = await this.getInstalledMigrations(connection, true)
+  migrations = migrations.reverse()
 
-  for (let migration of (await connection.selectMigrations())) {
-  
-    let _migration = Migration.requireMigration(Path.join(migrationPath, migration.path), connection)
-
-    Log.debug(`Uninstalling '${_migration.path}' ...`)
-    await _migration.uninstall()
-
+  for (let migration of migrations) {
+    Log.debug(`Uninstalling '${migration.path}' ...`)
+    await migration.uninstall()
   }
-
-  await connection.dropMigration()
 
 }
 

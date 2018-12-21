@@ -48,12 +48,25 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Initialize",
+      "program": "${workspaceFolder}/distributable/index.js",
+      "preLaunchTask": "Build",
+      "args": [
+        "initialize",
+        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        "--logLevel", "trace", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Install",
       "program": "${workspaceFolder}/distributable/index.js",
       "preLaunchTask": "Build",
       "args": [
         "install",
-        "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
+        // "--configurationPath", "${workspaceFolder}/resource/deluge/configuration.json",
         "--logLevel", "debug", "--logPath", "${env:HOME}/Library/Logs/azog/azog.log"
       ],
       "internalConsoleOptions": "openOnSessionStart"

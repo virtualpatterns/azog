@@ -85,12 +85,8 @@ videoPrototype.getDateAired = function () {
   return Video.getDateAired(this.path)
 }
 
-videoPrototype.getSeasonNumber = function () {
-  return Video.getSeasonNumber(this.path)
-}
-
-videoPrototype.getEpisodeNumber = function () {
-  return Video.getEpisodeNumber(this.path)
+videoPrototype.getSeasonEpisodeNumber = function () {
+  return Video.getSeasonEpisodeNumber(this.path)
 }
 
 videoPrototype.getEpisodeTitle = function () {
@@ -181,6 +177,17 @@ Video.getDateAired = function (path) {
   }
 
   return dateAired
+
+}
+
+Video.getSeasonEpisodeNumber = function (path) {
+
+  let seasonNumber = this.getSeasonNumber(path)
+  let episodeNumber = this.getEpisodeNumber(path)
+
+  seasonNumber = Is.not.null(seasonNumber) ? seasonNumber : (Is.not.null(episodeNumber) ? 1 : null)
+
+  return [ seasonNumber, episodeNumber ]
 
 }
 
