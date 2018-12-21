@@ -6,7 +6,7 @@ import Configuration from '../../configuration'
 import Connection from '../../library/connection'
 import Migration from '../../library/migration'
 
-describe.only('connection', () => {
+describe('connection', () => {
   
   let administratorConnection = null
   let userConnection = null

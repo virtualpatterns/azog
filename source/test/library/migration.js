@@ -6,7 +6,7 @@ import Configuration from '../../configuration'
 import Connection from '../../library/connection'
 import Migration from '../../library/migration'
 
-describe.only('migration', () => {
+describe('migration', () => {
 
   describe('(when using an empty database)', () => {
   
