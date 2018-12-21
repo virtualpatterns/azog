@@ -38,8 +38,8 @@ mediaPrototype.convert = async function (fn) {
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
 
-  Log.trace(`FileSystem.move(convertPath, '${Path.basename(toPath)}')`)
-  await FileSystem.move(convertPath, toPath)
+  Log.trace(`FileSystem.move(convertPath, '${Path.basename(toPath)}', { 'overwrite': true })`)
+  await FileSystem.move(convertPath, toPath, { 'overwrite': true })
 
   return toPath   
 

@@ -30,8 +30,8 @@ resourcePrototype.copy = async function () {
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
 
-  Log.trace(`FileSystem.copy(fromPath, '${Path.basename(toPath)}')`)
-  await FileSystem.copy(fromPath, toPath)
+  Log.trace(`FileSystem.copy(fromPath, '${Path.basename(toPath)}', { 'overwrite': true })`)
+  await FileSystem.copy(fromPath, toPath, { 'overwrite': true })
 
   return this.path = toPath
 
