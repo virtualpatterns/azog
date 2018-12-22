@@ -32,7 +32,7 @@
     "uninstallMigrations": "node distributable/index.js --logLevel debug --logPath console uninstall",
     "uninitializeDatabase": "node distributable/index.js --logLevel debug --logPath console uninitialize"
   },
-  "version": "0.0.28",
+  "version": "0.0.29-11",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
@@ -49,7 +49,7 @@
     "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung": "0.0.25",
     "commander": "^2.19.0",
-    "deepmerge": "^2.2.1",
+    "deepmerge": "^3.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "luxon": "^1.4.5",
     "moviedb": "^0.2.10",

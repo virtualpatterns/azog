@@ -49,7 +49,7 @@ describe('torrent', () => {
 
       let processedBookPath = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Book'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
@@ -59,7 +59,10 @@ describe('torrent', () => {
   
         processedBookPath = Path.join(Configuration.path.processed.other, `${resourceToName}.epub`)
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedBookPath), { 'recursive': true })
+        await FileSystem.touch(processedBookPath)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -92,7 +95,7 @@ describe('torrent', () => {
       let processedAlbumPath = null
       let processedSongPath = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Music'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
@@ -104,7 +107,10 @@ describe('torrent', () => {
         processedAlbumPath = Path.join(processedArtistPath, 'Axis Bold as Love')
         processedSongPath = Path.join(processedAlbumPath, `${resourceToName}.mp3`)
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedSongPath), { 'recursive': true })
+        await FileSystem.touch(processedSongPath)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -161,7 +167,7 @@ describe('torrent', () => {
 
       let processedMoviePath = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Movie'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
@@ -171,7 +177,10 @@ describe('torrent', () => {
   
         processedMoviePath = Path.join(Configuration.path.processed.movie, `${resourceToName}.mp4`)
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedMoviePath), { 'recursive': true })
+        await FileSystem.touch(processedMoviePath)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -198,13 +207,16 @@ describe('torrent', () => {
       let torrentPath = null
       let processedMoviePath = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Movie (no year released)'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
         processedMoviePath = Path.join(Configuration.path.processed.movie, 'They Shall Not Grow Old (2018).mp4')
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedMoviePath), { 'recursive': true })
+        await FileSystem.touch(processedMoviePath)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -228,7 +240,7 @@ describe('torrent', () => {
 
       let processedMoviePath = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Movie (incorrect year released)'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
@@ -238,7 +250,10 @@ describe('torrent', () => {
   
         processedMoviePath = Path.join(Configuration.path.processed.movie, `${resourceToName}.mp4`)
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedMoviePath), { 'recursive': true })
+        await FileSystem.touch(processedMoviePath)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -363,7 +378,7 @@ describe('torrent', () => {
       let processedSeasonPath3 = null
       let processedEpisodePath3 = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Episodes'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
@@ -374,6 +389,9 @@ describe('torrent', () => {
         processedSeriesPath1 = Path.join(Configuration.path.processed.episode, 'South Park')
         processedSeasonPath1 = Path.join(processedSeriesPath1, 'Season 22')
         processedEpisodePath1 = Path.join(processedSeasonPath1, `${resourceToName1}.mp4`)
+
+        await FileSystem.mkdir(Path.dirname(processedEpisodePath1), { 'recursive': true })
+        await FileSystem.touch(processedEpisodePath1)
  
         resourceFromName2 = 'Will.and.Grace.S10E07.720p.HDTV.x264-AVS'
         resourceToName2 = 'Will & Grace - 10x07 - So Long, Division'
@@ -381,6 +399,9 @@ describe('torrent', () => {
         processedSeriesPath2 = Path.join(Configuration.path.processed.episode, 'Will & Grace')
         processedSeasonPath2 = Path.join(processedSeriesPath2, 'Season 10')
         processedEpisodePath2 = Path.join(processedSeasonPath2, `${resourceToName2}.mp4`)
+
+        await FileSystem.mkdir(Path.dirname(processedEpisodePath2), { 'recursive': true })
+        await FileSystem.touch(processedEpisodePath2)
  
         resourceFromName3 = 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv]'
         resourceToName3 = 'Leah Remini Scientology and the Aftermath - 0x12 - The Jehovah\'s Witnesses'
@@ -389,7 +410,10 @@ describe('torrent', () => {
         processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
         processedEpisodePath3 = Path.join(processedSeasonPath3, `${resourceToName3}.mp4`)
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedEpisodePath3), { 'recursive': true })
+        await FileSystem.touch(processedEpisodePath3)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 
@@ -490,7 +514,7 @@ describe('torrent', () => {
 
       let processedArchivePath = null
 
-      before(() => {
+      before(async () => {
 
         torrentName = 'Archive'
         torrentPath = Path.join(Configuration.path.downloaded, torrentName)
@@ -500,7 +524,10 @@ describe('torrent', () => {
   
         processedArchivePath = Path.join(Configuration.path.processed.other, `${resourceToName}.zip`)
 
-        return Torrent.createTorrent(torrentPath).process(userConnection)
+        await FileSystem.mkdir(Path.dirname(processedArchivePath), { 'recursive': true })
+        await FileSystem.touch(processedArchivePath)
+
+        await Torrent.createTorrent(torrentPath).process(userConnection)
 
       })
 

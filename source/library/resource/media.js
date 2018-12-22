@@ -35,11 +35,23 @@ mediaPrototype.convert = async function (fn) {
 
   await Media.convert(fromPath, convertPath, fn)
 
-  Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
-  await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+  try {
 
-  Log.trace(`FileSystem.move(convertPath, '${Path.basename(toPath)}', { 'overwrite': true })`)
-  await FileSystem.move(convertPath, toPath, { 'overwrite': true })
+    Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
+    await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+  
+    Log.trace(`FileSystem.move(convertPath, '${Path.basename(toPath)}', { 'overwrite': true })`)
+    await FileSystem.move(convertPath, toPath, { 'overwrite': true })
+  
+  }
+  catch(error) {
+
+    Log.trace(`FileSystem.unlink('${Path.basename(convertPath)}')`)
+    await FileSystem.unlink(convertPath)
+
+    throw error
+
+  }
 
   return toPath   
 
@@ -92,7 +104,7 @@ Media.convert = function (fromPath, toPath, fn) {
           Log.trace(`FFMPEG.on('start', (command) => { ... }) toPath='${Path.basename(toPath)}'`)
           Log.trace(command)
   
-          Log.debug(`'${Path.basename(toPath)}' ...`)
+          Log.debug(`Converting to '${Path.basename(toPath)}' ...`)
 
           start = Process.hrtime()
           progress = Process.hrtime()

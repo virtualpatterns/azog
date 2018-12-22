@@ -21,15 +21,15 @@ videoPrototype.process = async function () {
 
   if (durationInMinutes >= minimumDurationInMinutes) {
 
-    let path = null
-    path = await mediaPrototype.process.call(this)
+    let toPath = null
+    toPath = await mediaPrototype.process.call(this)
 
     let videoInformation = null
     ;[ videoInformation ] = await this.getVideoInformation()
 
-    Log.debug(`'${Path.basename(path)}' ${videoInformation.codecName} (${videoInformation.codecDescription}) ${videoInformation.codedWidth}x${videoInformation.codedHeight}`)    
+    Log.debug(`'${Path.basename(toPath)}' ${videoInformation.codecName} (${videoInformation.codecDescription}) ${videoInformation.codedWidth}x${videoInformation.codedHeight}`)    
 
-    return path
+    return toPath
 
   }
   else {
