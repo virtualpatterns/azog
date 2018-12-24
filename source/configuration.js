@@ -10,6 +10,8 @@ const MILLISECONDS_PER_SECOND = 1000
 const NANOSECONDS_PER_SECOND = 1000000000
 // const SECONDS_PER_MINUTE = 60
 
+const KILO_PER_UNIT = 1000
+
 const Configuration = Object.create({
   'connection': {
     'administrator': {
@@ -24,6 +26,7 @@ const Configuration = Object.create({
     'secondsToMilliseconds': (seconds) => seconds * MILLISECONDS_PER_SECOND,
     // 'secondsToMinutes': (seconds) => seconds / SECONDS_PER_MINUTE,
     'toDuration': ([ seconds, nanoseconds ]) => Duration.fromMillis((seconds + nanoseconds / NANOSECONDS_PER_SECOND) * MILLISECONDS_PER_SECOND), 
+    'toKilo': (unit) => (unit / KILO_PER_UNIT).toFixed(2),
     'toPercent': (progress) => progress.percent.toFixed(2),
     'toMinutes': (minutes) => minutes.toFixed(2),
     'toSeconds': ([ seconds, nanoseconds ]) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
@@ -38,7 +41,8 @@ const Configuration = Object.create({
   'format': {
     'date': 'yyyy-LL-dd',
     'longDuration': 'hh\'h\' mm\'m\' ss.SSSS\'s\'',
-    'shortDuration': 'ss.SSSS\'s\''
+    'shortDuration': 'ss.SSSS\'s\'',
+    'rate': 'kHz'
   },
   'key': {
     'movieDB': '',

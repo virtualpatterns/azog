@@ -32,11 +32,7 @@ Program
       connection = await Connection.openUserConnection()
 
       try {
-
-        let torrent = null
-        torrent = Torrent.createTorrent(Path.join(torrentPath, torrentName))
-        
-        await torrent.process(connection)
+        await Torrent.createTorrent(Path.join(torrentPath, torrentName), connection).process()
 
       }
       finally {

@@ -9,8 +9,8 @@ const bookPrototype = Object.create(resourcePrototype)
 
 const Book = Object.create(Resource)
 
-Book.createResource = function (path, prototype = bookPrototype) {
-  return Resource.createResource.call(this, path, prototype)
+Book.createResource = function (path, connection, prototype = bookPrototype) {
+  return Resource.createResource.call(this, path, connection, prototype)
 }
 
 Book.getResourcePrototype = function () {

@@ -17,7 +17,7 @@ import { ResourceClassNotFoundError } from './error/resource-error'
 
 const torrentPrototype = Object.create({})
 
-torrentPrototype.process = async function (connection) {
+torrentPrototype.process = async function () {
 
   let start = Process.hrtime()
 
@@ -26,10 +26,10 @@ torrentPrototype.process = async function (connection) {
     let file = await FileSystem.stat(this.path)
 
     if (file.isDirectory()) {
-      await this.processDirectory(this.path, connection)
+      await this.processDirectory(this.path)
     }
     else if (file.isFile()) {
-      this.enqueuePath(this.path, connection)
+      this.enqueuePath(this.path)
     }
   
     await this.dequeuePaths()
@@ -41,7 +41,7 @@ torrentPrototype.process = async function (connection) {
 
 }
 
-torrentPrototype.processDirectory = async function (path, connection) {
+torrentPrototype.processDirectory = async function (path) {
 
   let files = await FileSystem.readdir(path, {
     'encoding': 'utf-8',
@@ -50,17 +50,17 @@ torrentPrototype.processDirectory = async function (path, connection) {
 
   for (let file of files) {
     if (file.isDirectory()) {
-      await this.processDirectory(Path.join(path, file.name), connection)
+      await this.processDirectory(Path.join(path, file.name))
     }
     else if (file.isFile()) {
-      this.enqueuePath(Path.join(path, file.name), connection)
+      this.enqueuePath(Path.join(path, file.name))
     }
   }
 
 }
 
-torrentPrototype.enqueuePath = function (path, connection) {
-  this.queue.add(torrentPrototype.dequeuePath.bind(torrentPrototype, path, connection))
+torrentPrototype.enqueuePath = function (path) {
+  this.queue.add(this.dequeuePath.bind(this, path))
 }
 
 torrentPrototype.dequeuePaths = async function () {
@@ -68,45 +68,28 @@ torrentPrototype.dequeuePaths = async function () {
   await this.queue.onIdle()
 }
 
-torrentPrototype.dequeuePath = async function (path, connection) {
-  
-  let fromPath = path
-  let fromExtension = Path.extname(fromPath)
-  let fromName = Path.basename(fromPath, fromExtension)
-
-  let toPath = null
-  let toExtension = null
-  let toName = null
+torrentPrototype.dequeuePath = async function (path) {
 
   try {
-
-    let resource = null
-    resource = Resource.selectResource(fromPath)
-
-    toPath = await resource.process()
-    toExtension = Path.extname(toPath)
-    toName = Path.basename(toPath, toExtension)
-
-    await connection.insertResource(fromName, toName)
-  
+    await Resource.selectResource(path, this.connection).process()
   }
   catch (error) {
 
     if (error instanceof ResourceClassNotFoundError) {
-      Log.debug(`Skipped '${Path.basename(fromPath)}'`)
+      Log.debug(`Skipped '${Path.basename(path)}'`)
     }
     else {
 
-      Log.error(`Failed on '${Path.basename(fromPath)}'`)
+      Log.error(`Failed on '${Path.basename(path)}'`)
       Log.error(error)
 
-      toPath = Path.join(Configuration.path.failed, Path.basename(fromPath))
+      let toPath = Path.join(Configuration.path.failed, Path.basename(path))
     
       Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
       await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
 
-      Log.trace(`FileSystem.copy(fromPath, '${Path.basename(toPath)}')`)
-      await FileSystem.copy(fromPath, toPath)
+      Log.trace(`FileSystem.copy(path, '${Path.basename(toPath)}')`)
+      await FileSystem.copy(path, toPath)
   
     }
   
@@ -116,11 +99,13 @@ torrentPrototype.dequeuePath = async function (path, connection) {
 
 const Torrent = Object.create({})
 
-Torrent.createTorrent = function (path, prototype = torrentPrototype) {
+Torrent.createTorrent = function (path, connection, prototype = torrentPrototype) {
 
   let torrent = Object.create(prototype)
 
   torrent.path = path
+  torrent.connection = connection
+
   torrent.queue = new Queue(Configuration.queue)
 
   return torrent

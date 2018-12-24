@@ -8,7 +8,7 @@ import { ResourceClassNotFoundError } from './error/resource-error'
 const resourcePrototype = Object.create({})
 
 resourcePrototype.process = function () {
-  return this.copy()
+  return this.copyTo(this.getToPath())
 }
 
 resourcePrototype.getToPath = function () {
@@ -20,12 +20,17 @@ resourcePrototype.getToPath = function () {
 
 }
 
-resourcePrototype.copy = async function () {
+resourcePrototype.copyTo = async function (path) {
 
   let fromPath = this.path
-  let toPath = await this.getToPath()
+  let fromExtension = Path.extname(fromPath)
+  let fromName = Path.basename(fromPath, fromExtension)
 
-  Log.debug(`Creating '${Path.relative(Configuration.path.processed.other, toPath)}' ...`)
+  let toPath = path
+  let toExtension = Path.extname(toPath)
+  let toName = Path.basename(toPath, toExtension)
+  
+  Log.debug(`Copying to '${Path.basename(toPath)}' ...`)
 
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
@@ -33,19 +38,26 @@ resourcePrototype.copy = async function () {
   Log.trace(`FileSystem.copy(fromPath, '${Path.basename(toPath)}', { 'overwrite': true })`)
   await FileSystem.copy(fromPath, toPath, { 'overwrite': true })
 
+  await this.track(fromName, toName)
+
   return this.path = toPath
 
+}
+
+resourcePrototype.track = function (fromName, toName) {
+  return this.connection.insertResource(fromName, toName)
 }
 
 const Resource = Object.create({})
 
 Resource.resourceClasses = []
 
-Resource.createResource = function (path, prototype = resourcePrototype) {
+Resource.createResource = function (path, connection, prototype = resourcePrototype) {
 
   let resource = Object.create(prototype)
 
   resource.path = path
+  resource.connection = connection
 
   return resource
 
@@ -65,7 +77,7 @@ Resource.sanitize = function (value) {
 
 Resource.transform = function (value) {
 
-  let fromValue = value
+  // let fromValue = value
   let toValue = value
 
   do {
@@ -83,7 +95,7 @@ Resource.transform = function (value) {
     Configuration.transform.remove.reduce((accumulator, pattern) => accumulator || pattern.test(toValue), false)
   ].reduce((accumulator, test) => accumulator || test, false))
 
-  Log.trace(`Resource.transform ('${fromValue}') { return '${toValue}' }`)
+  // Log.trace(`Resource.transform ('${fromValue}') { return '${toValue}' }`)
 
   return toValue
 
@@ -109,13 +121,8 @@ Resource.selectResourceClass = function(path) {
 
 }
 
-Resource.selectResource = function (path) {
-
-  let resourceClass = this.selectResourceClass(path)
-  let resource = resourceClass.createResource(path)
-
-  return resource
-  
+Resource.selectResource = function (path, connection) {
+  return this.selectResourceClass(path).createResource(path, connection)
 }
 
 export default Resource

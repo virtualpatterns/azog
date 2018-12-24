@@ -10,51 +10,46 @@ import Resource from '../resource'
 const resourcePrototype = Resource.getResourcePrototype()
 const mediaPrototype = Object.create(resourcePrototype)
 
-mediaPrototype.process = function () {
-  return this.convert()
+mediaPrototype.process = async function () {
+  return this.convertTo(await this.getToPath())
 }
 
-mediaPrototype.getStreamInformation = async function () {
-  return (await this.probe()).streams
-}
-
-mediaPrototype.getFormatInformation = async function () {
-  return (await this.probe()).format
-}
-
-mediaPrototype.convert = async function (fn) {
+mediaPrototype.convertTo = async function (path, fn) {
 
   let fromPath = this.path
-  let toPath = await this.getToPath()
-
   let fromExtension = Path.extname(fromPath)
-  let toExtension = Path.extname(toPath)
-
   let fromName = Path.basename(fromPath, fromExtension)
-  let convertPath = Path.join(Configuration.path.processing, `${fromName}${toExtension}`)
 
-  await Media.convert(fromPath, convertPath, fn)
+  let intermediatePath = Path.join(Configuration.path.processing, Path.basename(fromPath))
 
-  try {
+  Log.debug(`Converting to '${Path.basename(intermediatePath)}' ...`)
 
-    Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
-    await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
+  await Media.convertTo(fromPath, intermediatePath, fn)
+
+  let toPath = path
+  let toExtension = Path.extname(toPath)
+  let toName = Path.basename(toPath, toExtension)
   
-    Log.trace(`FileSystem.move(convertPath, '${Path.basename(toPath)}', { 'overwrite': true })`)
-    await FileSystem.move(convertPath, toPath, { 'overwrite': true })
-  
-  }
-  catch(error) {
+  Log.debug(`Moving to '${Path.basename(toPath)}' ...`)
 
-    Log.trace(`FileSystem.unlink('${Path.basename(convertPath)}')`)
-    await FileSystem.unlink(convertPath)
+  Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
+  await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
 
-    throw error
+  Log.trace(`FileSystem.move(intermediatePath, '${Path.basename(toPath)}', { 'overwrite': true })`)
+  await FileSystem.move(intermediatePath, toPath, { 'overwrite': true })
 
-  }
+  await this.track(fromName, toName)
 
-  return toPath   
+  return this.path = toPath
 
+}
+
+mediaPrototype.getStreamInformation = function () {
+  return Media.getStreamInformation(this.path)
+}
+
+mediaPrototype.getFormatInformation = function () {
+  return Media.getFormatInformation(this.path)
 }
 
 mediaPrototype.probe = function () {
@@ -63,8 +58,8 @@ mediaPrototype.probe = function () {
 
 const Media = Object.create(Resource)
 
-Media.createResource = function (path, prototype = mediaPrototype) {
-  return Resource.createResource.call(this, path, prototype)
+Media.createResource = function (path, connection, prototype = mediaPrototype) {
+  return Resource.createResource.call(this, path, connection, prototype)
 }
 
 Media.getResourcePrototype = function () {
@@ -75,7 +70,7 @@ Media.isResource = function (media) {
   return mediaPrototype.isPrototypeOf(media)
 }
 
-Media.convert = function (fromPath, toPath, fn) {
+Media.convertTo = function (fromPath, toPath, fn) {
 
   return new Promise(async (resolve, reject) => {
 
@@ -103,8 +98,6 @@ Media.convert = function (fromPath, toPath, fn) {
   
           Log.trace(`FFMPEG.on('start', (command) => { ... }) toPath='${Path.basename(toPath)}'`)
           Log.trace(command)
-  
-          Log.debug(`Converting to '${Path.basename(toPath)}' ...`)
 
           start = Process.hrtime()
           progress = Process.hrtime()
@@ -126,13 +119,6 @@ Media.convert = function (fromPath, toPath, fn) {
           Log.trace(`FFMPEG.on('error', (error, stdout, stderr) => { ... }) toPath='${Path.basename(toPath)}'`)
           Log.trace(`\n\n${stderr}`)
   
-          try {
-            FileSystem.unlinkSync(toPath)
-          }
-          catch (error) {
-            // Do nothing
-          }
-  
           reject(new MediaConversionError(fromPath))
   
         })
@@ -140,7 +126,7 @@ Media.convert = function (fromPath, toPath, fn) {
         
           Log.trace(`FFMPEG.on('end', () => { ... }) toPath='${Path.basename(toPath)}' ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.longDuration)}`)
   
-          resolve(this.path = toPath)
+          resolve(toPath)
   
         })
         .run()
@@ -152,6 +138,14 @@ Media.convert = function (fromPath, toPath, fn) {
 
   })
 
+}
+
+Media.getStreamInformation = async function (path) {
+  return (await this.probe(path)).streams
+}
+
+Media.getFormatInformation = async function (path) {
+  return (await this.probe(path)).format
 }
 
 Media.probe = function (path) {

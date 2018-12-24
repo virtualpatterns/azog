@@ -20,17 +20,7 @@ videoPrototype.process = async function () {
   let minimumDurationInMinutes = Configuration.range.videoDurationInMinutes.minimum
 
   if (durationInMinutes >= minimumDurationInMinutes) {
-
-    let toPath = null
-    toPath = await mediaPrototype.process.call(this)
-
-    let videoInformation = null
-    ;[ videoInformation ] = await this.getVideoInformation()
-
-    Log.debug(`'${Path.basename(toPath)}' ${videoInformation.codecName} (${videoInformation.codecDescription}) ${videoInformation.codedWidth}x${videoInformation.codedHeight}`)    
-
-    return toPath
-
+    return mediaPrototype.process.call(this)
   }
   else {
     throw new VideoDurationError(this.path, durationInMinutes, minimumDurationInMinutes)
@@ -38,39 +28,37 @@ videoPrototype.process = async function () {
 
 }
 
-videoPrototype.getVideoInformation = async function () {
-  return (await this.getStreamInformation())
-    .filter((stream) => stream.codec_type == 'video')
-    .map((stream) => {
-      return {
-        'codecName': stream.codec_name.toUpperCase(),
-        'codecDescription': stream.codec_long_name,
-        'width': stream.width,
-        'height': stream.height,
-        'codedWidth': stream.coded_width,
-        'codedHeight': stream.coded_height
-      }
-    })
+videoPrototype.convertTo = async function (path, fn) {
+
+  await mediaPrototype.convertTo.call(this, path, fn || ((converter) => { converter.outputOptions('-codec copy') }))
+
+  let informations = null
+  informations = await this.getVideoInformation()
+
+  for (let information of informations) {
+    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${information.codedWidth}x${information.codedHeight}`)    
+  }
+
+  informations = await this.getAudioInformation()
+
+  for (let information of informations) {
+    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${Configuration.conversion.toKilo(information.rate)}kHz`)    
+  }
+
+  return path
+
+}
+
+videoPrototype.getVideoInformation = function () {
+  return Video.getVideoInformation(this.path)
+}
+
+videoPrototype.getAudioInformation = function () {
+  return Video.getAudioInformation(this.path)
 }
 
 videoPrototype.getFormatInformation = async function () {
-
-  let format = null
-  format = await mediaPrototype.getFormatInformation.call(this)
-
-  return {
-    'name': format.format_name,
-    'description': format.format_long_name,
-    'duration': Duration.fromMillis(Configuration.conversion.secondsToMilliseconds(format.duration))
-  }
-
-}
-
-videoPrototype.convert = function () {
-  return mediaPrototype.convert.call(this, (converter) => {
-    converter
-      .outputOptions('-codec copy')
-  })
+  return Video.getFormatInformation(this.path)
 }
 
 videoPrototype.getTitle = function () {
@@ -95,8 +83,8 @@ videoPrototype.getEpisodeTitle = function () {
 
 const Video = Object.create(Media)
 
-Video.createResource = function (path, prototype = videoPrototype) {
-  return Media.createResource.call(this, path, prototype)
+Video.createResource = function (path, connection, prototype = videoPrototype) {
+  return Media.createResource.call(this, path, connection, prototype)
 }
 
 Video.getResourcePrototype = function () {
@@ -109,6 +97,50 @@ Video.isResource = function (video) {
 
 Video.isResourceClass = function (path) {
   return Configuration.extension.video.includes(Path.extname(path))
+}
+
+Video.getVideoInformation = async function (path) {
+  return (await this.getStreamInformation(path))
+    .filter((stream) => stream.codec_type == 'video')
+    .map((stream) => {
+      return {
+        'codecName': stream.codec_name.toUpperCase(),
+        'codecDescription': stream.codec_long_name,
+        'width': stream.width,
+        'height': stream.height,
+        'codedWidth': stream.coded_width,
+        'codedHeight': stream.coded_height
+      }
+    })
+}
+
+Video.getAudioInformation = async function (path) {
+  return (await this.getStreamInformation(path))
+    .filter((stream) => stream.codec_type == 'audio')
+    .map((stream) => {
+
+      // Log.debug({ stream })
+
+      return {
+        'codecName': stream.codec_name.toUpperCase(),
+        'codecDescription': stream.codec_long_name,
+        'rate': stream.sample_rate
+      }
+
+    })
+}
+
+Video.getFormatInformation = async function (path) {
+
+  let format = null
+  format = await Media.getFormatInformation.call(this, path)
+
+  return {
+    'name': format.format_name,
+    'description': format.format_long_name,
+    'duration': Duration.fromMillis(Configuration.conversion.secondsToMilliseconds(format.duration))
+  }
+
 }
 
 Video.getTitle = function (path) {

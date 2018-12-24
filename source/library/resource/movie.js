@@ -17,98 +17,33 @@ const moviePrototype = Object.create(videoPrototype)
 moviePrototype.getToPath = async function () {
 
   let movie = await this.getMovie()
-  let name = `${Movie.sanitize(movie.title)} (${movie.yearReleased})`
+  let title = `${Movie.sanitize(movie.title)} (${movie.yearReleased})`
 
-  return Path.join(Configuration.path.processed.movie, `${name}.mp4`)
+  return Path.join(Configuration.path.processed.movie, `${title}.mp4`)
 
 }
 
-moviePrototype.getMovie = async function () {
+moviePrototype.getMovie = function () {
 
   let title = this.getTitle()
   let yearReleased = this.getYearReleased()
 
-  let movie = await Movie.getMovie(title, yearReleased)
+  return Movie.getMovie(title, yearReleased)
 
-  return movie
+}
 
-  // let options = []
+moviePrototype.track = function (fromName, toName) {
 
-  // if (Is.not.null(yearReleased)) {
-  //   options.push({
-  //     'query': title,
-  //     'year': yearReleased,
-  //     'include_adult': true
-  //   })
-  // }
+  let title = this.getTitle()
+  let yearReleased = this.getYearReleased()
 
-  // options.push({
-  //   'query': title,
-  //   'include_adult': true
-  // })
-
-  // let data = null
-
-  // for (let _options of options) {
-
-  //   Log.trace('MovieDB.searchMovie(options) ...')
-  //   let start = Process.hrtime()
-  
-  //   try {
-  //     data = await Movie.MovieDB.searchMovie(_options)
-  //   }
-  //   finally {
-  //     Log.trace({ _options, data }, `MovieDB.searchMovie(options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
-  //   }
-      
-  //   if (data.total_results > 0) {
-  //     break
-  //   }
-
-  // }
-
-  // if (data.total_results > 0) {
-
-  //   let movie = data.results
-  //     .map((_movie) => { 
-
-  //       let _title = _movie.title
-  //       let _yearReleased = DateTime.fromISO(_movie.release_date).year
-
-  //       let score = null
-
-  //       if (Is.not.null(yearReleased)) {
-  //         score = Score.compareTwoStrings(`${_title} (${_yearReleased})`.toLowerCase(), `${title} (${yearReleased})`.toLowerCase())
-  //       }
-  //       else {
-  //         score = Score.compareTwoStrings(_title.toLowerCase(), title.toLowerCase())
-  //       }
-
-  //       return {
-  //         'title': _title,
-  //         'yearReleased': _yearReleased,
-  //         // 'score': movie.vote_count
-  //         'score': score
-  //       }
-
-  //     })
-  //     .reduce((accumulator, _movie) => {
-  //       return Is.null(accumulator) ? _movie : (accumulator.score > _movie.score ? accumulator : _movie)
-  //     }, null)
-
-  //   delete movie.score
-  //   return movie
-
-  // }
-  // else {
-  //   throw new MovieNotFoundError(title, yearReleased)
-  // }
+  return this.connection.insertMovie(fromName, toName, title, yearReleased)
 
 }
 
 const Movie = Object.create(Video)
 
-Movie.createResource = function (path, prototype = moviePrototype) {
+Movie.createResource = function (path, connection, prototype = moviePrototype) {
 
   if (Is.undefined(Movie.MovieDB)) {
 
@@ -117,7 +52,7 @@ Movie.createResource = function (path, prototype = moviePrototype) {
 
   }
 
-  return Video.createResource.call(this, path, prototype)
+  return Video.createResource.call(this, path, connection, prototype)
 
 }
 

@@ -6,8 +6,26 @@ import Configuration from '../configuration'
 
 const connectionPrototype = Object.create(EventEmitter.prototype)
 
-connectionPrototype.createUserDatabase = function () {
-  return this.query(`create database "${Configuration.connection.user.database}";`)
+connectionPrototype.existsUserDatabase = async function () {
+
+  let query = `select TRUE as "existsDatabase"
+               from   pg_database
+               where  pg_database.datname = '${Configuration.connection.user.database}';`
+
+  let response = await this.query(query)
+
+  return response.rowCount == 0 ? false : response.rows[0].existsDatabase
+
+}
+
+connectionPrototype.createUserDatabase = async function () {
+
+  if (await this.existsUserDatabase()) {
+    await this.dropUserDatabase()
+  }
+
+  await this.query(`create database "${Configuration.connection.user.database}";`)
+
 }
 
 connectionPrototype.dropUserDatabase = function () {
@@ -141,6 +159,50 @@ connectionPrototype.selectResource = async function (fromName, toName) {
 
 }
 
+connectionPrototype.selectMovie = async function (fromName, toName) {
+
+  let query = 'select movie."fromName" as "fromName", \
+                      movie."toName" as "toName", \
+                      movie.title as title, \
+                      movie."yearReleased" as "yearReleased", \
+                      movie.inserted as inserted, \
+                      movie.deleted as deleted \
+               from   movie \
+               where  movie."fromName" = $1 and \
+                      movie."toName" = $2;'
+  
+  let values = [ fromName, toName ]
+
+  let response = await this.query(query, values)
+
+  return response.rowCount == 0 ? {} : response.rows[0]
+
+}
+
+connectionPrototype.selectEpisode = async function (fromName, toName) {
+
+  let query = 'select episode."fromName" as "fromName", \
+                      episode."toName" as "toName", \
+                      episode."seriesTitle" as "seriesTitle", \
+                      episode."yearReleased" as "yearReleased", \
+                      episode."dateAired" as "dateAired", \
+                      episode."seasonNumber" as "seasonNumber", \
+                      episode."episodeNumber" as "episodeNumber", \
+                      episode."episodeTitle" as "episodeTitle", \
+                      episode.inserted as inserted, \
+                      episode.deleted as deleted \
+               from   episode \
+               where  episode."fromName" = $1 and \
+                      episode."toName" = $2;'
+  
+  let values = [ fromName, toName ]
+
+  let response = await this.query(query, values)
+
+  return response.rowCount == 0 ? {} : response.rows[0]
+
+}
+
 connectionPrototype.existsResource = async function (fromName, toName) {
 
   let query = 'select true as "existsResource" \
@@ -155,6 +217,14 @@ connectionPrototype.existsResource = async function (fromName, toName) {
 
   return response.rowCount == 0 ? false : response.rows[0].existsResource
 
+}
+
+connectionPrototype.existsMovie = async function (fromName, toName) {
+  return this.existsResource(fromName, toName)
+}
+
+connectionPrototype.existsEpisode = async function (fromName, toName) {
+  return this.existsResource(fromName, toName)
 }
 
 connectionPrototype.insertResource = function (fromName, toName) {
@@ -175,9 +245,87 @@ connectionPrototype.insertResource = function (fromName, toName) {
 
 }
 
+connectionPrototype.insertMovie = async function (fromName, toName, title, yearReleased) {
+
+  let query = 'insert into movie (  "fromName", \
+                                    "toName", \
+                                    title, \
+                                    "yearReleased" ) \
+               values            (  $1, \
+                                    $2, \
+                                    $3, \
+                                    $4 ) \
+               on conflict \
+               on constraint "movieKey" \
+               do update \
+               set  inserted = current_timestamp, \
+                    deleted = null;'
+
+  let values = [ fromName, toName, title, yearReleased ]
+
+  return this.query(query, values)
+
+}
+
+connectionPrototype.insertEpisode = async function (fromName, toName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle) {
+
+  let query = 'insert into episode (  "fromName", \
+                                      "toName", \
+                                      "seriesTitle", \
+                                      "yearReleased", \
+                                      "dateAired", \
+                                      "seasonNumber", \
+                                      "episodeNumber", \
+                                      "episodeTitle" ) \
+               values            (    $1, \
+                                      $2, \
+                                      $3, \
+                                      $4, \
+                                      $5, \
+                                      $6, \
+                                      $7, \
+                                      $8 ) \
+               on conflict \
+               on constraint "episodeKey" \
+               do update \
+               set  inserted = current_timestamp, \
+                    deleted = null;'
+
+  let values = [ fromName, toName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle ]
+
+  return this.query(query, values)
+
+}
+
 connectionPrototype.deleteResource = function (fromName, toName) {
 
   let query = 'update resource \
+               set    deleted = current_timestamp \
+               where  "fromName" = $1 and \
+                      "toName" = $2;'
+
+  let values = [ fromName, toName ]
+
+  return this.query(query, values)
+
+}
+
+connectionPrototype.deleteMovie = function (fromName, toName) {
+
+  let query = 'update movie \
+               set    deleted = current_timestamp \
+               where  "fromName" = $1 and \
+                      "toName" = $2;'
+
+  let values = [ fromName, toName ]
+
+  return this.query(query, values)
+
+}
+
+connectionPrototype.deleteEpisode = function (fromName, toName) {
+
+  let query = 'update episode \
                set    deleted = current_timestamp \
                where  "fromName" = $1 and \
                       "toName" = $2;'

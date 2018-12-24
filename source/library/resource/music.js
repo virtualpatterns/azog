@@ -23,8 +23,8 @@ musicPrototype.getToPath = async function () {
 
 const Music = Object.create(Media)
 
-Music.createResource = function (path, prototype = musicPrototype) {
-  return Media.createResource.call(this, path, prototype)
+Music.createResource = function (path, connection, prototype = musicPrototype) {
+  return Media.createResource.call(this, path, connection, prototype)
 }
 
 Music.getResourcePrototype = function () {
