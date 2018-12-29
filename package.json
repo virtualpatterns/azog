@@ -33,7 +33,7 @@
     "uninitializeDatabase": "node distributable/index.js --logLevel debug --logPath console uninitialize",
     "dump": "dropdb --echo --if-exists azog-production && createdb --echo azog-production && pg_dump --host=RONAN.local --dbname=azog | psql --dbname=azog-production"
   },
-  "version": "0.0.32",
+  "version": "0.0.33",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
