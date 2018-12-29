@@ -30,9 +30,21 @@ videoPrototype.process = async function () {
 
 videoPrototype.convertTo = async function (path, fn) {
 
+  let informations = null
+  informations = await this.getVideoInformation()
+
+  for (let information of informations) {
+    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${information.codedWidth}x${information.codedHeight}`)    
+  }
+
+  informations = await this.getAudioInformation()
+
+  for (let information of informations) {
+    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${Configuration.conversion.toKilo(information.rate)}kHz`)    
+  }
+
   await mediaPrototype.convertTo.call(this, path, fn || ((converter) => { converter.outputOptions('-codec copy') }))
 
-  let informations = null
   informations = await this.getVideoInformation()
 
   for (let information of informations) {
