@@ -118,11 +118,11 @@ const Configuration = Object.create({
     ]
   },
   'task': {
-    'logLevel': 'debug',
+    'logLevel': 'trace',
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-task.log`
   },
   'test': {
-    'logLevel': 'debug',
+    'logLevel': 'trace',
     'logPath': `${Process.env.HOME}/Library/Logs/azog/azog-test.log`,
     'path': {
       'module': `${__dirname}/index.js`

@@ -160,8 +160,8 @@ Video.getTitle = function (path) {
   let yearReleased = this.getYearReleased(path) || DateTime.local().year
   let dateAired = this.getDateAired(path) || DateTime.local()
 
-  // let pattern = /^(.+?)(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})/i
-  let pattern = new RegExp(`^(.+?)(?:${yearReleased}|s\\d+e\\d+|\\d+x\\d+|series.\\d+|\\d+of\\d+|part.\\d+|${dateAired.year}.${dateAired.month.toString().padStart(2, '0')}.${dateAired.day.toString().padStart(2, '0')}|\\d+p)`, 'i')
+  // let pattern = /^(.+?)(?:s\d+e\d+|\d+x\d+|series.\d+|\d+.?of.?\d+|part.\d+|\d{4})/i
+  let pattern = new RegExp(`^(.+?)(?:${yearReleased}|s\\d+e\\d+|\\d+x\\d+|series.\\d+|\\d+.?of.?\\d+|part.\\d+|${dateAired.year}.${dateAired.month.toString().padStart(2, '0')}.${dateAired.day.toString().padStart(2, '0')}|\\d+p)`, 'i')
   let match = null
 
   let title = null
@@ -257,7 +257,7 @@ Video.getSeasonNumber = function (path) {
 
 Video.getEpisodeNumber = function (path) {
 
-  let pattern = /s\d+e(\d+)|\d+x(\d+)|(\d+)of\d+|part.(\d+)/i
+  let pattern = /s\d+e(\d+)|\d+x(\d+)|(\d+).?of.?\d+|part.(\d+)/i
   let match = null
 
   let episodeNumber = null
@@ -280,8 +280,8 @@ Video.getEpisodeTitle = function (path) {
   let yearReleased = this.getYearReleased(path) || DateTime.local().year
   let dateAired = this.getDateAired(path) || DateTime.local()
 
-  // let pattern = /(?:s\d+e\d+|\d+x\d+|series.\d+|\d+of\d+|part.\d+|\d{4})(.*?)$/i
-  let pattern = new RegExp(`(?:${yearReleased}|s\\d+e\\d+|\\d+x\\d+|series.\\d+|\\d+of\\d+|part.\\d+|${dateAired.year}.${dateAired.month.toString().padStart(2, '0')}.${dateAired.day.toString().padStart(2, '0')})(.*?)$`, 'i')
+  // let pattern = /(?:s\d+e\d+|\d+x\d+|series.\d+|\d+.?of.?\d+|part.\d+|\d{4})(.*?)$/i
+  let pattern = new RegExp(`(?:${yearReleased}|s\\d+e\\d+|\\d+x\\d+|series.\\d+|\\d+.?of.?\\d+|part.\\d+|${dateAired.year}.${dateAired.month.toString().padStart(2, '0')}.${dateAired.day.toString().padStart(2, '0')})(.*?)$`, 'i')
   let match = null
 
   let extension = Path.extname(path)

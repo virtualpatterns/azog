@@ -7,8 +7,19 @@ import Video from '../../../library/resource/video'
 describe('video', () => {
 
   describe('getTitle(path)', () => {
-
     [
+      {
+        'path': 'abc 97 of 99 def',
+        'title': 'abc'
+      },
+      {
+        'path': 'abc.97.of.99.def',
+        'title': 'abc'
+      },
+      {
+        'path': 'abc.97of99.def',
+        'title': 'abc'
+      },
       {
         'path': 'abc.1970.S98E99-def',
         'title': 'abc'
@@ -56,7 +67,6 @@ describe('video', () => {
   })
 
   describe('getYearReleased(path)', () => {
-
     [
       {
         'path': 'abc.(1970)-def',
@@ -97,7 +107,6 @@ describe('video', () => {
   })
 
   describe('getDateAired(path)', () => {
-
     [
       {
         'path': 'abc.1970.01.01-def',
@@ -144,8 +153,19 @@ describe('video', () => {
   })
 
   describe('getSeasonNumber(path)', () => {
-
     [
+      {
+        'path': 'abc 97 of 99 def',
+        'seasonNumber': null
+      },
+      {
+        'path': 'abc.97.of.99.def',
+        'seasonNumber': null
+      },
+      {
+        'path': 'abc.97of99.def',
+        'seasonNumber': null
+      },
       {
         'path': 'abc.1970.S98E99-def',
         'seasonNumber': 98
@@ -185,8 +205,19 @@ describe('video', () => {
   })
 
   describe('getEpisodeNumber(path)', () => {
-
     [
+      {
+        'path': 'abc 97 of 99 def',
+        'episodeNumber': 97
+      },
+      {
+        'path': 'abc.97.of.99.def',
+        'episodeNumber': 97
+      },
+      {
+        'path': 'abc.97of99.def',
+        'episodeNumber': 97
+      },
       {
         'path': 'abc.1970.S98E99-def',
         'episodeNumber': 99
@@ -230,8 +261,15 @@ describe('video', () => {
   })
 
   describe('getEpisodeTitle(path)', () => {
-
     [
+      {
+        'path': 'Wonders of Life Endless Forms Most Beautiful (3 of 5)-004[KRISH].mp4',
+        'episodeTitle': '004'
+      },
+      {
+        'path': 'Wonders of Life (3 of 5) Endless Forms Most Beautiful-004[KRISH].mp4',
+        'episodeTitle': 'Endless Forms Most Beautiful 004'
+      },
       {
         'path': 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv].mp4',
         'episodeTitle': 'The Jehovahs Witnesses WEB h264 TBS'

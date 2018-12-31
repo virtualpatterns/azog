@@ -26,11 +26,11 @@ mediaPrototype.convertTo = async function (path, fn) {
   
   let intermediatePath = Path.join(Configuration.path.processing, `${fromName}${toExtension}`)
 
-  Log.debug(`Converting to '${Path.basename(intermediatePath)}' ...`)
+  // Log.debug(`'${Path.basename(intermediatePath)}' ...`)
 
   await Media.convertTo(fromPath, intermediatePath, fn)
 
-  Log.debug(`Moving to '${Path.basename(toPath)}' ...`)
+  // Log.debug(`'${Path.basename(toPath)}' ...`)
 
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
