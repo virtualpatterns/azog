@@ -1,6 +1,6 @@
 import { DateTime, Duration } from 'luxon'
 import Is from '@pwn/is'
-import { Log, Path } from '@virtualpatterns/mablung'
+import { Path } from '@virtualpatterns/mablung'
 
 import Configuration from '../../configuration'
 
@@ -28,36 +28,36 @@ videoPrototype.process = async function () {
 
 }
 
-videoPrototype.convertTo = async function (path, fn) {
+videoPrototype.convertTo = function (path, fn) {
 
-  let informations = null
-  informations = await this.getVideoInformation()
+  // let informations = null
+  // informations = await this.getVideoInformation()
 
-  for (let information of informations) {
-    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${information.codedWidth}x${information.codedHeight}`)    
-  }
+  // for (let information of informations) {
+  //   Log.trace(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${information.codedWidth}x${information.codedHeight}`)    
+  // }
 
-  informations = await this.getAudioInformation()
+  // informations = await this.getAudioInformation()
 
-  for (let information of informations) {
-    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${Configuration.conversion.toKilo(information.rate)}kHz`)    
-  }
+  // for (let information of informations) {
+  //   Log.trace(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${Configuration.conversion.toKilo(information.rate)}kHz`)    
+  // }
 
-  await mediaPrototype.convertTo.call(this, path, fn || ((converter) => { converter.outputOptions('-codec copy') }))
+  return mediaPrototype.convertTo.call(this, path, fn || ((converter) => { converter.outputOptions('-codec copy') }))
 
-  informations = await this.getVideoInformation()
+  // informations = await this.getVideoInformation()
 
-  for (let information of informations) {
-    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${information.codedWidth}x${information.codedHeight}`)    
-  }
+  // for (let information of informations) {
+  //   Log.trace(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${information.codedWidth}x${information.codedHeight}`)    
+  // }
 
-  informations = await this.getAudioInformation()
+  // informations = await this.getAudioInformation()
 
-  for (let information of informations) {
-    Log.debug(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${Configuration.conversion.toKilo(information.rate)}kHz`)    
-  }
+  // for (let information of informations) {
+  //   Log.trace(`'${Path.basename(this.path)}' ${information.codecName} (${information.codecDescription}) ${Configuration.conversion.toKilo(information.rate)}kHz`)    
+  // }
 
-  return path
+  // return path
 
 }
 

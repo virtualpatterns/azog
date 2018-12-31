@@ -30,7 +30,7 @@ resourcePrototype.copyTo = async function (path) {
   let toExtension = Path.extname(toPath)
   let toName = Path.basename(toPath, toExtension)
   
-  // Log.debug(`Copying to '${Path.basename(toPath)}' ...`)
+  Log.debug(`Copying to '${Path.basename(toPath)}' ...`)
 
   Log.trace(`FileSystem.mkdir('${Path.trim(Path.dirname(toPath))}'), { 'recursive': true }`)
   await FileSystem.mkdir(Path.dirname(toPath), { 'recursive': true })
