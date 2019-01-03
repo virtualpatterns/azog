@@ -339,24 +339,42 @@ describe('torrent', () => {
   
         let torrentName = null
         let torrentPath = null
-        let failedMoviePath = null
   
-        before(() => {
+        let resourceFromName = null
+        let resourceToName = null
+  
+        let processedMoviePath = null
+  
+        before(async () => {
   
           torrentName = 'Movie (unrecognized)'
           torrentPath = Path.join(Configuration.path.downloaded, torrentName)
-          failedMoviePath = Path.join(Configuration.path.failed, 'Fart Farter 1970.mp4')
+   
+          resourceFromName = 'Fart Farter 1970'
+          resourceToName = resourceFromName
+    
+          processedMoviePath = Path.join(Configuration.path.processed.movie, `${resourceToName}.mp4`)
   
-          return Torrent.createTorrent(torrentPath, userConnection).process()
+          await FileSystem.mkdir(Path.dirname(processedMoviePath), { 'recursive': true })
+          await FileSystem.touch(processedMoviePath)
+  
+          await Torrent.createTorrent(torrentPath, userConnection).process()
   
         })
   
         it('should create the correct file', () => {
-          return FileSystem.access(failedMoviePath, FileSystem.F_OK)
+          return FileSystem.access(processedMoviePath, FileSystem.F_OK)
+        })
+      
+        it('should create the correct record', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return FileSystem.remove(Configuration.path.failed)
+          return Promise.all([
+            userConnection.deleteResource(resourceFromName, resourceToName),
+            FileSystem.remove(Configuration.path.processed.movie)
+          ])
         })
     
       })
@@ -461,28 +479,46 @@ describe('torrent', () => {
     
       })
   
-      describe('(when passing an unrecognized episode)', () => {
+      describe('(when passing an unrecognized series)', () => {
   
         let torrentName = null
         let torrentPath = null
-        let failedSeriesPath = null
   
-        before(() => {
+        let resourceFromName = null
+        let resourceToName = null
+  
+        let processedEpisodePath = null
+  
+        before(async () => {
   
           torrentName = 'Series (unrecognized)'
           torrentPath = Path.join(Configuration.path.downloaded, torrentName)
-          failedSeriesPath = Path.join(Configuration.path.failed, 'Fart.Farter.S22E05.720p.HDTV.x264-AVS.mp4')
+   
+          resourceFromName = 'Fart.Farter.S22E05.720p.HDTV.x264-AVS'
+          resourceToName = resourceFromName
+    
+          processedEpisodePath = Path.join(Configuration.path.processed.episode, `${resourceToName}.mp4`)
   
-          return Torrent.createTorrent(torrentPath, userConnection).process()
+          await FileSystem.mkdir(Path.dirname(processedEpisodePath), { 'recursive': true })
+          await FileSystem.touch(processedEpisodePath)
+  
+          await Torrent.createTorrent(torrentPath, userConnection).process()
   
         })
   
         it('should create the correct file', () => {
-          return FileSystem.access(failedSeriesPath, FileSystem.F_OK)
+          return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        })
+      
+        it('should create the correct record', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return FileSystem.remove(Configuration.path.failed)
+          return Promise.all([
+            userConnection.deleteResource(resourceFromName, resourceToName),
+            FileSystem.remove(Configuration.path.processed.episode)
+          ])
         })
     
       })
@@ -491,24 +527,42 @@ describe('torrent', () => {
   
         let torrentName = null
         let torrentPath = null
-        let failedEpisodePath = null
   
-        before(() => {
+        let resourceFromName = null
+        let resourceToName = null
+  
+        let processedEpisodePath = null
+  
+        before(async () => {
   
           torrentName = 'Episode (unrecognized)'
           torrentPath = Path.join(Configuration.path.downloaded, torrentName)
-          failedEpisodePath = Path.join(Configuration.path.failed, 'South.Park.S321E123.mp4')
+   
+          resourceFromName = 'South.Park.S321E123'
+          resourceToName = resourceFromName
+    
+          processedEpisodePath = Path.join(Configuration.path.processed.episode, `${resourceToName}.mp4`)
   
-          return Torrent.createTorrent(torrentPath, userConnection).process()
+          await FileSystem.mkdir(Path.dirname(processedEpisodePath), { 'recursive': true })
+          await FileSystem.touch(processedEpisodePath)
+  
+          await Torrent.createTorrent(torrentPath, userConnection).process()
   
         })
   
         it('should create the correct file', () => {
-          return FileSystem.access(failedEpisodePath, FileSystem.F_OK)
+          return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        })
+      
+        it('should create the correct record', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return FileSystem.remove(Configuration.path.failed)
+          return Promise.all([
+            userConnection.deleteResource(resourceFromName, resourceToName),
+            FileSystem.remove(Configuration.path.processed.episode)
+          ])
         })
     
       })

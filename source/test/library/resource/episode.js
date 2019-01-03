@@ -25,10 +25,10 @@ describe('episode', () => {
         'fromPath': 'jimmy.kimmel.2018.11.19.bono.web.x264-tbs[eztv].mkv',
         'toPath': Path.join(Configuration.path.processed.episode, 'Jimmy Kimmel Live', 'Season 16', 'Jimmy Kimmel Live - 16x159 - Bono, Chris Rock, Will Ferrell, Kristen Bell, Channing Tatum, Snoop Dogg, Mila Kunis, Pharrell, Brad Paisley, Zoe Saldana.mp4')
       },
-      // {
-      //   'fromPath': 'Wonders Of Life What Is Life (1 of 5)[KRSH].mp4',
-      //   'toPath': Path.join(Configuration.path.processed.episode, 'Wonders Of Life', 'Season 1', 'Wonders Of Life - 1x01 - X.mp4')
-      // },
+      {
+        'fromPath': 'Wonders Of Life What Is Life (1 of 5)[KRSH].mp4',
+        'toPath': Path.join(Configuration.path.processed.episode, 'Wonders Of Life What Is Life (1 of 5)[KRSH].mp4')
+      },
       {
         'fromPath': 'Wonders Of Life (1 of 5) What Is Life[KRSH].mp4',
         'toPath': Path.join(Configuration.path.processed.episode, 'Wonders of Life', 'Season 1', 'Wonders of Life - 1x01 - What is Life.mp4')

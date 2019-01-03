@@ -14,13 +14,31 @@ const episodePrototype = Object.create(videoPrototype)
 
 episodePrototype.getToPath = async function () {
 
-  let episode = await this.getEpisode()
+  try {
 
-  let seriesTitle = Episode.sanitize(episode.seriesTitle)
-  let seasonNumber = `Season ${episode.seasonNumber.toString()}`
-  let episodeTitle = `${Episode.sanitize(episode.seriesTitle)} - ${episode.seasonNumber.toString()}x${episode.episodeNumber.toString().padStart(2, '0')} - ${Episode.sanitize(episode.episodeTitle)}`
+    let episode = await this.getEpisode()
+  
+    return Path.join(
+      Configuration.path.processed.episode, 
+      Episode.sanitize(episode.seriesTitle), 
+      `Season ${episode.seasonNumber.toString()}`, 
+      `${Episode.sanitize(episode.seriesTitle)} - ${episode.seasonNumber.toString()}x${episode.episodeNumber.toString().padStart(2, '0')} - ${Episode.sanitize(episode.episodeTitle)}.mp4`
+    )
+  
+  }
+  catch (error) {
+      
+    delete error.name
 
-  return Path.join(Configuration.path.processed.episode, seriesTitle, seasonNumber, `${episodeTitle}.mp4`)
+    Log.error('catch (error) { ... }')
+    Log.error(error)
+  
+    let extension = Path.extname(this.path)
+    let name = Path.basename(this.path, extension)
+  
+    return Path.join(Configuration.path.processed.episode, `${name}.mp4`)
+  
+  }
 
 }
 

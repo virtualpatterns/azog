@@ -16,10 +16,29 @@ const moviePrototype = Object.create(videoPrototype)
 
 moviePrototype.getToPath = async function () {
 
-  let movie = await this.getMovie()
-  let title = `${Movie.sanitize(movie.title)} (${movie.yearReleased})`
+  try {
 
-  return Path.join(Configuration.path.processed.movie, `${title}.mp4`)
+    let movie = await this.getMovie()
+  
+    return Path.join(
+      Configuration.path.processed.movie, 
+      `${Movie.sanitize(movie.title)} (${movie.yearReleased}).mp4`
+    )
+  
+  }
+  catch (error) {
+      
+    delete error.name
+
+    Log.error('catch (error) { ... }')
+    Log.error(error)
+  
+    let extension = Path.extname(this.path)
+    let name = Path.basename(this.path, extension)
+  
+    return Path.join(Configuration.path.processed.movie, `${name}.mp4`)
+    
+  }
 
 }
 
@@ -147,7 +166,6 @@ Movie.getMovie = async function (title, yearReleased) {
         return {
           'title': _title,
           'yearReleased': _yearReleased,
-          // 'score': movie.vote_count
           'score': score
         }
 
