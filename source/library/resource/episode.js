@@ -163,7 +163,13 @@ Episode.getSeries = async function (title, yearReleased) {
   let options = {}
   let data = null
 
-  let names = [ `${title} ${yearReleased}`, title ]
+  let names = []
+  
+  if (Is.not.null(yearReleased)) {
+    names.push(`${title} ${yearReleased}`)
+  }
+  
+  names.push(title)
 
   for (let name of names) {
 
@@ -177,6 +183,10 @@ Episode.getSeries = async function (title, yearReleased) {
       }
       finally {
         Log.trace({ options, data }, `TvDB.getSeriesByName('${name}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+      }
+
+      if (data.length > 0) {
+        break
       }
 
     }
