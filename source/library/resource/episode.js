@@ -162,17 +162,37 @@ Episode.getSeries = async function (title, yearReleased) {
 
   let options = {}
   let data = null
+
+  let names = [ `${title} ${yearReleased}`, title ]
+
+  for (let name of names) {
+
+    try {
+            
+      Log.trace(`TvDB.getSeriesByName('${name}', options) ...`)
+      let start = Process.hrtime()
+
+      try {
+        data = await this.TvDB.getSeriesByName(name, options)
+      }
+      finally {
+        Log.trace({ options, data }, `TvDB.getSeriesByName('${name}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+      }
+
+    }
+    catch (error) {
+      
+      delete error.name
+
+      Log.error('catch (error) { ... }')
+      Log.error(error)
+
+      data = []
   
-  Log.trace(`TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ...`)
-  let start = Process.hrtime()
+    }
 
-  try {
-    data = await this.TvDB.getSeriesByName(Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title, options)
   }
-  finally {
-    Log.trace({ options, data }, `TvDB.getSeriesByName('${Is.not.null(yearReleased) ? `${title} ${yearReleased}` : title}', options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
-  }
-
+  
   if (data.length > 0) {
 
     let series = data
@@ -192,7 +212,7 @@ Episode.getSeries = async function (title, yearReleased) {
   else {
     throw new SeriesNotFoundError(title, yearReleased)
   }
-  
+
 }
 
 Episode.getEpisodeByDateAired = async function (series, dateAired) {

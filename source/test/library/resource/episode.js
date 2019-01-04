@@ -32,6 +32,10 @@ describe('episode', () => {
       {
         'fromPath': 'Wonders Of Life (1 of 5) What Is Life[KRSH].mp4',
         'toPath': Path.join(Configuration.path.processed.episode, 'Wonders of Life', 'Season 1', 'Wonders of Life - 1x01 - What is Life.mp4')
+      },
+      {
+        'fromPath': 'How It\'s Made (2001) - S29E01 - Skateboard Wheels; Baklava & Galaktoboureko; CO2 Scrubbers; Honeycomb Candles (1080p WEB-DL x265 MONOLITH).mkv',
+        'toPath': Path.join(Configuration.path.processed.episode, 'How It\'s Made', 'Season 29', 'How It\'s Made - 29x01 - Skateboard Wheels; Baklava & Galaktoboureko; CO2 Scrubbers; Honeycomb Candles.mp4')
       }
     ].forEach((test) => {
 
