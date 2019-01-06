@@ -198,6 +198,39 @@ describe('migration', () => {
     
       })
     
+      describe('(when the migration \'1546656254572 - alter-resource-constraint.js\' is installed)', () => {
+
+        it('the number of resources should be 0', async () => {
+
+          let query = 'select count(*) as "numberOfResources" \
+                       from   resource \
+                       where  "fromName" = "toName" and \
+                              deleted is null;'
+
+          let response = await userConnection.query(query)
+
+          Assert.equal(response.rows[0].numberOfResources, 0)
+
+        })
+
+        it('should create the table check constraint \'resourceConstraint\'', async () => {
+
+          let query = 'select  TRUE as "existsConstraint" \
+                       from    pg_constraint \
+                                 inner join pg_class on \
+                                   pg_constraint.conrelid = pg_class.oid and \
+                                   pg_class.relname = \'resource\' and \
+                                   pg_constraint.conname = \'resourceConstraint\' and \
+                                   pg_constraint.contype = \'c\';'
+
+          let response = await userConnection.query(query)
+                                                            
+          Assert.isTrue(response.rowCount == 0 ? false : response.rows[0].existsConstraint)
+
+        })
+
+      })
+    
       after(() => {
         return Migration.uninstallMigrations(userConnection)
       })

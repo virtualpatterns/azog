@@ -79,15 +79,12 @@ describe('torrent', () => {
           return FileSystem.access(processedBookPath, FileSystem.F_OK)
         })
       
-        it('should create the correct record', async () => {
-          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        it('should not create a record', async () => {
+          Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return Promise.all([
-            userConnection.deleteResource(resourceFromName, resourceToName),
-            FileSystem.remove(Configuration.path.processed.other)
-          ])
+          return FileSystem.remove(Configuration.path.processed.other)
         })
     
       })
@@ -366,15 +363,12 @@ describe('torrent', () => {
           return FileSystem.access(processedMoviePath, FileSystem.F_OK)
         })
       
-        it('should create the correct record', async () => {
-          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        it('should not create a record', async () => {
+          Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return Promise.all([
-            userConnection.deleteResource(resourceFromName, resourceToName),
-            FileSystem.remove(Configuration.path.processed.movie)
-          ])
+          return FileSystem.remove(Configuration.path.processed.movie)
         })
     
       })
@@ -510,15 +504,12 @@ describe('torrent', () => {
           return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
         })
       
-        it('should create the correct record', async () => {
-          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        it('should not create a record', async () => {
+          Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return Promise.all([
-            userConnection.deleteResource(resourceFromName, resourceToName),
-            FileSystem.remove(Configuration.path.processed.episode)
-          ])
+          return FileSystem.remove(Configuration.path.processed.episode)
         })
     
       })
@@ -554,15 +545,12 @@ describe('torrent', () => {
           return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
         })
       
-        it('should create the correct record', async () => {
-          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        it('should not create a record', async () => {
+          Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return Promise.all([
-            userConnection.deleteResource(resourceFromName, resourceToName),
-            FileSystem.remove(Configuration.path.processed.episode)
-          ])
+          return FileSystem.remove(Configuration.path.processed.episode)
         })
     
       })
@@ -598,15 +586,12 @@ describe('torrent', () => {
           return FileSystem.access(processedArchivePath, FileSystem.F_OK)
         })
       
-        it('should create the correct record', async () => {
-          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        it('should not create a record', async () => {
+          Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
         after(() => {
-          return Promise.all([
-            userConnection.deleteResource(resourceFromName, resourceToName),
-            FileSystem.remove(Configuration.path.processed.other)
-          ])
+          return FileSystem.remove(Configuration.path.processed.other)
         })
     
       })

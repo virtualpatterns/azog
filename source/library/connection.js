@@ -219,25 +219,35 @@ connectionPrototype.existsResource = async function (fromName, toName) {
 
 }
 
-connectionPrototype.existsMovie = async function (fromName, toName) {
+connectionPrototype.existsMovie = function (fromName, toName) {
   return this.existsResource(fromName, toName)
 }
 
-connectionPrototype.existsEpisode = async function (fromName, toName) {
+connectionPrototype.existsEpisode = function (fromName, toName) {
   return this.existsResource(fromName, toName)
 }
 
 connectionPrototype.insertResource = function (fromName, toName) {
 
   let query = 'insert into resource ( "fromName", \
-                                      "toName" ) \
-               values               ( $1, \
-                                      $2 ) \
-               on conflict \
-               on constraint "resourceKey" \
-               do update \
-               set  inserted = current_timestamp, \
-                    deleted = null;'
+                                      "toName", \
+                                      inserted, \
+                                      deleted ) \
+                values               ( $1, \
+                                      $2, \
+                                      current_timestamp, \
+                                      case \
+                                        when $1 = $2 then current_timestamp \
+                                        else null \
+                                      end ) \
+                on conflict \
+                on constraint "resourceKey" \
+                do update \
+                  set     inserted = current_timestamp, \
+                          deleted = case \
+                                      when $1 = $2 then current_timestamp \
+                                      else null \
+                                    end;'
 
   let values = [ fromName, toName ]
 
@@ -250,16 +260,26 @@ connectionPrototype.insertMovie = async function (fromName, toName, title, yearR
   let query = 'insert into movie (  "fromName", \
                                     "toName", \
                                     title, \
-                                    "yearReleased" ) \
-               values            (  $1, \
+                                    "yearReleased", \
+                                    inserted, \
+                                    deleted ) \
+              values            (   $1, \
                                     $2, \
                                     $3, \
-                                    $4 ) \
-               on conflict \
-               on constraint "movieKey" \
-               do update \
-               set  inserted = current_timestamp, \
-                    deleted = null;'
+                                    $4, \
+                                    current_timestamp, \
+                                    case \
+                                      when $1 = $2 then current_timestamp \
+                                      else null \
+                                    end ) \
+              on conflict \
+              on constraint "movieKey" \
+              do update \
+                  set inserted = current_timestamp, \
+                      deleted = case \
+                                  when $1 = $2 then current_timestamp \
+                                  else null \
+                                end;'
 
   let values = [ fromName, toName, title, yearReleased ]
 
@@ -276,20 +296,30 @@ connectionPrototype.insertEpisode = async function (fromName, toName, seriesTitl
                                       "dateAired", \
                                       "seasonNumber", \
                                       "episodeNumber", \
-                                      "episodeTitle" ) \
-               values            (    $1, \
+                                      "episodeTitle", \
+                                      inserted, \
+                                      deleted ) \
+              values            (     $1, \
                                       $2, \
                                       $3, \
                                       $4, \
                                       $5, \
                                       $6, \
                                       $7, \
-                                      $8 ) \
-               on conflict \
-               on constraint "episodeKey" \
-               do update \
-               set  inserted = current_timestamp, \
-                    deleted = null;'
+                                      $8, \
+                                      current_timestamp, \
+                                      case \
+                                        when $1 = $2 then current_timestamp \
+                                        else null \
+                                      end ) \
+              on conflict \
+              on constraint "episodeKey" \
+              do update \
+                  set inserted = current_timestamp, \
+                      deleted = case \
+                                  when $1 = $2 then current_timestamp \
+                                  else null \
+                                end;'
 
   let values = [ fromName, toName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle ]
 
@@ -341,7 +371,7 @@ connectionPrototype.query = function (...parameters) {
 }
 
 connectionPrototype.close = function () {
-  Log.debug(`Closing '${this.options.database}' ...`)
+  // Log.debug(`Closing '${this.options.database}' ...`)
   return this.client.end()
 }
 

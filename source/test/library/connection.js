@@ -41,270 +41,650 @@ describe('connection', () => {
     
     })
 
-    describe('existsMigration(path)', () => {
+    describe('(migration)', () => {
 
-      let existsMigrationPath = Path.join(Configuration.path.migration.distributable, `${Process.pid} - existsMigration.js`)
-      let notExistsMigrationPath = Path.join(Configuration.path.migration.distributable, `${Process.pid} - notExistsMigration.js`)
+      describe('existsMigration(path)', () => {
 
-      before(async () => {
-        await userConnection.insertMigration(existsMigrationPath)
-      })
-    
-      it('should exist', async () => {
-        Assert.isTrue(await userConnection.existsMigration(existsMigrationPath))
-      })
-    
-      it('should not exist', async () => {
-        Assert.isFalse(await userConnection.existsMigration(notExistsMigrationPath))
-      })
-    
-      after(async () => {
-        await userConnection.deleteMigration(existsMigrationPath)
-      })
-    
-    })
-
-    describe('insertMigration(path)', () => {
-
-      let migrationName = Path.join(Configuration.path.migration.distributable, `${Process.pid} - insertMigration.js`)
-
-      before(async () => {
-        await userConnection.insertMigration(migrationName)
-      })
-    
-      it('should exist', async () => {
-        Assert.isTrue(await userConnection.existsMigration(migrationName))
-      })
-    
-      describe('selectMigration(path)', () => {
-
-        let migration = null
+        let existsMigrationPath = Path.join(Configuration.path.migration.distributable, `${Process.pid} - existsMigration.js`)
+        let notExistsMigrationPath = Path.join(Configuration.path.migration.distributable, `${Process.pid} - notExistsMigration.js`)
 
         before(async () => {
-          migration = await userConnection.selectMigration(migrationName)
+          await userConnection.insertMigration(existsMigrationPath)
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsMigration(existsMigrationPath))
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsMigration(notExistsMigrationPath))
+        })
+      
+        after(() => {
+          return userConnection.deleteMigration(existsMigrationPath)
+        })
+      
+      })
+
+      describe('insertMigration(path)', () => {
+
+        let migrationName = Path.join(Configuration.path.migration.distributable, `${Process.pid} - insertMigration.js`)
+
+        before(() => {
+          return userConnection.insertMigration(migrationName)
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsMigration(migrationName))
+        })
+      
+        describe('selectMigration(path)', () => {
+
+          let migration = null
+
+          before(async () => {
+            migration = await userConnection.selectMigration(migrationName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(migration.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(migration.deleted)
+          })
+
         })
 
-        it('inserted should not be null', async () => {
-          Assert.isNotNull(migration.inserted)
+        after(() => {
+          return userConnection.deleteMigration(migrationName)
         })
-
-        it('deleted should be null', async () => {
-          Assert.isNull(migration.deleted)
-        })
-
+      
       })
 
-      after(async () => {
-        await userConnection.deleteMigration(migrationName)
-      })
-    
-    })
+      describe('deleteMigration(path)', () => {
 
-    describe('deleteMigration(path)', () => {
-
-      let migrationName = Path.join(Configuration.path.migration.distributable, `${Process.pid} - deleteMigration.js`)
-
-      before(async () => {
-        await userConnection.insertMigration(migrationName)
-        await userConnection.deleteMigration(migrationName)
-      })
-    
-      it('should not exist', async () => {
-        Assert.isFalse(await userConnection.existsMigration(migrationName))
-      })
-    
-      describe('selectMigration(path)', () => {
-
-        let migration = null
+        let migrationName = Path.join(Configuration.path.migration.distributable, `${Process.pid} - deleteMigration.js`)
 
         before(async () => {
-          migration = await userConnection.selectMigration(migrationName)
+          await userConnection.insertMigration(migrationName)
+          await userConnection.deleteMigration(migrationName)
         })
-
-        it('inserted should not be null', async () => {
-          Assert.isNotNull(migration.inserted)
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsMigration(migrationName))
         })
+      
+        describe('selectMigration(path)', () => {
 
-        it('deleted should not be null', async () => {
-          Assert.isNotNull(migration.deleted)
+          let migration = null
+
+          before(async () => {
+            migration = await userConnection.selectMigration(migrationName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(migration.inserted)
+          })
+
+          it('deleted should not be null', () => {
+            Assert.exists(migration.deleted)
+          })
+
         })
 
       })
 
-    })
+      describe('insert(delete\'d)Migration(path)', () => {
 
-    describe('insert(delete\'d)Migration(path)', () => {
-
-      let migrationName = Path.join(Configuration.path.migration.distributable, `${Process.pid} - insert(delete'd)Migration.js`)
-
-      before(async () => {
-        await userConnection.insertMigration(migrationName)
-        await userConnection.deleteMigration(migrationName)
-        await userConnection.insertMigration(migrationName)
-      })
-    
-      it('should exist', async () => {
-        Assert.isTrue(await userConnection.existsMigration(migrationName))
-      })
-    
-      describe('selectMigration(path)', () => {
-
-        let migration = null
+        let migrationName = Path.join(Configuration.path.migration.distributable, `${Process.pid} - insert(delete'd)Migration.js`)
 
         before(async () => {
-          migration = await userConnection.selectMigration(migrationName)
+          await userConnection.insertMigration(migrationName)
+          await userConnection.deleteMigration(migrationName)
+          await userConnection.insertMigration(migrationName)
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsMigration(migrationName))
+        })
+      
+        describe('selectMigration(path)', () => {
+
+          let migration = null
+
+          before(async () => {
+            migration = await userConnection.selectMigration(migrationName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(migration.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(migration.deleted)
+          })
+
         })
 
-        it('inserted should not be null', async () => {
-          Assert.isNotNull(migration.inserted)
+        after(() => {
+          return userConnection.deleteMigration(migrationName)
         })
-
-        it('deleted should be null', async () => {
-          Assert.isNull(migration.deleted)
-        })
-
+      
       })
 
-      after(async () => {
-        await userConnection.deleteMigration(migrationName)
-      })
-    
     })
 
-    describe('existsResource(fromName, toName)', () => {
+    describe('(resource)', () => {
 
-      let existsResourceFromName = `${Process.pid}.existsResource`
-      let existsResourceToName = 'existsResource'
+      describe('existsResource(fromName, toName)', () => {
 
-      let notExistsResourceFromName = `${Process.pid}.notExistsResource`
-      let notExistsResourceToName = 'notExistsResource'
+        let existsResourceFromName = `${Process.pid}.existsResource`
+        let existsResourceToName = 'existsResource'
 
-      before(async () => {
-        await userConnection.insertResource(existsResourceFromName, existsResourceToName)
+        before(() => {
+          return userConnection.insertResource(existsResourceFromName, existsResourceToName)
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsResource(existsResourceFromName, existsResourceToName))
+        })
+      
+        after(() => {
+          return userConnection.deleteResource(existsResourceFromName, existsResourceToName)
+        })
+      
       })
-    
-      it('should exist', async () => {
-        Assert.isTrue(await userConnection.existsResource(existsResourceFromName, existsResourceToName))
-      })
-    
-      it('should not exist', async () => {
-        Assert.isFalse(await userConnection.existsResource(notExistsResourceFromName, notExistsResourceToName))
-      })
-    
-      after(async () => {
-        await userConnection.deleteResource(existsResourceFromName, existsResourceToName)
-      })
-    
-    })
 
-    describe('insertResource(fromName, toName)', () => {
+      describe('insertResource(fromName, toName)', () => {
 
-      let resourceFromName = `${Process.pid}.insertResource`
-      let resourceToName = 'insertResource'
+        let resourceFromName = `${Process.pid}.insertResource`
+        let resourceToName = 'insertResource'
 
-      before(async () => {
-        await userConnection.insertResource(resourceFromName, resourceToName)
+        let unchangedResourceFromName = 'unchangedResource'
+        let unchangedResourceToName = unchangedResourceFromName
+
+        before(() => {
+          return Promise.all([
+            userConnection.insertResource(resourceFromName, resourceToName),
+            userConnection.insertResource(unchangedResourceFromName, unchangedResourceToName)
+          ])
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        })
+
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsResource(unchangedResourceFromName, unchangedResourceToName))
+        })
+            
+        describe('selectResource(fromName, toName)', () => {
+
+          let resource = null
+          let unchangedResource = null
+
+          before(async () => {
+            resource = await userConnection.selectResource(resourceFromName, resourceToName)
+            unchangedResource = await userConnection.selectResource(unchangedResourceFromName, unchangedResourceToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(resource.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(resource.deleted)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(unchangedResource.inserted)
+          })
+
+          it('deleted should not be null', () => {
+            Assert.exists(unchangedResource.deleted)
+          })
+
+        })
+
+        after(() => {
+          return userConnection.deleteResource(resourceFromName, resourceToName)
+        })
+      
       })
-    
-      it('should exist', async () => {
-        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
-      })
-    
-      describe('selectResource(fromName, toName)', () => {
 
-        let resource = null
+      describe('deleteResource(fromName, toName)', () => {
+
+        let resourceFromName = `${Process.pid}.deleteResource`
+        let resourceToName = 'deleteResource'
 
         before(async () => {
-          resource = await userConnection.selectResource(resourceFromName, resourceToName)
+          await userConnection.insertResource(resourceFromName, resourceToName)
+          await userConnection.deleteResource(resourceFromName, resourceToName)
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
+        })
+      
+        describe('selectResource(fromName, toName)', () => {
+
+          let resource = null
+
+          before(async () => {
+            resource = await userConnection.selectResource(resourceFromName, resourceToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(resource.inserted)
+          })
+
+          it('deleted should not be null', () => {
+            Assert.exists(resource.deleted)
+          })
+
         })
 
-        it('inserted should not be null', async () => {
-          Assert.isNotNull(resource.inserted)
-        })
-
-        it('deleted should be null', async () => {
-          Assert.isNull(resource.deleted)
-        })
-
       })
 
-      after(async () => {
-        await userConnection.deleteResource(resourceFromName, resourceToName)
-      })
-    
-    })
+      describe('insert(delete\'d)Resource(fromName, toName)', () => {
 
-    describe('deleteResource(fromName, toName)', () => {
+        let deletedResourceFromName = `${Process.pid}.deletedResource`
+        let deletedResourceToName = 'deletedResource'
 
-      let resourceFromName = `${Process.pid}.deleteResource`
-      let resourceToName = 'deleteResource'
+        let unchangedResourceFromName = 'unchangedResource'
+        let unchangedResourceToName = unchangedResourceFromName
 
-      before(async () => {
-        await userConnection.insertResource(resourceFromName, resourceToName)
-        await userConnection.deleteResource(resourceFromName, resourceToName)
-      })
-    
-      it('should not exist', async () => {
-        Assert.isFalse(await userConnection.existsResource(resourceFromName, resourceToName))
-      })
-    
-      describe('selectResource(fromName, toName)', () => {
-
-        let resource = null
+        let resourceFromName = `${Process.pid}.insert(delete'd)Resource`
+        let resourceToName = 'insert(delete\'d)Resource'
 
         before(async () => {
-          resource = await userConnection.selectResource(resourceFromName, resourceToName)
+
+          await userConnection.insertResource(deletedResourceFromName, deletedResourceToName)
+          await userConnection.deleteResource(deletedResourceFromName, deletedResourceToName)
+
+          await userConnection.insertResource(unchangedResourceFromName, unchangedResourceToName)
+          await userConnection.deleteResource(unchangedResourceFromName, unchangedResourceToName)
+          await userConnection.insertResource(unchangedResourceFromName, unchangedResourceToName)
+
+          await userConnection.insertResource(resourceFromName, resourceToName)
+          await userConnection.deleteResource(resourceFromName, resourceToName)
+          await userConnection.insertResource(resourceFromName, resourceToName)
+
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsResource(deletedResourceFromName, deletedResourceToName))
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsResource(unchangedResourceFromName, unchangedResourceToName))
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        })
+      
+        describe('selectResource(fromName, toName)', () => {
+
+          let resource = null
+
+          before(async () => {
+            resource = await userConnection.selectResource(resourceFromName, resourceToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(resource.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(resource.deleted)
+          })
+
         })
 
-        it('inserted should not be null', async () => {
-          Assert.isNotNull(resource.inserted)
+        after(() => {
+          return userConnection.deleteResource(resourceFromName, resourceToName)
         })
-
-        it('deleted should not be null', async () => {
-          Assert.isNotNull(resource.deleted)
-        })
-
+      
       })
 
     })
 
-    describe('insert(delete\'d)Resource(fromName, toName)', () => {
+    describe('(movie)', () => {
 
-      let resourceFromName = `${Process.pid}.insert(delete'd)Resource`
-      let resourceToName = 'insert(delete\'d)Resource'
+      let title = 'movieTitle'
+      let yearReleased = new Date().getFullYear()
 
-      before(async () => {
-        await userConnection.insertResource(resourceFromName, resourceToName)
-        await userConnection.deleteResource(resourceFromName, resourceToName)
-        await userConnection.insertResource(resourceFromName, resourceToName)
+      describe('insertMovie(fromName, toName, ...)', () => {
+
+        let movieFromName = `${Process.pid}.insertMovie`
+        let movieToName = 'insertMovie'
+
+        let unchangedMovieFromName = 'unchangedMovie'
+        let unchangedMovieToName = unchangedMovieFromName
+
+        before(() => {
+          return Promise.all([
+            userConnection.insertMovie(movieFromName, movieToName, title, yearReleased),
+            userConnection.insertMovie(unchangedMovieFromName, unchangedMovieToName, title, yearReleased)
+          ])
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsMovie(movieFromName, movieToName))
+        })
+       
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsMovie(unchangedMovieFromName, unchangedMovieToName))
+        })
+     
+        describe('selectMovie(fromName, toName)', () => {
+
+          let movie = null
+
+          before(async () => {
+            movie = await userConnection.selectMovie(movieFromName, movieToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(movie.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(movie.deleted)
+          })
+
+          it(`title should be '${title}'`, () => {
+            Assert.equal(movie.title, title)
+          })
+
+          it(`yearReleased should be ${yearReleased}`, () => {
+            Assert.equal(movie.yearReleased, yearReleased)
+          })
+
+        })
+
+        after(() => {
+          return userConnection.deleteMovie(movieFromName, movieToName)
+        })
+      
       })
-    
-      it('should exist', async () => {
-        Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
-      })
-    
-      describe('selectResource(path)', () => {
 
-        let resource = null
+      describe('deleteMovie(fromName, toName)', () => {
+
+        let movieFromName = `${Process.pid}.deleteMovie`
+        let movieToName = 'deleteMovie'
 
         before(async () => {
-          resource = await userConnection.selectResource(resourceFromName, resourceToName)
+          await userConnection.insertMovie(movieFromName, movieToName, title, yearReleased)
+          await userConnection.deleteMovie(movieFromName, movieToName)
         })
-
-        it('inserted should not be null', async () => {
-          Assert.isNotNull(resource.inserted)
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsMovie(movieFromName, movieToName))
         })
+      
+        describe('selectMovie(fromName, toName)', () => {
 
-        it('deleted should be null', async () => {
-          Assert.isNull(resource.deleted)
+          let movie = null
+
+          before(async () => {
+            movie = await userConnection.selectMovie(movieFromName, movieToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(movie.inserted)
+          })
+
+          it('deleted should not be null', () => {
+            Assert.exists(movie.deleted)
+          })
+
         })
 
       })
 
-      after(async () => {
-        await userConnection.deleteResource(resourceFromName, resourceToName)
+      describe('insert(delete\'d)Movie(fromName, toName)', () => {
+
+        let deletedMovieFromName = `${Process.pid}.deletedMovie`
+        let deletedMovieToName = 'deletedMovie'
+
+        let unchangedMovieFromName = 'unchangedMovie'
+        let unchangedMovieToName = unchangedMovieFromName
+
+        let movieFromName = `${Process.pid}.insert(delete'd)Movie`
+        let movieToName = 'insert(delete\'d)Movie'
+
+        before(async () => {
+
+          await userConnection.insertMovie(deletedMovieFromName, deletedMovieToName, title, yearReleased)
+          await userConnection.deleteMovie(deletedMovieFromName, deletedMovieToName)
+
+          await userConnection.insertMovie(unchangedMovieFromName, unchangedMovieToName, title, yearReleased)
+          await userConnection.deleteMovie(unchangedMovieFromName, unchangedMovieToName)
+          await userConnection.insertMovie(unchangedMovieFromName, unchangedMovieToName, title, yearReleased)
+
+          await userConnection.insertMovie(movieFromName, movieToName, title, yearReleased)
+          await userConnection.deleteMovie(movieFromName, movieToName)
+          await userConnection.insertMovie(movieFromName, movieToName, title, yearReleased)
+
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsMovie(deletedMovieFromName, deletedMovieToName))
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsMovie(unchangedMovieFromName, unchangedMovieToName))
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsMovie(movieFromName, movieToName))
+        })
+      
+        describe('selectMovie(fromName, toName)', () => {
+
+          let movie = null
+
+          before(async () => {
+            movie = await userConnection.selectMovie(movieFromName, movieToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(movie.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(movie.deleted)
+          })
+
+        })
+
+        after(() => {
+          return userConnection.deleteMovie(movieFromName, movieToName)
+        })
+      
       })
-    
+
+    })
+
+    describe('(episode)', () => {
+
+      let seriesTitle = 'seriesTitle'
+      let yearReleased = new Date().getFullYear()
+      let dateAired = new Date('1973-05-28')
+      let seasonNumber = 1
+      let episodeNumber = 2
+      let episodeTitle = 'episodeTitle'
+
+      describe('insertEpisode(fromName, toName, ...)', () => {
+
+        let episodeFromName = `${Process.pid}.insertEpisode`
+        let episodeToName = 'insertEpisode'
+
+        let unchangedEpisodeFromName = 'unchangedEpisode'
+        let unchangedEpisodeToName = unchangedEpisodeFromName
+
+        before(() => {
+          return Promise.all([
+            userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle),
+            userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          ])
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsEpisode(episodeFromName, episodeToName))
+        })
+       
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsEpisode(unchangedEpisodeFromName, unchangedEpisodeToName))
+        })
+     
+        describe('selectEpisode(fromName, toName)', () => {
+
+          let episode = null
+
+          before(async () => {
+            episode = await userConnection.selectEpisode(episodeFromName, episodeToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(episode.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(episode.deleted)
+          })
+
+          it(`seriesTitle should be '${seriesTitle}'`, () => {
+            Assert.equal(episode.seriesTitle, seriesTitle)
+          })
+
+          it(`yearReleased should be ${yearReleased}`, () => {
+            Assert.equal(episode.yearReleased, yearReleased)
+          })
+
+          // it(`dateAired should be ${dateAired}`, () => {
+          //   Assert.equal(episode.dateAired, dateAired)
+          // })
+
+          it(`seasonNumber should be ${seasonNumber}`, () => {
+            Assert.equal(episode.seasonNumber, seasonNumber)
+          })
+
+          it(`episodeNumber should be ${episodeNumber}`, () => {
+            Assert.equal(episode.episodeNumber, episodeNumber)
+          })
+
+          it(`episodeTitle should be '${episodeTitle}'`, () => {
+            Assert.equal(episode.episodeTitle, episodeTitle)
+          })
+
+        })
+
+        after(() => {
+          return userConnection.deleteEpisode(episodeFromName, episodeToName)
+        })
+      
+      })
+
+      describe('deleteEpisode(fromName, toName)', () => {
+
+        let episodeFromName = `${Process.pid}.deleteEpisode`
+        let episodeToName = 'deleteEpisode'
+
+        before(async () => {
+          await userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.deleteEpisode(episodeFromName, episodeToName)
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsEpisode(episodeFromName, episodeToName))
+        })
+      
+        describe('selectEpisode(fromName, toName)', () => {
+
+          let episode = null
+
+          before(async () => {
+            episode = await userConnection.selectEpisode(episodeFromName, episodeToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(episode.inserted)
+          })
+
+          it('deleted should not be null', () => {
+            Assert.exists(episode.deleted)
+          })
+
+        })
+
+      })
+
+      describe('insert(delete\'d)Episode(fromName, toName)', () => {
+
+        let deletedEpisodeFromName = `${Process.pid}.deletedEpisode`
+        let deletedEpisodeToName = 'deletedEpisode'
+
+        let unchangedEpisodeFromName = 'unchangedEpisode'
+        let unchangedEpisodeToName = unchangedEpisodeFromName
+
+        let episodeFromName = `${Process.pid}.insert(delete'd)Episode`
+        let episodeToName = 'insert(delete\'d)Episode'
+
+        before(async () => {
+
+          await userConnection.insertEpisode(deletedEpisodeFromName, deletedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.deleteEpisode(deletedEpisodeFromName, deletedEpisodeToName)
+
+          await userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.deleteEpisode(unchangedEpisodeFromName, unchangedEpisodeToName)
+          await userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+
+          await userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.deleteEpisode(episodeFromName, episodeToName)
+          await userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsEpisode(deletedEpisodeFromName, deletedEpisodeToName))
+        })
+      
+        it('should not exist', async () => {
+          Assert.isFalse(await userConnection.existsEpisode(unchangedEpisodeFromName, unchangedEpisodeToName))
+        })
+      
+        it('should exist', async () => {
+          Assert.isTrue(await userConnection.existsEpisode(episodeFromName, episodeToName))
+        })
+      
+        describe('selectEpisode(fromName, toName)', () => {
+
+          let episode = null
+
+          before(async () => {
+            episode = await userConnection.selectEpisode(episodeFromName, episodeToName)
+          })
+
+          it('inserted should not be null', () => {
+            Assert.exists(episode.inserted)
+          })
+
+          it('deleted should be null', () => {
+            Assert.isNull(episode.deleted)
+          })
+
+        })
+
+        after(() => {
+          return userConnection.deleteEpisode(episodeFromName, episodeToName)
+        })
+      
+      })
+
     })
 
     after(async () => {
