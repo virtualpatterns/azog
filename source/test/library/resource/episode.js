@@ -36,6 +36,10 @@ describe('episode', () => {
       {
         'fromPath': 'How It\'s Made (2001) - S29E01 - Skateboard Wheels; Baklava & Galaktoboureko; CO2 Scrubbers; Honeycomb Candles (1080p WEB-DL x265 MONOLITH).mkv',
         'toPath': Path.join(Configuration.path.processed.episode, 'How It\'s Made', 'Season 29', 'How It\'s Made - 29x01 - Skateboard Wheels; Baklava & Galaktoboureko; CO2 Scrubbers; Honeycomb Candles.mp4')
+      },
+      {
+        'fromPath': 'The.Crown.S03E01.720p.NF.WEBRip.x264-GalaxyTV.id:305574.mkv',
+        'toPath': Path.join(Configuration.path.processed.episode, 'The Crown', 'Season 3', 'The Crown - 3x01 - Olding.mp4')
       }
     ].forEach((test) => {
 

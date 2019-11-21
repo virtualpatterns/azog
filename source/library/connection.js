@@ -183,6 +183,7 @@ connectionPrototype.selectEpisode = async function (fromName, toName) {
 
   let query = 'select episode."fromName" as "fromName", \
                       episode."toName" as "toName", \
+                      episode.id as id, \
                       episode."seriesTitle" as "seriesTitle", \
                       episode."yearReleased" as "yearReleased", \
                       episode."dateAired" as "dateAired", \
@@ -287,10 +288,11 @@ connectionPrototype.insertMovie = async function (fromName, toName, title, yearR
 
 }
 
-connectionPrototype.insertEpisode = async function (fromName, toName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle) {
+connectionPrototype.insertEpisode = async function (fromName, toName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle) {
 
   let query = 'insert into episode (  "fromName", \
                                       "toName", \
+                                      id, \
                                       "seriesTitle", \
                                       "yearReleased", \
                                       "dateAired", \
@@ -307,6 +309,7 @@ connectionPrototype.insertEpisode = async function (fromName, toName, seriesTitl
                                       $6, \
                                       $7, \
                                       $8, \
+                                      $9, \
                                       current_timestamp, \
                                       case \
                                         when $1 = $2 then current_timestamp \
@@ -321,7 +324,7 @@ connectionPrototype.insertEpisode = async function (fromName, toName, seriesTitl
                                   else null \
                                 end;'
 
-  let values = [ fromName, toName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle ]
+  let values = [ fromName, toName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle ]
 
   return this.query(query, values)
 

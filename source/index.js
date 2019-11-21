@@ -33,7 +33,6 @@ Program
 
       try {
         await Torrent.createTorrent(Path.join(torrentPath, torrentName), connection).process()
-
       }
       finally {
         await connection.close()

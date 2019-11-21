@@ -17,18 +17,44 @@ EpisodeError.prototype = Object.create(VideoError.prototype)
 EpisodeError.prototype.constructor = EpisodeError
 EpisodeError.prototype.name = EpisodeError.name
 
-function SeriesNotFoundError (title, yearReleased) {
+function SeriesNotFoundError (message) {
 
   Error.call(this)
   Error.captureStackTrace(this, SeriesNotFoundError)
 
-  this.message = `Unable to find a series with the title '${title}'${Is.not.null(yearReleased) ? ` released in ${yearReleased}` : ''}.`
+  this.message = message
 
 }
 
 SeriesNotFoundError.prototype = Object.create(EpisodeError.prototype)
 SeriesNotFoundError.prototype.constructor = SeriesNotFoundError
 SeriesNotFoundError.prototype.name = SeriesNotFoundError.name
+
+function SeriesByIdNotFoundError (id) {
+
+  Error.call(this)
+  Error.captureStackTrace(this, SeriesByIdNotFoundError)
+
+  this.message = `Unable to find a series with the id ${id}.`
+
+}
+
+SeriesByIdNotFoundError.prototype = Object.create(SeriesNotFoundError.prototype)
+SeriesByIdNotFoundError.prototype.constructor = SeriesByIdNotFoundError
+SeriesByIdNotFoundError.prototype.name = SeriesByIdNotFoundError.name
+
+function SeriesByNameNotFoundError (title, yearReleased) {
+
+  Error.call(this)
+  Error.captureStackTrace(this, SeriesByNameNotFoundError)
+
+  this.message = `Unable to find a series with the title '${title}'${Is.not.null(yearReleased) ? ` released in ${yearReleased}` : ''}.`
+
+}
+
+SeriesByNameNotFoundError.prototype = Object.create(SeriesNotFoundError.prototype)
+SeriesByNameNotFoundError.prototype.constructor = SeriesByNameNotFoundError
+SeriesByNameNotFoundError.prototype.name = SeriesByNameNotFoundError.name
 
 function EpisodeNotFoundError (series) {
 
@@ -85,6 +111,8 @@ EpisodeByTitleNotFoundError.prototype.name = EpisodeByTitleNotFoundError.name
 export {
   EpisodeError, 
   SeriesNotFoundError, 
+  SeriesByIdNotFoundError,
+  SeriesByNameNotFoundError,
   EpisodeNotFoundError,
   EpisodeByDateAiredNotFoundError,
   EpisodeByNumberNotFoundError,

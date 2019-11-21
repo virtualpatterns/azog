@@ -425,10 +425,10 @@ describe('torrent', () => {
           await FileSystem.touch(processedEpisodePath2)
    
           resourceFromName3 = 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv]'
-          resourceToName3 = 'Leah Remini Scientology and the Aftermath - 0x12 - The Jehovah\'s Witnesses'
-    
+          resourceToName3 = 'Leah Remini Scientology and the Aftermath - 3x01 - The Jehovah\'s Witnesses'
+
           processedSeriesPath3 = Path.join(Configuration.path.processed.episode, 'Leah Remini Scientology and the Aftermath')
-          processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
+          processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 3')
           processedEpisodePath3 = Path.join(processedSeasonPath3, `${resourceToName3}.mp4`)
   
           await FileSystem.mkdir(Path.dirname(processedEpisodePath3), { 'recursive': true })
@@ -551,6 +551,54 @@ describe('torrent', () => {
       
         after(() => {
           return FileSystem.remove(Configuration.path.processed.episode)
+        })
+    
+      })
+  
+      describe('(when passing a series with an id)', () => {
+  
+        let torrentName = null
+        let torrentPath = null
+  
+        let resourceFromName = null
+        let resourceToName = null
+  
+        let processedSeriesPath = null
+        let processedSeasonPath = null
+        let processedEpisodePath = null
+  
+        before(async () => {
+  
+          torrentName = 'Series (id)'
+          torrentPath = Path.join(Configuration.path.downloaded, torrentName)
+   
+          resourceFromName = 'The.Crown.S03E01.720p.NF.WEBRip.x264-GalaxyTV.id:305574'
+          resourceToName = 'The Crown - 3x01 - Olding'
+  
+          processedSeriesPath = Path.join(Configuration.path.processed.episode, 'The Crown')
+          processedSeasonPath = Path.join(processedSeriesPath, 'Season 3')
+          processedEpisodePath = Path.join(processedSeasonPath, `${resourceToName}.mp4`)
+  
+          await FileSystem.mkdir(Path.dirname(processedEpisodePath), { 'recursive': true })
+          await FileSystem.touch(processedEpisodePath)
+  
+          await Torrent.createTorrent(torrentPath, userConnection).process()
+  
+        })
+  
+        it('should create the correct file', () => {
+          return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        })
+      
+        it('should create the correct record', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+        })
+      
+        after(() => {
+          return Promise.all([
+            userConnection.deleteResource(resourceFromName, resourceToName),
+            FileSystem.remove(Configuration.path.processed.episode)
+          ])
         })
     
       })

@@ -6,6 +6,34 @@ import Video from '../../../library/resource/video'
 
 describe('video', () => {
 
+  describe('getId(path)', () => {
+    [
+      {
+        'path': 'abc 97 of 99 def',
+        'id': null
+      },
+      {
+        'path': 'id:1234 abc 97 of 99 def',
+        'id': 1234
+      },
+      {
+        'path': 'abc 97 of 99 def id:4321',
+        'id': 4321
+      }
+    ].forEach((test) => {
+
+      describe(`(when passing '${test.path}')`, () => {
+    
+        it(`should return ${test.id}`, () => {
+          Assert.equal(Video.getId(test.path), test.id)
+        })
+
+      })
+
+    })
+
+  })
+
   describe('getTitle(path)', () => {
     [
       {

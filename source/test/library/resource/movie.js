@@ -10,7 +10,7 @@ describe('movie', () => {
 
     [
       {
-        'fromPath': 'In Extremis.2018.HDRip.XviD.AC3-EVO',
+        'fromPath': 'In Extremis.2017.HDRip.XviD.AC3-EVO',
         'toPath': Path.join(Configuration.path.processed.movie, 'In Extremis (2017).mp4')
       },
       // {
@@ -19,7 +19,7 @@ describe('movie', () => {
       // },
       {
         'fromPath': 'A.Day.in.the.Life.of.Earth.2018.mkv',
-        'toPath': Path.join(Configuration.path.processed.movie, 'A.Day.in.the.Life.of.Earth.2018.mp4')
+        'toPath': Path.join(Configuration.path.processed.movie, 'A Day in the Life of Earth (2018).mp4')
       }
     ].forEach((test) => {
 

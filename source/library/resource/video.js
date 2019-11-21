@@ -73,6 +73,10 @@ videoPrototype.getFormatInformation = async function () {
   return Video.getFormatInformation(this.path)
 }
 
+videoPrototype.getId = function () {
+  return Video.getId(this.path)
+}
+
 videoPrototype.getTitle = function () {
   return Video.getTitle(this.path)
 }
@@ -152,6 +156,24 @@ Video.getFormatInformation = async function (path) {
     'description': format.format_long_name,
     'duration': Duration.fromMillis(Configuration.conversion.secondsToMilliseconds(format.duration))
   }
+
+}
+
+Video.getId = function (path) {
+
+  let pattern = /id:(\d+)/i
+  let match = null
+
+  let id = null
+
+  if (Is.not.null(match = pattern.exec(Path.basename(path)))) {
+
+    let [ , idAsString ] = match
+    id = parseInt(idAsString)
+
+  }
+
+  return id
 
 }
 

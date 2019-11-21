@@ -5,7 +5,7 @@ import TvDB from 'node-tvdb'
 
 import Configuration from '../../configuration'
 
-import { SeriesNotFoundError, EpisodeNotFoundError, EpisodeByDateAiredNotFoundError, EpisodeByNumberNotFoundError, EpisodeByTitleNotFoundError } from '../error/episode-error'
+import { SeriesByIdNotFoundError, SeriesByNameNotFoundError, EpisodeNotFoundError, EpisodeByDateAiredNotFoundError, EpisodeByNumberNotFoundError, EpisodeByTitleNotFoundError } from '../error/episode-error'
 
 import Video from './video'
 
@@ -42,27 +42,29 @@ episodePrototype.getToPath = async function () {
 
 }
 
-episodePrototype.getEpisode = async function () {
+episodePrototype.getEpisode = function () {
 
+  let id = this.getId()
   let seriesTitle = this.getTitle()
   let yearReleased = this.getYearReleased()
   let dateAired = this.getDateAired()
   let [ seasonNumber, episodeNumber ] = this.getSeasonEpisodeNumber()
   let episodeTitle = this.getEpisodeTitle()
 
-  return await Episode.getEpisode(seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+  return Episode.getEpisode(id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
 
 }
 
 episodePrototype.track = function (fromName, toName) {
 
+  let id = this.getId()
   let seriesTitle = this.getTitle()
   let yearReleased = this.getYearReleased()
   let dateAired = this.getDateAired()
   let [ seasonNumber, episodeNumber ] = this.getSeasonEpisodeNumber()
   let episodeTitle = this.getEpisodeTitle()
 
-  return this.connection.insertEpisode(fromName, toName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+  return this.connection.insertEpisode(fromName, toName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
 
 }
 
@@ -90,11 +92,13 @@ Episode.isResourceClass = function (path) {
 
   if (Video.isResourceClass(path)) {
 
+    let id = Video.getId(path)
     let title = Video.getTitle(path)
     let episodeNumber = Video.getEpisodeNumber(path)
     let dateAired = Video.getDateAired(path)
 
-    if (Is.not.null(title) &&
+    if (( Is.not.null(title) ||
+          Is.not.null(id)) &&
         ( Is.not.null(episodeNumber) ||
           Is.not.null(dateAired))) {
       return true
@@ -110,9 +114,17 @@ Episode.isResourceClass = function (path) {
 
 }
 
-Episode.getEpisode = async function (seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle) {
+Episode.getEpisode = async function (id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle) {
 
-  let series = await this.getSeries(seriesTitle, yearReleased)
+  let series = null
+
+  if (Is.not.null(id)) {
+    series = await this.getSeriesById(id)
+  }
+  else {
+    series = await this.getSeriesByName(seriesTitle, yearReleased)
+  }
+
   let episode = null
 
   if (Is.not.null(dateAired)) {
@@ -158,7 +170,43 @@ Episode.getEpisode = async function (seriesTitle, yearReleased, dateAired, seaso
 
 }
 
-Episode.getSeries = async function (title, yearReleased) {
+Episode.getSeriesById = async function (id) {
+
+  let options = {}
+  let data = null
+
+  try {
+          
+    Log.trace(`TvDB.getSeriesById(${id}, options) ...`)
+    let start = Process.hrtime()
+
+    try {
+      data = await this.TvDB.getSeriesById(id, options)
+    }
+    finally {
+      Log.trace({ options, data }, `TvDB.getSeriesById(${id}, options) ${Configuration.conversion.toDuration(Process.hrtime(start)).toFormat(Configuration.format.shortDuration)}`)
+    }
+
+    return {
+      'id': data.id,
+      'seriesTitle': data.seriesName
+    }
+
+  }
+  catch (error) {
+    
+    delete error.name
+
+    Log.error('catch (error) { ... }')
+    Log.error(error)
+
+    throw new SeriesByIdNotFoundError(id)
+
+  }
+
+}
+
+Episode.getSeriesByName = async function (title, yearReleased) {
 
   let options = {}
   let data = null
@@ -220,7 +268,7 @@ Episode.getSeries = async function (title, yearReleased) {
 
   }
   else {
-    throw new SeriesNotFoundError(title, yearReleased)
+    throw new SeriesByNameNotFoundError(title, yearReleased)
   }
 
 }

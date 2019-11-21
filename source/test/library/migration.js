@@ -231,6 +231,14 @@ describe('migration', () => {
 
       })
     
+      describe('(when the \'id\' column of \'episode\' is added)', () => {
+
+        it('the \'id\' column should exist', async () => {
+          Assert.isTrue(await userConnection.existsColumn('episode', 'id'))
+        })
+    
+      })
+    
       after(() => {
         return Migration.uninstallMigrations(userConnection)
       })

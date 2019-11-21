@@ -511,6 +511,7 @@ describe('connection', () => {
 
     describe('(episode)', () => {
 
+      let id = 1234
       let seriesTitle = 'seriesTitle'
       let yearReleased = new Date().getFullYear()
       let dateAired = new Date('1973-05-28')
@@ -528,8 +529,8 @@ describe('connection', () => {
 
         before(() => {
           return Promise.all([
-            userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle),
-            userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+            userConnection.insertEpisode(episodeFromName, episodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle),
+            userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
           ])
         })
       
@@ -555,6 +556,10 @@ describe('connection', () => {
 
           it('deleted should be null', () => {
             Assert.isNull(episode.deleted)
+          })
+
+          it(`id should be ${id}`, () => {
+            Assert.equal(episode.id, id)
           })
 
           it(`seriesTitle should be '${seriesTitle}'`, () => {
@@ -595,7 +600,7 @@ describe('connection', () => {
         let episodeToName = 'deleteEpisode'
 
         before(async () => {
-          await userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.insertEpisode(episodeFromName, episodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
           await userConnection.deleteEpisode(episodeFromName, episodeToName)
         })
       
@@ -636,16 +641,16 @@ describe('connection', () => {
 
         before(async () => {
 
-          await userConnection.insertEpisode(deletedEpisodeFromName, deletedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.insertEpisode(deletedEpisodeFromName, deletedEpisodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
           await userConnection.deleteEpisode(deletedEpisodeFromName, deletedEpisodeToName)
 
-          await userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
           await userConnection.deleteEpisode(unchangedEpisodeFromName, unchangedEpisodeToName)
-          await userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.insertEpisode(unchangedEpisodeFromName, unchangedEpisodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
 
-          await userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.insertEpisode(episodeFromName, episodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
           await userConnection.deleteEpisode(episodeFromName, episodeToName)
-          await userConnection.insertEpisode(episodeFromName, episodeToName, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
+          await userConnection.insertEpisode(episodeFromName, episodeToName, id, seriesTitle, yearReleased, dateAired, seasonNumber, episodeNumber, episodeTitle)
 
         })
       
