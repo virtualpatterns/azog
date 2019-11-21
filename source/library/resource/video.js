@@ -161,7 +161,7 @@ Video.getFormatInformation = async function (path) {
 
 Video.getId = function (path) {
 
-  let pattern = /id:(\d+)/i
+  let pattern = /id-(\d+)/i
   let match = null
 
   let id = null

@@ -13,11 +13,11 @@ describe('video', () => {
         'id': null
       },
       {
-        'path': 'id:1234 abc 97 of 99 def',
+        'path': 'id-1234 abc 97 of 99 def',
         'id': 1234
       },
       {
-        'path': 'abc 97 of 99 def id:4321',
+        'path': 'abc 97 of 99 def id-4321',
         'id': 4321
       }
     ].forEach((test) => {

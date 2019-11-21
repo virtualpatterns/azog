@@ -572,7 +572,7 @@ describe('torrent', () => {
           torrentName = 'Series (id)'
           torrentPath = Path.join(Configuration.path.downloaded, torrentName)
    
-          resourceFromName = 'The.Crown.S03E01.720p.NF.WEBRip.x264-GalaxyTV.id:305574'
+          resourceFromName = 'The.Crown.S03E01.720p.NF.WEBRip.x264-GalaxyTV.id-305574'
           resourceToName = 'The Crown - 3x01 - Olding'
   
           processedSeriesPath = Path.join(Configuration.path.processed.episode, 'The Crown')
