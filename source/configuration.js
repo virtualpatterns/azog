@@ -29,6 +29,7 @@ const Configuration = Object.create({
     'toKilo': (unit) => (unit / KILO_PER_UNIT).toFixed(2),
     'toPercent': (progress) => progress.percent.toFixed(2),
     'toMinutes': (minutes) => minutes.toFixed(2),
+    'toScore': (score) => score.toFixed(4),
     'toSeconds': ([ seconds, nanoseconds ]) => (seconds + nanoseconds / NANOSECONDS_PER_SECOND).toFixed(2)
   },
   'extension': {

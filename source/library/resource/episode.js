@@ -5,7 +5,7 @@ import TvDB from 'node-tvdb'
 
 import Configuration from '../../configuration'
 
-import { SeriesByIdNotFoundError, SeriesByNameNotFoundError, EpisodeNotFoundError, EpisodeByDateAiredNotFoundError, EpisodeByNumberNotFoundError, EpisodeByTitleNotFoundError } from '../error/episode-error'
+import { SeriesByIdNotFoundError, SeriesByNameNotFoundError, EpisodeByDateAiredNotFoundError, EpisodeByNumberNotFoundError, EpisodeByTitleNotFoundError } from '../error/episode-error'
 
 import Video from './video'
 
@@ -140,10 +140,20 @@ Episode.getEpisode = async function (id, seriesTitle, yearReleased, dateAired, s
 
       if (Is.not.null(episodeTitle)) {
 
-        Log.trace(`Episode.getEpisodeByNumber(series, ${seasonNumber}, ${episodeNumber})`)
-        Log.trace(error)
+        // Log.trace(`Episode.getEpisodeByNumber(series, ${seasonNumber}, ${episodeNumber})`)
+        // Log.trace(error)
   
+        // try {
         episode = await this.getEpisodeByTitle(series, episodeTitle)
+        // }
+        // catch (error) {
+
+        //   Log.trace(`Episode.getEpisodeByTitle(series, '${episodeTitle}')`)
+        //   Log.trace(error)
+    
+        //   throw error
+
+        // }
   
       }
       else {
@@ -154,23 +164,24 @@ Episode.getEpisode = async function (id, seriesTitle, yearReleased, dateAired, s
 
   }
 
-  if (Is.not.null(episode)) {
+  // if (Is.not.null(episode)) {
 
-    return {
-      'seriesTitle': series.seriesTitle,
-      'seasonNumber': episode.seasonNumber,
-      'episodeNumber': episode.episodeNumber,
-      'episodeTitle': episode.episodeTitle
-    }
+  return {
+    'seriesTitle': series.seriesTitle,
+    'seasonNumber': episode.seasonNumber,
+    'episodeNumber': episode.episodeNumber,
+    'episodeTitle': episode.episodeTitle
+  }
 
-  }
-  else {
-    throw new EpisodeNotFoundError(series)
-  }
+  // }
+  // else {
+  //   throw new EpisodeNotFoundError(series)
+  // }
 
 }
 
 Episode.getSeriesById = async function (id) {
+  Log.trace(`Episode.getSeriesById(${id})`)
 
   let options = {}
   let data = null
@@ -207,6 +218,7 @@ Episode.getSeriesById = async function (id) {
 }
 
 Episode.getSeriesByName = async function (title, yearReleased) {
+  Log.trace(`Episode.getSeriesByName('${title}', ${yearReleased})`)
 
   let options = {}
   let data = null
@@ -258,11 +270,18 @@ Episode.getSeriesByName = async function (title, yearReleased) {
 
         return {
           'id': series.id,
-          'seriesTitle': series.seriesName
+          'seriesTitle': series.seriesName,
+          'score': Score.compareTwoStrings(series.seriesName.toLowerCase(), title.toLowerCase())
         }
 
       })
-      .shift()
+      .map((series) => {
+        Log.debug(`Found series ${series.id} '${series.seriesTitle}' score ${Configuration.conversion.toScore(series.score)}` )
+        return series
+      })
+      .reduce((accumulator, series) => {
+        return Is.null(accumulator) ? series : (accumulator.score > series.score ? accumulator : series)
+      }, null)
 
     return series
 
@@ -274,6 +293,7 @@ Episode.getSeriesByName = async function (title, yearReleased) {
 }
 
 Episode.getEpisodeByDateAired = async function (series, dateAired) {
+  Log.trace(`Episode.getEpisodeByDateAired(${series.id}, '${dateAired.toFormat(Configuration.format.date)}')`)
 
   let options = {
     'query': {
@@ -301,7 +321,7 @@ Episode.getEpisodeByDateAired = async function (series, dateAired) {
         return {
           'seasonNumber': episode.airedSeason,
           'episodeNumber': episode.airedEpisodeNumber,
-          'episodeTitle': episode.episodeName
+          'episodeTitle': episode.episodeName || `Episode ${episode.airedEpisodeNumber}`
         }
 
       })
@@ -315,6 +335,7 @@ Episode.getEpisodeByDateAired = async function (series, dateAired) {
 }
 
 Episode.getEpisodeByNumber = async function (series, seasonNumber, episodeNumber) {
+  Log.trace(`Episode.getEpisodeByNumber(${series.id}, ${seasonNumber}, ${episodeNumber})`)
 
   let options = {
     'query': {
@@ -343,7 +364,7 @@ Episode.getEpisodeByNumber = async function (series, seasonNumber, episodeNumber
         return {
           'seasonNumber': episode.airedSeason,
           'episodeNumber': episode.airedEpisodeNumber,
-          'episodeTitle': episode.episodeName
+          'episodeTitle': episode.episodeName || `Episode ${episode.airedEpisodeNumber}`
         }
 
       })
@@ -357,6 +378,7 @@ Episode.getEpisodeByNumber = async function (series, seasonNumber, episodeNumber
 }
 
 Episode.getEpisodeByTitle = async function (series, episodeTitle) {
+  Log.trace(`Episode.getEpisodeByTitle(${series.id}, '${episodeTitle}')`)
 
   let options = {}
   let data = null
@@ -379,10 +401,14 @@ Episode.getEpisodeByTitle = async function (series, episodeTitle) {
         return {
           'seasonNumber': episode.airedSeason,
           'episodeNumber': episode.airedEpisodeNumber,
-          'episodeTitle': episode.episodeName,
-          'score': Score.compareTwoStrings(episode.episodeName.toLowerCase(), episodeTitle.toLowerCase())
+          'episodeTitle': episode.episodeName || `Episode ${episode.airedEpisodeNumber}`,
+          'score': Is.null(episode.episodeName) ? 0 : Score.compareTwoStrings(episode.episodeName.toLowerCase(), episodeTitle.toLowerCase())
         }
 
+      })
+      .map((episode) => {
+        Log.debug(`Found episode ${episode.seasonNumber}x${episode.episodeNumber.toString().padStart(2, '0')} '${episode.episodeTitle}' score ${Configuration.conversion.toScore(episode.score)}` )
+        return episode
       })
       .reduce((accumulator, episode) => {
         return Is.null(accumulator) ? episode : (accumulator.score > episode.score ? accumulator : episode)

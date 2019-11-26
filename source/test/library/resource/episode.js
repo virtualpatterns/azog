@@ -38,8 +38,20 @@ describe('episode', () => {
         'toPath': Path.join(Configuration.path.processed.episode, 'How It\'s Made', 'Season 29', 'How It\'s Made - 29x01 - Skateboard Wheels; Baklava & Galaktoboureko; CO2 Scrubbers; Honeycomb Candles.mp4')
       },
       {
-        'fromPath': 'The.Crown.S03E01.720p.NF.WEBRip.x264-GalaxyTV.id-305574.mkv',
+        'fromPath': 'The.Crown.S03E01.720p.NF.WEBRip.x264-GalaxyTV.mkv', // .id-305574
         'toPath': Path.join(Configuration.path.processed.episode, 'The Crown', 'Season 3', 'The Crown - 3x01 - Olding.mp4')
+      },
+      {
+        'fromPath': 'bobs.burgers.s10e08.1080p.web.x264-xlf.mkv',
+        'toPath': Path.join(Configuration.path.processed.episode, 'Bob\'s Burgers', 'Season 10', 'Bob\'s Burgers - 10x08 - Now We\'re Not Cooking With Gas.mp4')
+      },
+      {
+        'fromPath': 'watchmen.s01e06.1080p.web.h264-convoy.mkv', // .id-360733
+        'toPath': Path.join(Configuration.path.processed.episode, 'Watchmen', 'Season 1', 'Watchmen - 1x06 - This Extraordinary Being.mp4')
+      },
+      {
+        'fromPath': 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv].mp4',
+        'toPath': Path.join(Configuration.path.processed.episode, 'Leah Remini Scientology and the Aftermath', 'Season 3', 'Leah Remini Scientology and the Aftermath - 3x01 - The Jehovah\'s Witnesses.mp4')
       }
     ].forEach((test) => {
 
