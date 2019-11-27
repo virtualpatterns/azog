@@ -275,13 +275,12 @@ Episode.getSeriesByName = async function (title, yearReleased) {
         }
 
       })
+      .sort((seriesA, seriesB) => seriesA.score < seriesB.score ? 1 : (seriesA.score > seriesB.score ? -1 :0))
       .map((series) => {
-        Log.debug(`Found series ${series.id} '${series.seriesTitle}' score ${Configuration.conversion.toScore(series.score)}` )
+        Log.debug(`Score ${Configuration.conversion.toScore(series.score)} for series ${series.id} '${series.seriesTitle}'` )
         return series
       })
-      .reduce((accumulator, series) => {
-        return Is.null(accumulator) ? series : (accumulator.score > series.score ? accumulator : series)
-      }, null)
+      .shift()
 
     return series
 
@@ -406,13 +405,12 @@ Episode.getEpisodeByTitle = async function (series, episodeTitle) {
         }
 
       })
+      .sort((episodeA, episodeB) => episodeA.score < episodeB.score ? 1 : (episodeA.score > episodeB.score ? -1 :0))
       .map((episode) => {
-        Log.debug(`Found episode ${episode.seasonNumber}x${episode.episodeNumber.toString().padStart(2, '0')} '${episode.episodeTitle}' score ${Configuration.conversion.toScore(episode.score)}` )
+        Log.debug(`Score ${Configuration.conversion.toScore(episode.score)} for episode ${episode.seasonNumber}x${episode.episodeNumber.toString().padStart(2, '0')} '${episode.episodeTitle}'` )
         return episode
       })
-      .reduce((accumulator, episode) => {
-        return Is.null(accumulator) ? episode : (accumulator.score > episode.score ? accumulator : episode)
-      }, null)
+      .shift()
 
     delete episode.score
     return episode

@@ -51,7 +51,7 @@ describe('episode', () => {
       },
       {
         'fromPath': 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv].mp4',
-        'toPath': Path.join(Configuration.path.processed.episode, 'Leah Remini Scientology and the Aftermath', 'Season 3', 'Leah Remini Scientology and the Aftermath - 3x01 - The Jehovah\'s Witnesses.mp4')
+        'toPath': Path.join(Configuration.path.processed.episode, 'Leah Remini Scientology and the Aftermath', 'Season 0', 'Leah Remini Scientology and the Aftermath - 0x15 - The Jehovah\'s Witnesses.mp4')
       }
     ].forEach((test) => {
 

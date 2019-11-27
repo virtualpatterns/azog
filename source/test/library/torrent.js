@@ -75,8 +75,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedBookPath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedBookPath)).size, 1)
         })
       
         it('should not create a record', async () => {
@@ -120,11 +120,11 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedSongPath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedSongPath)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
@@ -153,8 +153,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(failedSongPath, FileSystem.F_OK)
+        it('should create an empty file', async () => {
+          Assert.equal((await FileSystem.stat(failedSongPath)).size, 0)
         })
       
         after(() => {
@@ -190,11 +190,11 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedMoviePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedMoviePath)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
@@ -226,8 +226,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedMoviePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedMoviePath)).size, 1)
         })
       
         after(() => {
@@ -263,11 +263,11 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedMoviePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedMoviePath)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
@@ -296,8 +296,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(failedMoviePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(failedMoviePath)).size, 1)
         })
       
         after(() => {
@@ -322,8 +322,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(failedMoviePath, FileSystem.F_OK)
+        it('should create an empty file', async () => {
+          Assert.equal((await FileSystem.stat(failedMoviePath)).size, 0)
         })
       
         after(() => {
@@ -359,8 +359,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedMoviePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedMoviePath)).size, 1)
         })
       
         it('should not create a record', async () => {
@@ -425,10 +425,10 @@ describe('torrent', () => {
           await FileSystem.touch(processedEpisodePath2)
    
           resourceFromName3 = 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv]'
-          resourceToName3 = 'Leah Remini Scientology and the Aftermath - 3x01 - The Jehovah\'s Witnesses'
+          resourceToName3 = 'Leah Remini Scientology and the Aftermath - 0x15 - The Jehovah\'s Witnesses'
 
           processedSeriesPath3 = Path.join(Configuration.path.processed.episode, 'Leah Remini Scientology and the Aftermath')
-          processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 3')
+          processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
           processedEpisodePath3 = Path.join(processedSeasonPath3, `${resourceToName3}.mp4`)
   
           await FileSystem.mkdir(Path.dirname(processedEpisodePath3), { 'recursive': true })
@@ -438,27 +438,27 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedEpisodePath1, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedEpisodePath1)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName1, resourceToName1))
         })
       
-        it('should create the correct file', () => {
-          return FileSystem.access(processedEpisodePath2, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedEpisodePath2)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName2, resourceToName2))
         })
       
-        it('should create the correct file', () => {
-          return FileSystem.access(processedEpisodePath3, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedEpisodePath3)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName3, resourceToName3))
         })
       
@@ -500,8 +500,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedEpisodePath)).size, 1)
         })
       
         it('should not create a record', async () => {
@@ -541,8 +541,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedEpisodePath)).size, 1)
         })
       
         it('should not create a record', async () => {
@@ -586,11 +586,11 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedEpisodePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedEpisodePath)).size, 1)
         })
       
-        it('should create the correct record', async () => {
+        it('should create a record', async () => {
           Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
         })
       
@@ -630,8 +630,8 @@ describe('torrent', () => {
   
         })
   
-        it('should create the correct file', () => {
-          return FileSystem.access(processedArchivePath, FileSystem.F_OK)
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedArchivePath)).size, 1)
         })
       
         it('should not create a record', async () => {
