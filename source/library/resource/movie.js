@@ -150,7 +150,7 @@ Movie.getMovie = async function (title, yearReleased) {
 
     let movie = data.results
       .map((_movie) => { 
-
+        
         let _title = _movie.title
         let _yearReleased = DateTime.fromISO(_movie.release_date).year
 
@@ -170,9 +170,12 @@ Movie.getMovie = async function (title, yearReleased) {
         }
 
       })
-      .reduce((accumulator, _movie) => {
-        return Is.null(accumulator) ? _movie : (accumulator.score > _movie.score ? accumulator : _movie)
-      }, null)
+      .sort((movieA, movieB) => movieA.score < movieB.score ? 1 : (movieA.score > movieB.score ? -1 :0))
+      .map((movie) => {
+        Log.debug(`Score ${Configuration.conversion.toScore(movie.score)} for movie '${movie.title} (${movie.yearReleased})'` )
+        return movie
+      })
+      .shift()
 
     delete movie.score
     return movie
