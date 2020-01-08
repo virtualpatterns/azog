@@ -425,7 +425,7 @@ describe('torrent', () => {
           await FileSystem.touch(processedEpisodePath2)
    
           resourceFromName3 = 'Leah.Remini.Scientology.and.the.Aftermath.S03E00.The.Jehovahs.Witnesses.WEB.h264-TBS[eztv]'
-          resourceToName3 = 'Leah Remini Scientology and the Aftermath - 0x15 - The Jehovah\'s Witnesses'
+          resourceToName3 = 'Leah Remini Scientology and the Aftermath - 0x12 - The Jehovah\'s Witnesses'
 
           processedSeriesPath3 = Path.join(Configuration.path.processed.episode, 'Leah Remini Scientology and the Aftermath')
           processedSeasonPath3 = Path.join(processedSeriesPath3, 'Season 0')
@@ -603,7 +603,7 @@ describe('torrent', () => {
     
       })
   
-      describe('(when passing an archive)', () => {
+      describe('(when passing a zip)', () => {
   
         let torrentName = null
         let torrentPath = null
@@ -611,27 +611,27 @@ describe('torrent', () => {
         let resourceFromName = null
         let resourceToName = null
   
-        let processedArchivePath = null
+        let processedZipPath = null
   
         before(async () => {
   
-          torrentName = 'Archive'
+          torrentName = 'Zip'
           torrentPath = Path.join(Configuration.path.downloaded, torrentName)
    
           resourceFromName = 'Sleeping Beauties by Stephen King'
           resourceToName = resourceFromName
     
-          processedArchivePath = Path.join(Configuration.path.processed.other, `${resourceToName}.zip`)
+          processedZipPath = Path.join(Configuration.path.processed.other, `${resourceToName}.epub`)
   
-          await FileSystem.mkdir(Path.dirname(processedArchivePath), { 'recursive': true })
-          await FileSystem.touch(processedArchivePath)
+          await FileSystem.mkdir(Path.dirname(processedZipPath), { 'recursive': true })
+          await FileSystem.touch(processedZipPath)
   
           await Torrent.createTorrent(torrentPath, userConnection).process()
   
         })
   
         it('should create a non-empty file', async () => {
-          Assert.isAtLeast((await FileSystem.stat(processedArchivePath)).size, 1)
+          Assert.isAtLeast((await FileSystem.stat(processedZipPath)).size, 1)
         })
       
         it('should not create a record', async () => {

@@ -37,7 +37,8 @@ const Configuration = Object.create({
     'book': [ '.epub', '.mobi', '.pdf' ],
     'music': [ '.flac', '.m4a', '.mp3' ],
     'video': [ '.avi', '.m4v', '.mkv', '.mov', '.mp4' ],
-    'other': [ '.rar', '.zip' ]      
+    'zip': [ '.zip' ],
+    'other': [ '.rar' ]      
   },
   'format': {
     'date': 'yyyy-LL-dd',

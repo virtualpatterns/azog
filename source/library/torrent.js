@@ -9,6 +9,7 @@ import Book from './resource/book'
 import Music from './resource/music'
 import Movie from './resource/movie'
 import Episode from './resource/episode'
+import Zip from './resource/zip'
 import Other from './resource/other'
 
 // import Library from './library'
@@ -163,6 +164,7 @@ Torrent.isTorrent = function (torrent) {
 
 // }
 
+Zip.registerResourceClass()
 Book.registerResourceClass()
 Music.registerResourceClass()
 Movie.registerResourceClass()

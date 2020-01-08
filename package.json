@@ -33,7 +33,7 @@
     "uninitializeDatabase": "node distributable/index.js --logLevel debug --logPath console uninitialize",
     "dump": "dropdb --echo --if-exists azog && createdb --echo azog && pg_dump --host=RONAN.local --dbname=azog | psql --dbname=azog"
   },
-  "version": "0.0.45",
+  "version": "0.0.46-27",
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
@@ -49,6 +49,7 @@
     "@babel/polyfill": "^7.7.0",
     "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung": "0.0.26",
+    "adm-zip": "^0.4.13",
     "commander": "^4.0.1",
     "deepmerge": "^4.2.2",
     "fluent-ffmpeg": "^2.1.2",
