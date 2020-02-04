@@ -94,43 +94,69 @@ describe('torrent', () => {
         let torrentName = null
         let torrentPath = null
   
-        let resourceFromName = null
-        let resourceToName = null
+        let resourceFromName1 = null
+        let resourceToName1 = null
   
-        let processedArtistPath = null
-        let processedAlbumPath = null
-        let processedSongPath = null
+        let processedArtistPath1 = null
+        let processedAlbumPath1 = null
+        let processedSongPath1 = null
+  
+        let resourceFromName2 = null
+        let resourceToName2 = null
+  
+        let processedArtistPath2 = null
+        let processedAlbumPath2 = null
+        let processedSongPath2 = null
   
         before(async () => {
   
           torrentName = 'Music'
           torrentPath = Path.join(Configuration.path.downloaded, torrentName)
   
-          resourceFromName = '26 - Bold as Love'
-          resourceToName = '26 Bold as Love'
+          resourceFromName1 = '26 - Bold as Love'
+          resourceToName1 = '26 Bold as Love'
     
-          processedArtistPath = Path.join(Configuration.path.processed.music, 'The Jimi Hendrix Experience')
-          processedAlbumPath = Path.join(processedArtistPath, 'Axis Bold as Love')
-          processedSongPath = Path.join(processedAlbumPath, `${resourceToName}.mp3`)
+          processedArtistPath1 = Path.join(Configuration.path.processed.music, 'The Jimi Hendrix Experience')
+          processedAlbumPath1 = Path.join(processedArtistPath1, 'Axis Bold as Love')
+          processedSongPath1 = Path.join(processedAlbumPath1, `${resourceToName1}.mp3`)
   
-          await FileSystem.mkdir(Path.dirname(processedSongPath), { 'recursive': true })
-          await FileSystem.touch(processedSongPath)
+          await FileSystem.mkdir(Path.dirname(processedSongPath1), { 'recursive': true })
+          await FileSystem.touch(processedSongPath1)
+  
+          resourceFromName2 = '26 - Bold as Love'
+          resourceToName2 = '01 World In My Eyes'
+    
+          processedArtistPath2 = Path.join(Configuration.path.processed.music, 'Depeche Mode')
+          processedAlbumPath2 = Path.join(processedArtistPath2, 'Violator')
+          processedSongPath2 = Path.join(processedAlbumPath2, `${resourceToName2}.mp3`)
+  
+          await FileSystem.mkdir(Path.dirname(processedSongPath2), { 'recursive': true })
+          await FileSystem.touch(processedSongPath2)
   
           await Torrent.createTorrent(torrentPath, userConnection).process()
   
         })
   
         it('should create a non-empty file', async () => {
-          Assert.isAtLeast((await FileSystem.stat(processedSongPath)).size, 1)
+          Assert.isAtLeast((await FileSystem.stat(processedSongPath1)).size, 1)
         })
       
         it('should create a record', async () => {
-          Assert.isTrue(await userConnection.existsResource(resourceFromName, resourceToName))
+          Assert.isTrue(await userConnection.existsResource(resourceFromName1, resourceToName1))
+        })
+      
+        it('should create a non-empty file', async () => {
+          Assert.isAtLeast((await FileSystem.stat(processedSongPath2)).size, 1)
+        })
+      
+        it('should create a record', async () => {
+          Assert.isTrue(await userConnection.existsResource(resourceFromName2, resourceToName2))
         })
       
         after(() => {
           return Promise.all([
-            userConnection.deleteResource(resourceFromName, resourceToName),
+            userConnection.deleteResource(resourceFromName1, resourceToName1),
+            userConnection.deleteResource(resourceFromName2, resourceToName2),
             FileSystem.remove(Configuration.path.processed.music)
           ])
         })

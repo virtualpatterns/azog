@@ -50,12 +50,14 @@ resourcePrototype.track = function (fromName, toName) {
 
 const Resource = Object.create({})
 
+Resource.nextIndex = 0
 Resource.resourceClasses = []
 
 Resource.createResource = function (path, connection, prototype = resourcePrototype) {
 
   let resource = Object.create(prototype)
 
+  resource.index = ++ Resource.nextIndex
   resource.path = path
   resource.connection = connection
 

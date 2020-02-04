@@ -24,7 +24,7 @@ mediaPrototype.convertTo = async function (path, fn) {
   let toExtension = Path.extname(toPath)
   let toName = Path.basename(toPath, toExtension)
   
-  let intermediatePath = Path.join(Configuration.path.processing, `${fromName}${toExtension}`)
+  let intermediatePath = Path.join(Configuration.path.processing, `${this.index}`, `${fromName}${toExtension}`)
 
   Log.debug(`Converting to '${Path.basename(intermediatePath)}' ...`)
 
@@ -37,6 +37,9 @@ mediaPrototype.convertTo = async function (path, fn) {
 
   Log.trace(`FileSystem.move(intermediatePath, '${Path.basename(toPath)}', { 'overwrite': true })`)
   await FileSystem.move(intermediatePath, toPath, { 'overwrite': true })
+
+  Log.trace('FileSystem.remove(intermediatePath)')
+  await FileSystem.remove(Path.dirname(intermediatePath))
 
   await this.track(fromName, toName)
 
