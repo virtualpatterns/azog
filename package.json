@@ -41,7 +41,7 @@
     "chai": "^4.2.0",
     "eslint": "^6.6.0",
     "jake": "^10.3.1",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "npm-check-updates": "^3.2.1",
     "shelljs": "^0.8.3"
   },
