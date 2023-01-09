@@ -53,7 +53,7 @@
     "commander": "^4.0.1",
     "deepmerge": "^4.2.2",
     "fluent-ffmpeg": "^2.1.2",
-    "luxon": "^1.21.2",
+    "luxon": "^2.5.2",
     "moviedb": "^0.2.10",
     "music-metadata": "^5.0.1",
     "node-tvdb": "^4.1.0",
